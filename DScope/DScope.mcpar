@@ -1,0 +1,72 @@
+[DEVICE]
+Name=STM32F103VB
+Clock=72000000
+[MEMORY_MODEL]
+Value=-1
+[BUILD_TYPE]
+Value=1
+[ACTIVE_TAB]
+Value=source\main.c
+[USE_EEPROM]
+Value=0
+[USE_HEAP]
+Value=0
+[HEAP_SIZE]
+Value=2000
+[EEPROM_DEFINITION]
+Value=
+[FILES]
+Count=3
+File0=source\main.c
+File1=source\HW_V1_Config.c
+File2=source\Lcd.c
+[BINARIES]
+Count=0
+[IMAGES]
+Count=0
+ActiveImageIndex=-1
+[OPENED_FILES]
+Count=6
+File0=C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for ARM\defs\STM32F103VB.c
+File1=source\main.c
+File2=source\HW_V1_Config.c
+File3=source\Lcd.c
+File4=include\HW_V1_Config.h
+File5=include\Lcd.h
+[EEPROM]
+Count=0
+[ACTIVE_COMMENTS_FILES]
+Count=0
+[OTHER_FILES]
+Count=0
+[SEARCH_PATH]
+Count=5
+Path0=C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for ARM\defs\
+Path1=Z:\Robs Folder\DScope\
+Path2=C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for ARM\Uses\ST M3\
+Path3=Z:\Robs Folder\DScope\source\
+Path4=Z:\Robs Folder\DScope\include\
+[HEADER_PATH]
+Count=2
+Path0=Z:\Robs Folder\DScope\
+Path1=Z:\Robs Folder\DScope\include\
+[HEADERS]
+Count=4
+File0=include\hw_config.h
+File1=include\HW_V1_Config.h
+File2=include\Lcd.h
+File3=include\Function.h
+[PLDS]
+Count=0
+[Useses]
+Count=1
+File0=UART
+[EXPANDED NODES]
+Node1=Sources
+Node2=Header Files
+Node3=Output Files
+Count=3
+[PROGRAMMER_OPTIONS]
+Value=SWD
+[PROGRAMMER_TYPE]
+Value=mE

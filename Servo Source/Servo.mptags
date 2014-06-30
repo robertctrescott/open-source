@@ -1,0 +1,355 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.4	//
+ABS	Z:\Robs Folder\Servo Source\main.c	77;"	d	line:77	file:
+ADC_CLOCK_DIV_16	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	297;"	d	line:297
+ADC_CLOCK_DIV_2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	294;"	d	line:294
+ADC_CLOCK_DIV_32	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	298;"	d	line:298
+ADC_CLOCK_DIV_4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	295;"	d	line:295
+ADC_CLOCK_DIV_64	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	299;"	d	line:299
+ADC_CLOCK_DIV_8	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	296;"	d	line:296
+ADC_CLOCK_INTERNAL	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	300;"	d	line:300
+ADC_CONT_A	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	321;"	d	line:321
+ADC_CONT_AB	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	328;"	d	line:328
+ADC_CONT_AB_CD	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	329;"	d	line:329
+ADC_CONT_A_B	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	326;"	d	line:326
+ADC_CONT_A_B_C_D	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	327;"	d	line:327
+ADC_CONT_B	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	322;"	d	line:322
+ADC_CONT_C	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	323;"	d	line:323
+ADC_CONT_D	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	324;"	d	line:324
+ADC_INT_EVERY_FOUR	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	340;"	d	line:340
+ADC_INT_EVERY_OTHER	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	339;"	d	line:339
+ADC_OFF	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	293;"	d	line:293
+ADC_READ_ONLY	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	364;"	d	line:364
+ADC_START_AND_READ	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	362;"	d	line:362
+ADC_START_ONLY	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	363;"	d	line:363
+ADC_TAD_MUL_0	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	303;"	d	line:303
+ADC_TAD_MUL_10	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	308;"	d	line:308
+ADC_TAD_MUL_12	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	309;"	d	line:309
+ADC_TAD_MUL_16	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	310;"	d	line:310
+ADC_TAD_MUL_2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	304;"	d	line:304
+ADC_TAD_MUL_20	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	311;"	d	line:311
+ADC_TAD_MUL_24	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	312;"	d	line:312
+ADC_TAD_MUL_28	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	313;"	d	line:313
+ADC_TAD_MUL_32	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	314;"	d	line:314
+ADC_TAD_MUL_36	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	315;"	d	line:315
+ADC_TAD_MUL_4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	305;"	d	line:305
+ADC_TAD_MUL_40	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	316;"	d	line:316
+ADC_TAD_MUL_48	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	317;"	d	line:317
+ADC_TAD_MUL_6	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	306;"	d	line:306
+ADC_TAD_MUL_64	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	318;"	d	line:318
+ADC_TAD_MUL_8	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	307;"	d	line:307
+ADC_WHEN_CCP2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	335;"	d	line:335
+ADC_WHEN_IC1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	334;"	d	line:334
+ADC_WHEN_INT0	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	332;"	d	line:332
+ADC_WHEN_PPWM	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	336;"	d	line:336
+ADC_WHEN_TIMER5	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	333;"	d	line:333
+ALL_ANALOG	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	352;"	d	line:352
+BOOLEAN	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	59;"	d	line:59
+BROWNOUT_RESTART	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	77;"	d	line:77
+BYTE	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	58;"	d	line:58
+Byte	Z:\Robs Folder\Servo Source\main.c	138;"	m	line:138	file:
+CCP_1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	179;"	v	line:179
+CCP_2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	183;"	v	line:183
+CCP_CAPTURE_DIV_16	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	168;"	d	line:168
+CCP_CAPTURE_DIV_4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	167;"	d	line:167
+CCP_CAPTURE_FE	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	165;"	d	line:165
+CCP_CAPTURE_RE	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	166;"	d	line:166
+CCP_COMPARE_CLR_ON_MATCH	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	170;"	d	line:170
+CCP_COMPARE_INT	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	171;"	d	line:171
+CCP_COMPARE_INT_AND_TOGGLE	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	172;"	d	line:172
+CCP_COMPARE_RESET_TIMER	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	173;"	d	line:173
+CCP_COMPARE_SET_ON_MATCH	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	169;"	d	line:169
+CCP_OFF	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	164;"	d	line:164
+CCP_PWM	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	174;"	d	line:174
+CCP_PWM_PLUS_1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	175;"	d	line:175
+CCP_PWM_PLUS_2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	176;"	d	line:176
+CCP_PWM_PLUS_3	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	177;"	d	line:177
+CCP_USE_TIMER3	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	178;"	d	line:178
+Encoder	Z:\Robs Folder\Servo Source\main.c	203;"	f	line:203	signature:(char state)
+FALSE	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	55;"	d	line:55
+FLAGS	Z:\Robs Folder\Servo Source\main.c	74;"	d	line:74	file:
+FORMATED	Z:\Robs Folder\Servo Source\main.c	61;"	d	line:61	file:
+FP	Z:\Robs Folder\Servo Source\main.c	141;"	m	line:141	file:
+FWD_DIR	Z:\Robs Folder\Servo Source\main.c	63;"	d	line:63	file:
+GLOBAL	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	379;"	d	line:379
+H_TO_L	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	377;"	d	line:377
+INDEX_PIN	Z:\Robs Folder\Servo Source\main.c	66;"	d	line:66	file:
+INT_AD	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	388;"	d	line:388
+INT_CCP1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	392;"	d	line:392
+INT_CCP2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	393;"	d	line:393
+INT_EEPROM	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	395;"	d	line:395
+INT_EXT	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	384;"	d	line:384
+INT_EXT1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	385;"	d	line:385
+INT_EXT2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	386;"	d	line:386
+INT_IC1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	400;"	d	line:400
+INT_IC2QEI	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	399;"	d	line:399
+INT_IC3DR	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	398;"	d	line:398
+INT_LOWVOLT	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	394;"	d	line:394
+INT_MAX	Z:\Robs Folder\Servo Source\main.c	60;"	d	line:60	file:
+INT_OSCF	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	396;"	d	line:396
+INT_PWMTB	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	397;"	d	line:397
+INT_RB	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	387;"	d	line:387
+INT_RDA	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	389;"	d	line:389
+INT_RTCC	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	380;"	d	line:380
+INT_SSP	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	391;"	d	line:391
+INT_TBE	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	390;"	d	line:390
+INT_TIMER0	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	381;"	d	line:381
+INT_TIMER1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	382;"	d	line:382
+INT_TIMER2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	383;"	d	line:383
+INT_TIMER5	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	401;"	d	line:401
+LSB	Z:\Robs Folder\Servo Source\main.c	71;"	d	line:71	file:
+LSD	Z:\Robs Folder\Servo Source\main.c	69;"	d	line:69	file:
+LVD_21	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	229;"	d	line:229
+LVD_23	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	228;"	d	line:228
+LVD_24	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	227;"	d	line:227
+LVD_26	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	226;"	d	line:226
+LVD_27	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	225;"	d	line:225
+LVD_28	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	224;"	d	line:224
+LVD_31	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	223;"	d	line:223
+LVD_33	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	222;"	d	line:222
+LVD_34	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	221;"	d	line:221
+LVD_36	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	220;"	d	line:220
+LVD_38	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	219;"	d	line:219
+LVD_39	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	218;"	d	line:218
+LVD_42	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	217;"	d	line:217
+LVD_LVDIN	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	216;"	d	line:216
+L_TO_H	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	376;"	d	line:376
+MCLR_FROM_RUN	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	75;"	d	line:75
+MCLR_FROM_SLEEP	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	74;"	d	line:74
+MSB	Z:\Robs Folder\Servo Source\main.c	70;"	d	line:70	file:
+MSD	Z:\Robs Folder\Servo Source\main.c	68;"	d	line:68	file:
+NORMAL_POWER_UP	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	76;"	d	line:76
+NO_ANALOGS	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	351;"	d	line:351
+OSC_125KHZ	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	235;"	d	line:235
+OSC_1MHZ	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	238;"	d	line:238
+OSC_250KHZ	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	236;"	d	line:236
+OSC_2MHZ	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	239;"	d	line:239
+OSC_31KHZ	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	234;"	d	line:234
+OSC_4MHZ	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	240;"	d	line:240
+OSC_500KHZ	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	237;"	d	line:237
+OSC_8MHZ	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	241;"	d	line:241
+OSC_IDLE_MODE	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	247;"	d	line:247
+OSC_INTRC	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	244;"	d	line:244
+OSC_NORMAL	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	245;"	d	line:245
+OSC_STATE_EXT_RUNNING	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	252;"	d	line:252
+OSC_STATE_STABLE	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	251;"	d	line:251
+OSC_TIMER1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	243;"	d	line:243
+PIN_A0	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	25;"	d	line:25
+PIN_A1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	26;"	d	line:26
+PIN_A2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	27;"	d	line:27
+PIN_A3	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	28;"	d	line:28
+PIN_A4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	29;"	d	line:29
+PIN_A5	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	30;"	d	line:30
+PIN_A6	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	31;"	d	line:31
+PIN_A7	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	32;"	d	line:32
+PIN_B0	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	34;"	d	line:34
+PIN_B1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	35;"	d	line:35
+PIN_B2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	36;"	d	line:36
+PIN_B3	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	37;"	d	line:37
+PIN_B4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	38;"	d	line:38
+PIN_B5	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	39;"	d	line:39
+PIN_B6	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	40;"	d	line:40
+PIN_B7	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	41;"	d	line:41
+PIN_C0	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	43;"	d	line:43
+PIN_C1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	44;"	d	line:44
+PIN_C2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	45;"	d	line:45
+PIN_C3	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	46;"	d	line:46
+PIN_C4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	47;"	d	line:47
+PIN_C5	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	48;"	d	line:48
+PIN_C6	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	49;"	d	line:49
+PIN_C7	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	50;"	d	line:50
+PIN_E3	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	52;"	d	line:52
+PWM_BOTH_ON	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	285;"	d	line:285
+PWM_CLOCK_DIV_128	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	260;"	d	line:260
+PWM_CLOCK_DIV_16	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	258;"	d	line:258
+PWM_CLOCK_DIV_4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	257;"	d	line:257
+PWM_CLOCK_DIV_64	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	259;"	d	line:259
+PWM_COMPLEMENTARY	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	286;"	d	line:286
+PWM_DEAD_CLOCK_DIV_16	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	276;"	d	line:276
+PWM_DEAD_CLOCK_DIV_2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	273;"	d	line:273
+PWM_DEAD_CLOCK_DIV_4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	274;"	d	line:274
+PWM_DEAD_CLOCK_DIV_8	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	275;"	d	line:275
+PWM_DOWN_TRIGGER	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	271;"	d	line:271
+PWM_FREE_RUN	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	263;"	d	line:263
+PWM_ODD_ON	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	284;"	d	line:284
+PWM_OFF	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	262;"	d	line:262
+PWM_OVERRIDE_SYNC	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	268;"	d	line:268
+PWM_SINGLE_SHOT	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	264;"	d	line:264
+PWM_UPDATE_DISABLE	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	279;"	d	line:279
+PWM_UPDATE_ENABLE	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	280;"	d	line:280
+PWM_UP_DOWN	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	265;"	d	line:265
+PWM_UP_DOWN_INT	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	266;"	d	line:266
+PWM_UP_TRIGGER	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	270;"	d	line:270
+RESET_INSTRUCTION	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	79;"	d	line:79
+REV_DIR	Z:\Robs Folder\Servo Source\main.c	64;"	d	line:64	file:
+RS485_RX	Z:\Robs Folder\Servo Source\main.c	39;"	d	line:39	file:
+RS485_TX	Z:\Robs Folder\Servo Source\main.c	38;"	d	line:38	file:
+RTCC_8_BIT	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	102;"	d	line:102
+RTCC_DIV_1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	90;"	d	line:90
+RTCC_DIV_128	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	97;"	d	line:97
+RTCC_DIV_16	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	94;"	d	line:94
+RTCC_DIV_2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	91;"	d	line:91
+RTCC_DIV_256	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	98;"	d	line:98
+RTCC_DIV_32	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	95;"	d	line:95
+RTCC_DIV_4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	92;"	d	line:92
+RTCC_DIV_64	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	96;"	d	line:96
+RTCC_DIV_8	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	93;"	d	line:93
+RTCC_EXT_H_TO_L	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	88;"	d	line:88
+RTCC_EXT_L_TO_H	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	87;"	d	line:87
+RTCC_INTERNAL	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	86;"	d	line:86
+RTCC_OFF	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	100;"	d	line:100
+RX_MAX	Z:\Robs Folder\Servo Source\main.c	75;"	d	line:75	file:
+SPI_CLK_DIV_16	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	195;"	d	line:195
+SPI_CLK_DIV_4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	194;"	d	line:194
+SPI_CLK_DIV_64	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	196;"	d	line:196
+SPI_CLK_T2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	197;"	d	line:197
+SPI_H_TO_L	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	193;"	d	line:193
+SPI_L_TO_H	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	192;"	d	line:192
+SPI_MASTER	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	190;"	d	line:190
+SPI_SAMPLE_AT_END	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	200;"	d	line:200
+SPI_SLAVE	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	191;"	d	line:191
+SPI_SS_DISABLED	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	198;"	d	line:198
+SPI_XMIT_L_TO_H	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	201;"	d	line:201
+STATUS	Z:\Robs Folder\Servo Source\main.c	73;"	d	line:73	file:
+STEP_DIR	Z:\Robs Folder\Servo Source\main.c	65;"	d	line:65	file:
+T1_CLK_OUT	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	125;"	d	line:125
+T1_DISABLED	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	120;"	d	line:120
+T1_DIV_BY_1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	127;"	d	line:127
+T1_DIV_BY_2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	128;"	d	line:128
+T1_DIV_BY_4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	129;"	d	line:129
+T1_DIV_BY_8	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	130;"	d	line:130
+T1_EXTERNAL	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	122;"	d	line:122
+T1_EXTERNAL_SYNC	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	123;"	d	line:123
+T1_INTERNAL	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	121;"	d	line:121
+T2_DISABLED	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	135;"	d	line:135
+T2_DIV_BY_1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	136;"	d	line:136
+T2_DIV_BY_16	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	138;"	d	line:138
+T2_DIV_BY_4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	137;"	d	line:137
+T5_DISABLED	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	144;"	d	line:144
+T5_DISABLE_SE_RESET	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	156;"	d	line:156
+T5_DIV_BY_1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	149;"	d	line:149
+T5_DIV_BY_2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	150;"	d	line:150
+T5_DIV_BY_4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	151;"	d	line:151
+T5_DIV_BY_8	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	152;"	d	line:152
+T5_ENABLE_DURING_SLEEP	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	158;"	d	line:158
+T5_EXTERNAL	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	146;"	d	line:146
+T5_EXTERNAL_SYNC	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	147;"	d	line:147
+T5_INTERNAL	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	145;"	d	line:145
+T5_ONE_SHOT	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	154;"	d	line:154
+TRUE	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	56;"	d	line:56
+UART_ADDRESS	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	207;"	d	line:207
+UART_AUTODETECT	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	209;"	d	line:209
+UART_AUTODETECT_NOWAIT	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	210;"	d	line:210
+UART_DATA	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	208;"	d	line:208
+UART_SEND_BREAK	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	212;"	d	line:212
+UART_WAKEUP_ON_RDA	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	211;"	d	line:211
+VREF_VDD	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	358;"	d	line:358
+VREF_VREF	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	356;"	d	line:356
+VSS_VDD	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	355;"	d	line:355
+VSS_VREF	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	357;"	d	line:357
+WDT_FROM_SLEEP	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	78;"	d	line:78
+WDT_OFF	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	114;"	d	line:114
+WDT_ON	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	113;"	d	line:113
+WDT_TIMEOUT	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	73;"	d	line:73
+abs_flag	Z:\Robs Folder\Servo Source\main.c	104;"	m	line:104	file:
+accel	Z:\Robs Folder\Servo Source\main.c	159;"	m	line:159	file:
+act_pos	Z:\Robs Folder\Servo Source\main.c	168;"	v	line:168
+ascii	Z:\Robs Folder\Servo Source\main.c	120;"	m	line:120	file:
+b	Z:\Robs Folder\Servo Source\main.c	133;"	m	line:133	file:
+bDirty	Z:\Robs Folder\Servo Source\main.c	198;"	v	line:198
+bEnable	Z:\Robs Folder\Servo Source\main.c	197;"	v	line:197
+bServo	Z:\Robs Folder\Servo Source\main.c	196;"	v	line:196
+boolean	Z:\Robs Folder\Servo Source\main.c	36;"	d	line:36	file:
+byte	Z:\Robs Folder\Servo Source\main.c	109;"	m	line:109	file:
+byte	Z:\Robs Folder\Servo Source\main.c	125;"	m	line:125	file:
+cmd_pos	Z:\Robs Folder\Servo Source\main.c	170;"	v	line:170
+d3	Z:\Robs Folder\Servo Source\main.c	117;"	m	line:117	file:
+d4	Z:\Robs Folder\Servo Source\main.c	116;"	m	line:116	file:
+d5	Z:\Robs Folder\Servo Source\main.c	115;"	m	line:115	file:
+dstep	Z:\Robs Folder\Servo Source\main.c	102;"	m	line:102	file:
+e_hold_mode	Z:\Robs Folder\Servo Source\main.c	80;"	e	line:80	file:
+e_pos_go_mode	Z:\Robs Folder\Servo Source\main.c	87;"	e	line:87	file:
+e_pos_mode	Z:\Robs Folder\Servo Source\main.c	86;"	e	line:86	file:
+e_save_eeprom_mode	Z:\Robs Folder\Servo Source\main.c	91;"	e	line:91	file:
+e_servo_lock_mode	Z:\Robs Folder\Servo Source\main.c	89;"	e	line:89	file:
+e_servo_reset_mode	Z:\Robs Folder\Servo Source\main.c	88;"	e	line:88	file:
+e_servo_unlock_mode	Z:\Robs Folder\Servo Source\main.c	90;"	e	line:90	file:
+e_start_pos_mode	Z:\Robs Folder\Servo Source\main.c	85;"	e	line:85	file:
+e_step_dir_mode	Z:\Robs Folder\Servo Source\main.c	81;"	e	line:81	file:
+e_step_mode	Z:\Robs Folder\Servo Source\main.c	82;"	e	line:82	file:
+e_velo_dir_mode	Z:\Robs Folder\Servo Source\main.c	83;"	e	line:83	file:
+e_velo_mode	Z:\Robs Folder\Servo Source\main.c	84;"	e	line:84	file:
+error	Z:\Robs Folder\Servo Source\main.c	97;"	m	line:97	file:
+f	Z:\Robs Folder\Servo Source\main.c	124;"	m	line:124	file:
+false	Z:\Robs Folder\Servo Source\main.c	34;"	d	line:34	file:
+fgetc	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	62;"	d	line:62
+fgets	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	66;"	d	line:66
+flags	Z:\Robs Folder\Servo Source\main.c	151;"	m	line:151	file:
+flatcount	Z:\Robs Folder\Servo Source\main.c	185;"	v	line:185
+format	Z:\Robs Folder\Servo Source\main.c	148;"	m	line:148	file:
+fposition	Z:\Robs Folder\Servo Source\main.c	184;"	v	line:184
+fputc	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	65;"	d	line:65
+fputs	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	67;"	d	line:67
+getc	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	61;"	d	line:61
+getchar	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	63;"	d	line:63
+halt_index	Z:\Robs Folder\Servo Source\main.c	100;"	m	line:100	file:
+i	Z:\Robs Folder\Servo Source\main.c	132;"	m	line:132	file:
+index	Z:\Robs Folder\Servo Source\main.c	99;"	m	line:99	file:
+integral	Z:\Robs Folder\Servo Source\main.c	178;"	v	line:178
+kd	Z:\Robs Folder\Servo Source\main.c	155;"	m	line:155	file:
+ki	Z:\Robs Folder\Servo Source\main.c	154;"	m	line:154	file:
+kp	Z:\Robs Folder\Servo Source\main.c	153;"	m	line:153	file:
+main	Z:\Robs Folder\Servo Source\main.c	227;"	f	line:227
+menu	Z:\Robs Folder\Servo Source\main.c	119;"	m	line:119	file:
+mode	Z:\Robs Folder\Servo Source\main.c	165;"	v	line:165
+move_in_prog	Z:\Robs Folder\Servo Source\main.c	101;"	m	line:101	file:
+mposition	Z:\Robs Folder\Servo Source\main.c	171;"	v	line:171
+neg_move	Z:\Robs Folder\Servo Source\main.c	114;"	m	line:114	file:
+phase	Z:\Robs Folder\Servo Source\main.c	113;"	m	line:113	file:
+phase1dist	Z:\Robs Folder\Servo Source\main.c	174;"	v	line:174
+pid_lock	Z:\Robs Folder\Servo Source\main.c	103;"	m	line:103	file:
+pos_com	Z:\Robs Folder\Servo Source\main.c	167;"	v	line:167
+prev_count	Z:\Robs Folder\Servo Source\main.c	182;"	v	line:182
+prev_t1count	Z:\Robs Folder\Servo Source\main.c	188;"	v	line:188
+prev_t5count	Z:\Robs Folder\Servo Source\main.c	189;"	v	line:189
+putc	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	64;"	d	line:64
+rx_count	Z:\Robs Folder\Servo Source\main.c	193;"	v	line:193
+rx_timer	Z:\Robs Folder\Servo Source\main.c	192;"	v	line:192
+rx_tx	Z:\Robs Folder\Servo Source\main.c	194;"	v	line:194
+s	Z:\Robs Folder\Servo Source\main.c	108;"	m	line:108	file:
+sAN0	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	346;"	d	line:346
+sAN1	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	347;"	d	line:347
+sAN2	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	348;"	d	line:348
+sAN3	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	349;"	d	line:349
+sAN4	C:\Program Files\CCS_4_3\PICC\Devices\18F2431.h	350;"	d	line:350
+s_flags	Z:\Robs Folder\Servo Source\main.c	121;"	t	line:121	file:
+s_stat	Z:\Robs Folder\Servo Source\main.c	105;"	t	line:105	file:
+s_vars	Z:\Robs Folder\Servo Source\main.c	160;"	t	line:160	file:
+saturated	Z:\Robs Folder\Servo Source\main.c	98;"	m	line:98	file:
+servo_cmd	Z:\Robs Folder\Servo Source\main.c	186;"	v	line:186
+servo_update	Z:\Robs Folder\Servo Source\main.c	190;"	v	line:190
+servoisr	Z:\Robs Folder\Servo Source\main.c	265;"	f	line:265
+sl	Z:\Robs Folder\Servo Source\main.c	130;"	m	line:130	file:
+src_id	Z:\Robs Folder\Servo Source\main.c	149;"	m	line:149	file:
+status	Z:\Robs Folder\Servo Source\main.c	150;"	m	line:150	file:
+step_motor	Z:\Robs Folder\Servo Source\main.c	118;"	m	line:118	file:
+true	Z:\Robs Folder\Servo Source\main.c	35;"	d	line:35	file:
+u0	Z:\Robs Folder\Servo Source\main.c	180;"	v	line:180
+u1	Z:\Robs Folder\Servo Source\main.c	177;"	v	line:177
+u_BFP	Z:\Robs Folder\Servo Source\main.c	143;"	t	line:143	file:
+u_fix	Z:\Robs Folder\Servo Source\main.c	134;"	t	line:134	file:
+u_flags	Z:\Robs Folder\Servo Source\main.c	126;"	t	line:126	file:
+u_stat	Z:\Robs Folder\Servo Source\main.c	110;"	t	line:110	file:
+ui	Z:\Robs Folder\Servo Source\main.c	131;"	m	line:131	file:
+ul	Z:\Robs Folder\Servo Source\main.c	129;"	m	line:129	file:
+vars	Z:\Robs Folder\Servo Source\main.c	163;"	v	line:163
+velact	Z:\Robs Folder\Servo Source\main.c	172;"	v	line:172
+velcom	Z:\Robs Folder\Servo Source\main.c	156;"	m	line:156	file:
+vlim	Z:\Robs Folder\Servo Source\main.c	157;"	m	line:157	file:
+windup	Z:\Robs Folder\Servo Source\main.c	158;"	m	line:158	file:
+ypid	Z:\Robs Folder\Servo Source\main.c	173;"	v	line:173
+ypwm	Z:\Robs Folder\Servo Source\main.c	176;"	v	line:176

@@ -1,0 +1,225 @@
+CCS PCM C Compiler, Version 4.066, 42283               08-Nov-11 20:41
+
+               Filename: main.lst
+
+               ROM used: 122 words (12%)
+                         Largest free fragment is 902
+               RAM used: 8 (12%) at main() level
+                         8 (12%) worst case
+               Stack:    2 locations
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   004
+0003:  NOP
+0004:  CALL   3FF
+0005:  BSF    03.5
+0006:  MOVWF  10
+0007:  MOVLW  00
+0008:  MOVWF  0A
+0009:  GOTO   030
+.................... /* main.c 
+....................  
+.................... 	11/08/2011 by Robert Trescott Jr. 
+.................... 	(C)2011 Analogic 
+....................  
+.................... 	History: 
+.................... 		11/08/11 - original work 
+....................  
+.................... */ 
+....................  
+.................... // compiler and hardware special settings 
+.................... #case 
+....................  
+.................... #include <12F675.h> 
+.................... //////// Standard Header file for the PIC12F675 device //////////////// 
+.................... #device PIC12F675 
+.................... #list 
+....................  
+....................  
+.................... #fuses INTRC_IO,PUT,NOWDT,BROWNOUT,CPD,PROTECT 
+....................  
+.................... #use delay (clock=4000000) 
+000A:  MOVLW  27
+000B:  MOVWF  04
+000C:  MOVF   00,W
+000D:  BTFSC  03.2
+000E:  GOTO   01D
+000F:  MOVLW  01
+0010:  MOVWF  21
+0011:  CLRF   20
+0012:  DECFSZ 20,F
+0013:  GOTO   012
+0014:  DECFSZ 21,F
+0015:  GOTO   011
+0016:  MOVLW  4A
+0017:  MOVWF  20
+0018:  DECFSZ 20,F
+0019:  GOTO   018
+001A:  GOTO   01B
+001B:  DECFSZ 00,F
+001C:  GOTO   00F
+001D:  RETLW  00
+.................... #include "PIC12F629.inc" 
+.................... #list	 
+....................  
+....................  
+.................... #define	true			1 
+.................... #define	false			0 
+.................... 								// PIN	FUNCTION 
+.................... 								//	1 	Vcc 
+.................... #BIT 	UNUSED1		= GPIO.5	// 	2	not used 
+.................... #BIT 	SW_IN		= GPIO.4	// 	3	push button input to toggle between mute and unmute (active low) 
+.................... #BIT 	RESET		= GPIO.3	// 	4	not used 
+.................... #BIT 	MUTE_RLY	= GPIO.2	// 	5	active for mute 
+.................... #BIT 	MUTE_LED	= GPIO.1	// 	6	solid on for no mute, blink 2sec off 1sec on for mute 
+.................... #BIT 	UNUSED2		= GPIO.0	// 	7	not used 
+.................... 								//	8	GND 
+....................  
+.................... int1	bMute		= false; 
+*
+0049:  BCF    25.0
+.................... int1	prev_sw; 
+.................... int8	counter		= 0; 
+004A:  CLRF   26
+....................  
+....................  
+.................... void initialize() 
+.................... {	 
+.................... 	delay_ms(50); 
+*
+001E:  MOVLW  32
+001F:  MOVWF  27
+0020:  CALL   00A
+.................... 	set_tris_a(0x18);			// set io direction 
+0021:  MOVLW  18
+0022:  BSF    03.5
+0023:  MOVWF  05
+.................... 	GPIO = 0;					// keep everything low 
+0024:  BCF    03.5
+0025:  CLRF   05
+.................... 	MUTE_RLY	= true;			// but activate the relay for test 
+0026:  BSF    05.2
+.................... 	delay_ms(100);				// small delay 
+0027:  MOVLW  64
+0028:  MOVWF  27
+0029:  CALL   00A
+.................... 	MUTE_RLY	= false;		// now un mute	 
+002A:  BCF    05.2
+.................... 	MUTE_LED	= true;			// and fire up led indicator 
+002B:  BSF    05.1
+.................... 	prev_sw 	= SW_IN;		// remember switch state	 
+002C:  BCF    25.1
+002D:  BTFSC  05.4
+002E:  BSF    25.1
+.................... } 
+002F:  GOTO   04C (RETURN)
+....................  
+.................... #zero_ram 
+.................... void main() 
+.................... {	 
+0030:  MOVF   03,W
+0031:  ANDLW  1F
+0032:  MOVWF  03
+0033:  MOVLW  3F
+0034:  MOVWF  20
+0035:  MOVLW  21
+0036:  MOVWF  04
+0037:  BCF    03.7
+0038:  CLRF   00
+0039:  INCF   04,F
+003A:  DECFSZ 20,F
+003B:  GOTO   038
+003C:  CLRF   20
+003D:  CLRF   04
+003E:  MOVLW  1F
+003F:  ANDWF  03,F
+0040:  BCF    1F.6
+0041:  BSF    03.5
+0042:  BCF    1F.0
+0043:  BCF    1F.1
+0044:  BCF    1F.2
+0045:  BCF    1F.3
+0046:  MOVLW  07
+0047:  BCF    03.5
+0048:  MOVWF  19
+.................... 	initialize(); 
+*
+004B:  GOTO   01E
+.................... 		 
+.................... 	for(;;){ 
+.................... 		delay_ms(20);				// loop update timer 
+004C:  MOVLW  14
+004D:  MOVWF  27
+004E:  CALL   00A
+....................  
+.................... 		if (bMute){					// we are in active mute mode 
+004F:  BTFSS  25.0
+0050:  GOTO   066
+.................... 			MUTE_RLY = true;		// trip the mute relay 
+0051:  BSF    05.2
+.................... 			counter+=1;				// and advance the timer counter every time through the loop 
+0052:  MOVLW  01
+0053:  ADDWF  26,F
+.................... 			switch (counter){ 
+0054:  MOVF   26,W
+0055:  XORLW  01
+0056:  BTFSC  03.2
+0057:  GOTO   05F
+0058:  XORLW  33
+0059:  BTFSC  03.2
+005A:  GOTO   061
+005B:  XORLW  79
+005C:  BTFSC  03.2
+005D:  GOTO   063
+005E:  GOTO   065
+.................... 				case 1:		MUTE_LED = false; 	break;	// led off now 
+005F:  BCF    05.1
+0060:  GOTO   065
+.................... 				case 50:	MUTE_LED = true; 	break;	// led on now after 1 sec 
+0061:  BSF    05.1
+0062:  GOTO   065
+.................... 				case 75:	counter = 0;		break;	// wait on for .5 second then reset counter			 
+0063:  CLRF   26
+0064:  GOTO   065
+.................... 			} 
+.................... 			 
+.................... 		} else { 
+0065:  GOTO   069
+.................... 			MUTE_RLY = false;		// un_mute relay 
+0066:  BCF    05.2
+.................... 			MUTE_LED = true;		// solid on for un-mute 
+0067:  BSF    05.1
+.................... 			counter = 0;			// clear counter for new cycle 
+0068:  CLRF   26
+.................... 		} 
+....................  
+.................... 		if (SW_IN != prev_sw){		// we have a button state change 
+0069:  CLRF   20
+006A:  BTFSC  25.1
+006B:  BSF    20.4
+006C:  MOVF   05,W
+006D:  XORWF  20,W
+006E:  ANDLW  10
+006F:  BTFSC  03.2
+0070:  GOTO   078
+.................... 			prev_sw = SW_IN;		// remember for later 
+0071:  BCF    25.1
+0072:  BTFSC  05.4
+0073:  BSF    25.1
+.................... 			if (SW_IN == false){	// active low! the button is being pressed 
+0074:  BTFSC  05.4
+0075:  GOTO   078
+.................... 				bMute = !bMute;		// toggle mute state flag only on press, not button release 
+0076:  MOVLW  01
+0077:  XORWF  25,F
+.................... 			} 	 
+.................... 		} 
+.................... 	} 
+0078:  GOTO   04C
+.................... } 
+0079:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3064   NOWDT CPD PROTECT MCLR PUT INTRC_IO BROWNOUT BANDGAP_HIGH

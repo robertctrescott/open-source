@@ -1,0 +1,497 @@
+_SCSI_Inquiry_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,47 :: 		void SCSI_Inquiry_Cmd(void)
+_SCSI_Inquiry_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,52 :: 		if (CBW.CB[1] & 0x01)/*Evpd is set*/
+	R0 <4> <- addr(_CBW+16)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	R0 <1> <-  R0 & 1   (midx: 0)
+	if (!R0) then goto 0   (midx: 0)
+//usb_scsi.c,54 :: 		Inquiry_Data = Page00_Inquiry_Data;
+   (midx: 0)
+	R0 <4> <- #_Page00_Inquiry_Data   (midx: 0)
+//usb_scsi.c,55 :: 		Inquiry_Data_Length = 5;
+   (midx: 0)
+	R1 <1> <- 5   (midx: 0)
+//usb_scsi.c,56 :: 		}
+   (midx: 0)
+   (midx: 0)
+	R1 <1> <- PUSH(R1)   (midx: 254)
+	R1 <4> <- R0   (midx: 0)
+	R0 <1> <- POP   (midx: 254)
+	goto	1   (midx: 0)
+0:   (midx: 0)
+//usb_scsi.c,59 :: 		Inquiry_Data = Standard_Inquiry_Data;
+   (midx: 0)
+	R1 <4> <- #_Standard_Inquiry_Data   (midx: 0)
+//usb_scsi.c,60 :: 		if (CBW.CB[4] <= STANDARD_INQUIRY_DATA_LEN)
+	R0 <4> <- addr(_CBW+19)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 > 36) then goto 2   (midx: 0)
+//usb_scsi.c,61 :: 		Inquiry_Data_Length = CBW.CB[4];
+	R0 <4> <- addr(_CBW+19)   (midx: 0)
+   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+	goto	3   (midx: 0)
+2:   (midx: 0)
+//usb_scsi.c,63 :: 		Inquiry_Data_Length = STANDARD_INQUIRY_DATA_LEN;
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- 36   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+3:   (midx: 0)
+//usb_scsi.c,64 :: 		}
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R1 <4> <- R1   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+1:   (midx: 0)
+//usb_scsi.c,65 :: 		Transfer_Data_Request(Inquiry_Data, Inquiry_Data_Length);
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R1 <4> <- PUSH(R1)   (midx: 255)
+	R1 <1> <- R0   (midx: 0)
+   (midx: 0)
+	R0 <4> <- POP   (midx: 255)
+	CALL _Transfer_Data_Request   (midx: 0)
+  end
+   (midx: 0)
+_SCSI_ReadFormatCapacity_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,75 :: 		void SCSI_ReadFormatCapacity_Cmd(void)
+_SCSI_ReadFormatCapacity_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,77 :: 		ReadFormatCapacity_Data[4] = (u8)(Mass_Block_Count >> 24);
+	R2 <4> <- addr(_Mass_Block_Count)   (midx: 0)
+	R0 <4> <- [R2]   (midx: 0)
+	R0 <4> <-  R0 shr 24   (midx: 2)
+	R1 <1> <- R0   (midx: 0)
+	R0 <4> <- addr(_ReadFormatCapacity_Data+4)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,78 :: 		ReadFormatCapacity_Data[5] = (u8)(Mass_Block_Count >> 16);
+	R0 <4> <- R2   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R0 <4> <-  R0 shr 16   (midx: 2)
+	R1 <1> <- R0   (midx: 0)
+	R0 <4> <- addr(_ReadFormatCapacity_Data+5)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,79 :: 		ReadFormatCapacity_Data[6] = (u8)(Mass_Block_Count >>  8);
+	R0 <4> <- R2   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R0 <4> <-  R0 shr 8   (midx: 2)
+	R1 <1> <- R0   (midx: 0)
+	R0 <4> <- addr(_ReadFormatCapacity_Data+6)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,80 :: 		ReadFormatCapacity_Data[7] = (u8)(Mass_Block_Count);
+	R0 <4> <- R2   (midx: 0)
+	R1 <1> <- [R0]   (midx: 0)
+	R0 <4> <- addr(_ReadFormatCapacity_Data+7)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,82 :: 		ReadFormatCapacity_Data[9] = (u8)(Mass_Block_Size >>  16);
+	R2 <4> <- addr(_Mass_Block_Size)   (midx: 0)
+	R0 <4> <- [R2]   (midx: 0)
+	R0 <4> <-  R0 shr 16   (midx: 2)
+	R1 <1> <- R0   (midx: 0)
+	R0 <4> <- addr(_ReadFormatCapacity_Data+9)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,83 :: 		ReadFormatCapacity_Data[10] = (u8)(Mass_Block_Size >>  8);
+	R0 <4> <- R2   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R0 <4> <-  R0 shr 8   (midx: 2)
+	R1 <1> <- R0   (midx: 0)
+	R0 <4> <- addr(_ReadFormatCapacity_Data+10)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,84 :: 		ReadFormatCapacity_Data[11] = (u8)(Mass_Block_Size);
+	R0 <4> <- R2   (midx: 0)
+	R1 <1> <- [R0]   (midx: 0)
+	R0 <4> <- addr(_ReadFormatCapacity_Data+11)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,85 :: 		Transfer_Data_Request(ReadFormatCapacity_Data, READ_FORMAT_CAPACITY_DATA_LEN);
+	R1 <1> <- 12   (midx: 0)
+	R0 <4> <- #_ReadFormatCapacity_Data   (midx: 0)
+	CALL _Transfer_Data_Request   (midx: 0)
+  end
+   (midx: 0)
+_SCSI_ReadCapacity10_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,95 :: 		void SCSI_ReadCapacity10_Cmd(void)
+_SCSI_ReadCapacity10_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,97 :: 		ReadCapacity10_Data[0] = (u8)(Mass_Block_Count - 1 >> 24);
+	R0 <4> <- addr(_Mass_Block_Count)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R2 <4> <-  R0 - 1   (midx: 2)
+	R0 <4> <-  R2 shr 24   (midx: 2)
+	R1 <1> <- R0   (midx: 0)
+	R0 <4> <- addr(_ReadCapacity10_Data)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,98 :: 		ReadCapacity10_Data[1] = (u8)(Mass_Block_Count - 1 >> 16);
+	R0 <4> <-  R2 shr 16   (midx: 2)
+	R1 <1> <- R0   (midx: 0)
+	R0 <4> <- addr(_ReadCapacity10_Data+1)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,99 :: 		ReadCapacity10_Data[2] = (u8)(Mass_Block_Count - 1 >>  8);
+	R0 <4> <-  R2 shr 8   (midx: 2)
+	R1 <1> <- R0   (midx: 0)
+	R0 <4> <- addr(_ReadCapacity10_Data+2)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,100 :: 		ReadCapacity10_Data[3] = (u8)(Mass_Block_Count - 1);
+	R1 <1> <- R2   (midx: 0)
+	R0 <4> <- addr(_ReadCapacity10_Data+3)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,102 :: 		ReadCapacity10_Data[4] = (u8)(Mass_Block_Size >>  24);
+	R2 <4> <- addr(_Mass_Block_Size)   (midx: 0)
+	R0 <4> <- [R2]   (midx: 0)
+	R0 <4> <-  R0 shr 24   (midx: 2)
+	R1 <1> <- R0   (midx: 0)
+	R0 <4> <- addr(_ReadCapacity10_Data+4)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,103 :: 		ReadCapacity10_Data[5] = (u8)(Mass_Block_Size >>  16);
+	R0 <4> <- R2   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R0 <4> <-  R0 shr 16   (midx: 2)
+	R1 <1> <- R0   (midx: 0)
+	R0 <4> <- addr(_ReadCapacity10_Data+5)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,104 :: 		ReadCapacity10_Data[6] = (u8)(Mass_Block_Size >>  8);
+	R0 <4> <- R2   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R0 <4> <-  R0 shr 8   (midx: 2)
+	R1 <1> <- R0   (midx: 0)
+	R0 <4> <- addr(_ReadCapacity10_Data+6)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,105 :: 		ReadCapacity10_Data[7] = (u8)(Mass_Block_Size);
+	R0 <4> <- R2   (midx: 0)
+	R1 <1> <- [R0]   (midx: 0)
+	R0 <4> <- addr(_ReadCapacity10_Data+7)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,106 :: 		Transfer_Data_Request(ReadCapacity10_Data, READ_CAPACITY10_DATA_LEN);
+	R1 <1> <- 8   (midx: 0)
+	R0 <4> <- #_ReadCapacity10_Data   (midx: 0)
+	CALL _Transfer_Data_Request   (midx: 0)
+  end
+   (midx: 0)
+_SCSI_ModeSense6_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,116 :: 		void SCSI_ModeSense6_Cmd (void)
+_SCSI_ModeSense6_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,118 :: 		Transfer_Data_Request(Mode_Sense6_data, MODE_SENSE6_DATA_LEN);
+	R1 <1> <- 4   (midx: 0)
+	R0 <4> <- #_Mode_Sense6_data   (midx: 0)
+	CALL _Transfer_Data_Request   (midx: 0)
+  end
+   (midx: 0)
+_SCSI_ModeSense10_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,128 :: 		void SCSI_ModeSense10_Cmd (void)
+_SCSI_ModeSense10_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,130 :: 		Transfer_Data_Request(Mode_Sense10_data, MODE_SENSE10_DATA_LEN);
+	R1 <1> <- 8   (midx: 0)
+	R0 <4> <- #_Mode_Sense10_data   (midx: 0)
+	CALL _Transfer_Data_Request   (midx: 0)
+  end
+   (midx: 0)
+_SCSI_RequestSense_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,140 :: 		void SCSI_RequestSense_Cmd (void)
+_SCSI_RequestSense_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,144 :: 		if (CBW.CB[4] <= REQUEST_SENSE_DATA_LEN)
+	R0 <4> <- addr(_CBW+19)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 > 18) then goto 4   (midx: 0)
+//usb_scsi.c,146 :: 		Request_Sense_data_Length = CBW.CB[4];
+	R0 <4> <- addr(_CBW+19)   (midx: 0)
+   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+//usb_scsi.c,147 :: 		}
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+	goto	5   (midx: 0)
+4:   (midx: 0)
+//usb_scsi.c,150 :: 		Request_Sense_data_Length = REQUEST_SENSE_DATA_LEN;
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- 18   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+//usb_scsi.c,151 :: 		}
+5:   (midx: 0)
+//usb_scsi.c,152 :: 		Transfer_Data_Request(Scsi_Sense_Data, Request_Sense_data_Length);
+   (midx: 0)
+   (midx: 0)
+	R1 <1> <- R0   (midx: 0)
+	R0 <4> <- #_Scsi_Sense_Data   (midx: 0)
+	CALL _Transfer_Data_Request   (midx: 0)
+  end
+   (midx: 0)
+_Set_Scsi_Sense_Data:
+  begin   (midx: 0)
+//usb_scsi.c,163 :: 		void Set_Scsi_Sense_Data(u8 Sens_Key, u8 Asc)
+_Set_Scsi_Sense_Data:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R1 <1> <- R1   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+//usb_scsi.c,165 :: 		Scsi_Sense_Data[2] = Sens_Key;
+	R2 <4> <- addr(_Scsi_Sense_Data+2)   (midx: 0)
+   (midx: 0)
+	[R2] <1> <- R0   (midx: 0)
+//usb_scsi.c,166 :: 		Scsi_Sense_Data[12] = Asc;
+	R2 <4> <- addr(_Scsi_Sense_Data+12)   (midx: 0)
+   (midx: 0)
+	[R2] <1> <- R1   (midx: 0)
+  end
+   (midx: 0)
+_SCSI_Start_Stop_Unit_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,176 :: 		void SCSI_Start_Stop_Unit_Cmd(void)
+_SCSI_Start_Stop_Unit_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,178 :: 		Set_CSW (CSW_CMD_PASSED, SEND_CSW_ENABLE);
+	R1 <1> <- 1   (midx: 0)
+	R0 <1> <- 0   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+  end
+   (midx: 0)
+_SCSI_Read10_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,188 :: 		void SCSI_Read10_Cmd(void)
+_SCSI_Read10_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,191 :: 		if (Bot_State == BOT_IDLE)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 != 0) then goto 6   (midx: 0)
+//usb_scsi.c,193 :: 		if (!(Address_Management_Test(SCSI_READ10)))/*address out of range*/
+	R0 <1> <- 40   (midx: 0)
+	CALL _Address_Management_Test   (midx: 0)
+	if (R0) then goto 7   (midx: 0)
+//usb_scsi.c,195 :: 		return;
+	return   (midx: 0)
+//usb_scsi.c,196 :: 		}
+7:   (midx: 0)
+//usb_scsi.c,198 :: 		if ((CBW.bmFlags & 0x80) != 0)
+	R0 <4> <- addr(_CBW+12)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	R0 <1> <-  R0 & 128   (midx: 0)
+	if ( R0 = 0) then goto 8   (midx: 0)
+//usb_scsi.c,200 :: 		Bot_State = BOT_DATA_IN;
+	R1 <1> <- 2   (midx: 0)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,201 :: 		Read_Memory();
+	CALL _Read_Memory   (midx: 0)
+//usb_scsi.c,202 :: 		}
+	goto	9   (midx: 0)
+8:   (midx: 0)
+//usb_scsi.c,205 :: 		Bot_Abort(BOTH_DIR);
+	R0 <1> <- 2   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_scsi.c,206 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, INVALID_FIELED_IN_COMMAND);
+	R1 <1> <- 36   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//usb_scsi.c,207 :: 		Set_CSW (CSW_CMD_FAILED, SEND_CSW_ENABLE);
+	R1 <1> <- 1   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//usb_scsi.c,208 :: 		}
+9:   (midx: 0)
+//usb_scsi.c,209 :: 		return;
+	return   (midx: 0)
+//usb_scsi.c,210 :: 		}
+6:   (midx: 0)
+//usb_scsi.c,211 :: 		else if (Bot_State == BOT_DATA_IN)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 != 2) then goto 11   (midx: 0)
+//usb_scsi.c,213 :: 		Read_Memory();
+	CALL _Read_Memory   (midx: 0)
+//usb_scsi.c,214 :: 		}
+11:   (midx: 0)
+  end
+   (midx: 0)
+_SCSI_Write10_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,224 :: 		void SCSI_Write10_Cmd(void)
+_SCSI_Write10_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,227 :: 		if (Bot_State == BOT_IDLE)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 != 0) then goto 12   (midx: 0)
+//usb_scsi.c,229 :: 		if (!(Address_Management_Test(SCSI_WRITE10)))/*address out of range*/
+	R0 <1> <- 42   (midx: 0)
+	CALL _Address_Management_Test   (midx: 0)
+	if (R0) then goto 13   (midx: 0)
+//usb_scsi.c,231 :: 		return;
+	return   (midx: 0)
+//usb_scsi.c,232 :: 		}
+13:   (midx: 0)
+//usb_scsi.c,234 :: 		if ((CBW.bmFlags & 0x80) == 0)
+	R0 <4> <- addr(_CBW+12)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	R0 <1> <-  R0 & 128   (midx: 0)
+	if ( R0 != 0) then goto 14   (midx: 0)
+//usb_scsi.c,236 :: 		Bot_State = BOT_DATA_OUT;
+	R1 <1> <- 1   (midx: 0)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_scsi.c,237 :: 		SetEPRxStatus(ENDP2, EP_RX_VALID);
+	R1 <1> <- 12288   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _SetEPRxStatus   (midx: 0)
+//usb_scsi.c,238 :: 		}
+	goto	15   (midx: 0)
+14:   (midx: 0)
+//usb_scsi.c,241 :: 		Bot_Abort(DIR_IN);
+	R0 <1> <- 0   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_scsi.c,242 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, INVALID_FIELED_IN_COMMAND);
+	R1 <1> <- 36   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//usb_scsi.c,243 :: 		Set_CSW (CSW_CMD_FAILED, SEND_CSW_DISABLE);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//usb_scsi.c,244 :: 		}
+15:   (midx: 0)
+//usb_scsi.c,245 :: 		return;
+	return   (midx: 0)
+//usb_scsi.c,246 :: 		}
+12:   (midx: 0)
+//usb_scsi.c,247 :: 		else if (Bot_State == BOT_DATA_OUT)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 != 1) then goto 17   (midx: 0)
+//usb_scsi.c,249 :: 		Write_Memory();
+	CALL _Write_Memory   (midx: 0)
+//usb_scsi.c,250 :: 		}
+17:   (midx: 0)
+  end
+   (midx: 0)
+_SCSI_Verify10_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,260 :: 		void SCSI_Verify10_Cmd(void)
+_SCSI_Verify10_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,262 :: 		if ((CBW.dDataLength == 0) && !(CBW.CB[1] & BLKVFY))/* BLKVFY not set*/
+	R0 <4> <- addr(_CBW+8)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	if ( R0 != 0) then goto 30   (midx: 2)
+	R0 <4> <- addr(_CBW+16)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	R0 <1> <-  R0 & 4   (midx: 0)
+	if (R0) then goto 29   (midx: 0)
+28:   (midx: 0)
+//usb_scsi.c,264 :: 		Set_CSW (CSW_CMD_PASSED, SEND_CSW_ENABLE);
+	R1 <1> <- 1   (midx: 0)
+	R0 <1> <- 0   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//usb_scsi.c,265 :: 		}
+	goto	21   (midx: 0)
+//usb_scsi.c,262 :: 		if ((CBW.dDataLength == 0) && !(CBW.CB[1] & BLKVFY))/* BLKVFY not set*/
+30:   (midx: 0)
+29:   (midx: 0)
+//usb_scsi.c,268 :: 		Bot_Abort(BOTH_DIR);
+	R0 <1> <- 2   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_scsi.c,269 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, INVALID_FIELED_IN_COMMAND);
+	R1 <1> <- 36   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//usb_scsi.c,270 :: 		Set_CSW (CSW_CMD_FAILED, SEND_CSW_DISABLE);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//usb_scsi.c,271 :: 		}
+21:   (midx: 0)
+  end
+   (midx: 0)
+_SCSI_Valid_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,281 :: 		void SCSI_Valid_Cmd(void)
+_SCSI_Valid_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,283 :: 		if (CBW.dDataLength != 0)
+	R0 <4> <- addr(_CBW+8)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	if ( R0 = 0) then goto 22   (midx: 2)
+//usb_scsi.c,285 :: 		Bot_Abort(BOTH_DIR);
+	R0 <1> <- 2   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_scsi.c,286 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, INVALID_COMMAND);
+	R1 <1> <- 32   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//usb_scsi.c,287 :: 		Set_CSW (CSW_CMD_FAILED, SEND_CSW_DISABLE);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//usb_scsi.c,288 :: 		}
+	goto	23   (midx: 0)
+22:   (midx: 0)
+//usb_scsi.c,290 :: 		Set_CSW (CSW_CMD_PASSED, SEND_CSW_ENABLE);
+	R1 <1> <- 1   (midx: 0)
+	R0 <1> <- 0   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+23:   (midx: 0)
+  end
+   (midx: 0)
+_SCSI_Invalid_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,300 :: 		void SCSI_Invalid_Cmd(void)
+_SCSI_Invalid_Cmd:
+  begin   (midx: 0)
+//usb_scsi.c,302 :: 		if (CBW.dDataLength == 0)
+	R0 <4> <- addr(_CBW+8)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	if ( R0 != 0) then goto 24   (midx: 2)
+//usb_scsi.c,304 :: 		Bot_Abort(DIR_IN);
+	R0 <1> <- 0   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_scsi.c,305 :: 		}
+	goto	25   (midx: 0)
+24:   (midx: 0)
+//usb_scsi.c,308 :: 		if ((CBW.bmFlags & 0x80) != 0)
+	R0 <4> <- addr(_CBW+12)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	R0 <1> <-  R0 & 128   (midx: 0)
+	if ( R0 = 0) then goto 26   (midx: 0)
+//usb_scsi.c,310 :: 		Bot_Abort(DIR_IN);
+	R0 <1> <- 0   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_scsi.c,311 :: 		}
+	goto	27   (midx: 0)
+26:   (midx: 0)
+//usb_scsi.c,314 :: 		Bot_Abort(BOTH_DIR);
+	R0 <1> <- 2   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_scsi.c,315 :: 		}
+27:   (midx: 0)
+//usb_scsi.c,316 :: 		}
+25:   (midx: 0)
+//usb_scsi.c,317 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, INVALID_COMMAND);
+	R1 <1> <- 32   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//usb_scsi.c,318 :: 		Set_CSW (CSW_CMD_FAILED, SEND_CSW_DISABLE);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+  end
+   (midx: 0)

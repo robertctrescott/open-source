@@ -1,0 +1,196 @@
+000     INDF
+001     TMR0
+002     PCL
+003     STATUS
+003.0   C
+003.1   DC
+003.2   Z
+003.3   NOT_PD
+003.4   NOT_TO
+003.5   RP0
+003.6   RP1
+003.7   IRP
+004     FSR
+004-005 @READ_PROGRAM_MEMORY8.P1
+005.0   GPIO0
+005     GPIO
+005.0   GP0
+005.0   UNUSED2
+005.1   MUTE_LED
+005.1   GP1
+005.1   GPIO1
+005.2   MUTE_RLY
+005.2   GP2
+005.2   GPIO2
+005.3   GPIO3
+005.3   GP3
+005.3   RESET
+005.4   SW_IN
+005.4   GP4
+005.4   GPIO4
+005.5   GPIO5
+005.5   GP5
+005.5   UNUSED1
+00A     PCLATH
+00B.0   GPIF
+00B     INTCON
+00B.1   INTF
+00B.2   T0IF
+00B.3   GPIE
+00B.4   INTE
+00B.5   T0IE
+00B.6   PEIE
+00B.7   GIE
+00C     PIR1
+00C.0   TMR1IF
+00C.0   T1IF
+00C.3   CMIF
+00C.6   ADIF
+00C.7   EEIF
+00E     TMR1L
+00F     TMR1H
+010.0   TMR1ON
+010     T1CON
+010.1   TMR1CS
+010.2   NOT_T1SYNC
+010.3   T1OSCEN
+010.4   T1CKPS0
+010.5   T1CKPS1
+010.6   TMR1GE
+019.0   CM0
+019     CMCON
+019.1   CM1
+019.2   CM2
+019.3   CIS
+019.4   CINV
+019.6   COUT
+019.6   C1OUT
+01E     ADRESH
+01F     ADCON0
+01F.0   ADON
+01F.1   GO
+01F.1   GO_DONE
+01F.1   NOT_DONE
+01F.2   CHS0
+01F.3   CHS1
+01F.6   VCFG
+01F.7   ADFM
+020     @SCRATCH
+021     @SCRATCH
+021     _RETURN_
+022     @SCRATCH
+023     @SCRATCH
+024     @SCRATCH
+025.0   bMute
+025.1   prev_sw
+026     counter
+027     @delay_ms1.P1
+027     main.@SCRATCH1
+081     OPTION_REG
+081.0   PS0
+081.1   PS1
+081.2   PS2
+081.3   PSA
+081.4   T0SE
+081.5   T0CS
+081.6   INTEDG
+081.7   NOT_GPPU
+085.0   TS0
+085     TRISIO
+085.1   TS1
+085.2   TS2
+085.3   TS3
+085.4   TS4
+085.5   TS5
+08C.0   TMR1IE
+08C     PIE1
+08C.0   T1IE
+08C.3   CMIE
+08C.6   ADIE
+08C.7   EEIE
+08E     PCON
+08E.0   NOT_BOD
+08E.1   NOT_POR
+090     OSCCAL
+090.2   CAL0
+090.3   CAL1
+090.4   CAL2
+090.5   CAL3
+090.6   CAL4
+090.7   CAL5
+095     WPU
+096.0   IOCB0
+096     IOCB
+096     IOC
+096.0   IOC0
+096.1   IOC1
+096.1   IOCB1
+096.2   IOC2
+096.2   IOCB2
+096.3   IOCB3
+096.3   IOC3
+096.4   IOCB4
+096.4   IOC4
+096.5   IOC5
+096.5   IOCB5
+099.0   VR0
+099     VRCON
+099.1   VR1
+099.2   VR2
+099.3   VR3
+099.5   VRR
+099.7   VREN
+09A     EEDAT
+09A     EEDATA
+09B     EEADR
+09C.0   RD
+09C     EECON1
+09C.1   WR
+09C.2   WREN
+09C.3   WRERR
+09D     EECON2
+09E     ADRESL
+09F.0   ANS0
+09F     ANSEL
+09F.1   ANS1
+09F.2   ANS2
+09F.3   ANS3
+09F.4   ADCS0
+09F.5   ADCS1
+09F.6   ADCS2
+10D-10E @READ_PROGRAM_MEMORY8.P1
+
+ROM Allocation:
+000A  @delay_ms1
+001E  initialize
+0030  main
+0030  @cinit
+
+Project Directory:
+    Z:\Robs Folder\Dave Corey\Source\MuteSwitch\
+
+Project Files:
+    main.c
+    C:\PROGRA~1\CCS_4_3\PICC\devices\12F675.h
+    PIC12F629.inc
+
+Units:
+    main.c (main)
+
+Compiler Settings:
+    Processor:      PIC12F675
+    Pointer Size:   8
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+    Case Sensitive: Yes
+
+Output Files:
+    Errors:      main.err
+    INHX8:       main.hex
+    Symbols:     main.sym
+    List:        main.lst
+    Debug/eCOD:  main.cod
+    Project:     main.PJT
+    Call Tree:   main.tre

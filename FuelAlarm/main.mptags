@@ -1,0 +1,24 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.4	//
+InitHardware	Z:\Sage\Source\Dongle\main.c	69;"	f	line:69
+RS485_RX	Z:\Sage\Source\Dongle\main.c	40;"	d	line:40	file:
+RS485_TX	Z:\Sage\Source\Dongle\main.c	39;"	d	line:39	file:
+bDAChi	Z:\Sage\Source\Dongle\main.c	58;"	m	line:58	file:
+bDAClo	Z:\Sage\Source\Dongle\main.c	57;"	m	line:57	file:
+bEEProm	Z:\Sage\Source\Dongle\main.c	53;"	m	line:53	file:
+bLeadEn	Z:\Sage\Source\Dongle\main.c	56;"	m	line:56	file:
+bReset	Z:\Sage\Source\Dongle\main.c	54;"	m	line:54	file:
+bRun	Z:\Sage\Source\Dongle\main.c	51;"	m	line:51	file:
+bTotal	Z:\Sage\Source\Dongle\main.c	52;"	m	line:52	file:
+boolean	Z:\Sage\Source\Dongle\main.c	37;"	d	line:37	file:
+byte	Z:\Sage\Source\Dongle\main.c	36;"	d	line:36	file:
+clear_tot_tab	Z:\Sage\Source\Dongle\main.c	61;"	v	line:61
+cmd_bits	Z:\Sage\Source\Dongle\main.c	59;"	t	line:59	file:
+false	Z:\Sage\Source\Dongle\main.c	34;"	d	line:34	file:
+main	Z:\Sage\Source\Dongle\main.c	83;"	f	line:83
+padd	Z:\Sage\Source\Dongle\main.c	55;"	m	line:55	file:
+true	Z:\Sage\Source\Dongle\main.c	35;"	d	line:35	file:

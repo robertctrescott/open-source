@@ -1,0 +1,8 @@
+ÀÄmain
+   ÃÄmain  0/224  Ram=1
+   ³  ÃÄ??0??
+   ³  ÃÄInitHardware  0/34  Ram=0
+   ³  ÀÄHandleMIDI  0/116  Ram=0
+   ³     ÀÄRxMIDI  0/60  Ram=0
+   ÃÄtimer2_isr  0/6  Ram=0
+   ÀÄrx_isr  0/54  Ram=3

@@ -1,0 +1,43 @@
+main
+	GPIO_Configure
+	InitUART1
+		UART1_Init_Advanced
+			UARTx_Init_Advanced
+				RCC_GetClocksFrequency
+					Get_Fosc_kHz
+				GPIO_Alternate_Function_Enable
+					GPIO_Configure_Pin
+						GPIO_Config
+							GPIO_Clk_Enable
+		NVIC_IntEnable
+	InitTimers
+		NVIC_IntEnable
+	LCD_Initial
+		LCD_WR_REG
+	Clear_Screen
+		Point_SCR
+			LCD_WR_REG
+		Set_Pixel
+	Display_Str
+		Point_SCR
+		Set_Pixel
+	Handle_UART_Input
+		isAvailable
+		getChar
+		Clear_Screen
+		ClearNextTextLine
+			Point_SCR
+			Set_Pixel
+		Display_Char
+			Point_SCR
+			Set_Pixel
+	HandleKeyPress
+		KeyScan
+		Display_Char
+		Clear_Screen
+		String2Send
+		ClearNextTextLine
+	__CC2DW
+	__FillZeros
+Usart1_ISR
+Timer2_interrupt

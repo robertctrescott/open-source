@@ -1,0 +1,42 @@
+_USB_Istr:
+  begin   (midx: 0)
+//usb_istr.c,63 :: 		void USB_Istr(void)
+_USB_Istr:
+  begin   (midx: 0)
+//usb_istr.c,66 :: 		wIstr = _GetISTR();
+	R0 <4> <- addr(LitPtrAbs: 40005C44)   (midx: 0)
+	R1 <1> <- [R0]   (midx: 0)
+	R0 <4> <- addr(_wIstr)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_istr.c,69 :: 		if (wIstr & ISTR_RESET & wInterrupt_Mask)
+	R0 <4> <- addr(_wIstr)   (midx: 0)
+	R0 <2> <- [R0]   (midx: 0)
+	R5 <2> <-  R0 & 1024   (midx: 5)
+	R4 <4> <- addr(_wInterrupt_Mask)   (midx: 0)
+	R4 <2> <- [R4]   (midx: 0)
+	R4 <2> <-  R5 & R4   (midx: 5)
+	if (!R4) then goto 0   (midx: 0)
+//usb_istr.c,71 :: 		_SetISTR((u16)CLR_RESET);
+	R4 <2> <- 255   (midx: 0)
+	R0 <4> <- addr(LitPtrAbs: 40005C44)   (midx: 0)
+	[R0] <2> <- R4   (midx: 0)
+//usb_istr.c,72 :: 		Device_Property.Reset();
+	R4 <4> <- addr(_Device_Property+4)   (midx: 0)
+	R4 <4> <- [R4]   (midx: 0)
+	CALL (*R4)   (midx: 0)
+//usb_istr.c,76 :: 		}
+0:   (midx: 0)
+//usb_istr.c,158 :: 		if (wIstr & ISTR_CTR & wInterrupt_Mask)
+	R0 <4> <- addr(_wIstr)   (midx: 0)
+	R0 <2> <- [R0]   (midx: 0)
+	R1 <2> <-  R0 & 32768   (midx: 1)
+	R0 <4> <- addr(_wInterrupt_Mask)   (midx: 0)
+	R0 <2> <- [R0]   (midx: 0)
+	R0 <2> <-  R1 & R0   (midx: 1)
+	if (!R0) then goto 1   (midx: 0)
+//usb_istr.c,162 :: 		CTR_LP();
+	CALL _CTR_LP   (midx: 0)
+//usb_istr.c,166 :: 		}
+1:   (midx: 0)
+  end
+   (midx: 0)

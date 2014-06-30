@@ -1,0 +1,18 @@
+_EP1_IN_Callback:
+  begin   (midx: 0)
+//usb_endp.c,35 :: 		void EP1_IN_Callback(void)
+_EP1_IN_Callback:
+  begin   (midx: 0)
+//usb_endp.c,37 :: 		Mass_Storage_In();
+	CALL _Mass_Storage_In   (midx: 0)
+  end
+   (midx: 0)
+_EP2_OUT_Callback:
+  begin   (midx: 0)
+//usb_endp.c,47 :: 		void EP2_OUT_Callback(void)
+_EP2_OUT_Callback:
+  begin   (midx: 0)
+//usb_endp.c,49 :: 		Mass_Storage_Out();
+	CALL _Mass_Storage_Out   (midx: 0)
+  end
+   (midx: 0)

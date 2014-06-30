@@ -1,0 +1,2279 @@
+CCS PCH C Compiler, Version 4.066, 42283               28-Dec-10 00:45
+
+               Filename: main.lst
+
+               ROM used: 3748 bytes (23%)
+                         Largest free fragment is 12632
+               RAM used: 236 (31%) at main() level
+                         263 (34%) worst case
+               Stack:    4 worst case (3 in main + 1 for interrupts)
+
+*
+0000:  GOTO   0DDE
+*
+0008:  MOVWF  05
+000A:  MOVFF  FD8,06
+000E:  MOVFF  FE0,07
+0012:  MOVLB  0
+0014:  MOVFF  FE9,0D
+0018:  MOVFF  FEA,08
+001C:  MOVFF  FE1,09
+0020:  MOVFF  FE2,0A
+0024:  MOVFF  FD9,0B
+0028:  MOVFF  FDA,0C
+002C:  MOVFF  FF3,14
+0030:  MOVFF  FF4,15
+0034:  MOVFF  FFA,16
+0038:  MOVFF  00,0F
+003C:  MOVFF  01,10
+0040:  MOVFF  02,11
+0044:  MOVFF  03,12
+0048:  MOVFF  04,13
+004C:  BTFSS  F9D.1
+004E:  GOTO   0058
+0052:  BTFSC  F9E.1
+0054:  GOTO   009E
+0058:  MOVFF  0F,00
+005C:  MOVFF  10,01
+0060:  MOVFF  11,02
+0064:  MOVFF  12,03
+0068:  MOVFF  13,04
+006C:  BSF    0E.7
+006E:  MOVFF  0D,FE9
+0072:  MOVFF  08,FEA
+0076:  MOVFF  09,FE1
+007A:  MOVFF  0A,FE2
+007E:  MOVFF  0B,FD9
+0082:  MOVFF  0C,FDA
+0086:  MOVFF  14,FF3
+008A:  MOVFF  15,FF4
+008E:  MOVFF  16,FFA
+0092:  MOVF   05,W
+0094:  MOVFF  07,FE0
+0098:  MOVFF  06,FD8
+009C:  RETFIE 0
+.................... /* main.c 
+....................  
+.................... 	02/25/07 by Robert Trescott Jr. 
+.................... 	(C)2007 Acquitronics INC 
+....................  
+.................... 	Microchip MPLAB ICD2 Emulation 
+....................  
+.................... 	History: 
+.................... 		02/25/07 - ORIGINAL WORK -rct 
+.................... 		03/06/07 - changed to prev code developed 11/12/04 -rct 
+.................... 					but kept the new code that is used with the PIC18F2431 
+.................... 		03/13/07 - Converted comms to Modbus 
+.................... 		12/27/10 - removed Modbus added output fail on TX pin to signal PID error to host 
+....................  
+.................... */ 
+....................  
+.................... // compiler and hardware special settings 
+.................... // *** Microchip stores "little-endian" ex. $4F52 = 0x52 0x4F in memory *** 
+.................... #case 
+....................  
+.................... //#define ICD2 
+....................  
+.................... #include <18F2431.h> 
+.................... //////// Standard Header file for the PIC18F2431 device //////////////// 
+.................... #device PIC18F2431 
+.................... #list 
+....................  
+.................... #device *=16 
+.................... #include "18F2431.inc" 
+.................... #list 
+....................  
+....................  
+.................... #ifdef ICD2 
+.................... #fuses HS,NOWDT,NOPROTECT,NOBROWNOUT,PUT,DEBUG,NOLVP 
+.................... #else 
+.................... #fuses HS,NOWDT,PROTECT,BROWNOUT,PUT,NODEBUG,NOLVP 
+.................... #endif 
+.................... #use delay(clock=20000000) 
+*
+00B2:  CLRF   FEA
+00B4:  MOVLW  EC
+00B6:  MOVWF  FE9
+00B8:  MOVF   FEF,W
+00BA:  BZ    00D6
+00BC:  MOVLW  06
+00BE:  MOVWF  01
+00C0:  CLRF   00
+00C2:  DECFSZ 00,F
+00C4:  BRA    00C2
+00C6:  DECFSZ 01,F
+00C8:  BRA    00C0
+00CA:  MOVLW  7B
+00CC:  MOVWF  00
+00CE:  DECFSZ 00,F
+00D0:  BRA    00CE
+00D2:  DECFSZ FEF,F
+00D4:  BRA    00BC
+00D6:  RETLW  00
+.................... #id CHECKSUM 
+....................  
+.................... #define false			0 
+.................... #define true			1 
+.................... #define boolean			short int 
+....................  
+.................... #define RS485_TX		PIN_C6 
+.................... #define RS485_RX		PIN_C7 
+....................  
+.................... #BIT 	SYNC			= PORTB.5 
+.................... #BIT	ERR_EN			= PORTB.5 
+.................... #BIT	INDEX_BIT		= PORTA.2 
+.................... #BIT	M_DIR			= PORTC.5 
+.................... #BIT	PID_ERROR		= PORTC.6 
+.................... #BIT	STEP_ENABLE		= PORTB.4 
+....................  
+.................... #BIT	TX_STATE		= TRISC.6 
+.................... #BIT	TX_ENABLE		= TXSTA.5 
+....................  
+.................... #BIT	BRGH			= TXSTA.2 
+.................... #BIT	POR				= RCON.1 
+.................... #BIT	RINT			= RCON.4 
+.................... #BIT	RCIF			= PIR1.5 
+.................... #BIT	RCIE			= PIE1.5 
+.................... #BIT	TRMT			= TXSTA.1 
+.................... #BIT	CREN			= RCSTA.4 
+.................... #BIT	PORT_EN			= RCSTA.7 
+.................... #BIT	TIMER0			= T0CON.7 
+.................... #BIT	UP_DN			= QEICON.5 
+....................  
+.................... #define INT_MAX		32767 
+.................... #define FORMATED	0x50 
+....................  
+.................... #define FWD_DIR			(M_DIR = false) 
+.................... #define REV_DIR			(M_DIR = true) 
+.................... #define STEP_DIR		(M_DIR) 
+.................... #define INDEX_PIN		(INDEX_BIT) 
+....................  
+.................... #define MSD 0 
+.................... #define LSD 1 
+.................... #define MSB 0 
+.................... #define LSB 3 
+....................  
+.................... #define STATUS			vars.status.s 
+.................... #define FLAGS			vars.flags.f 
+.................... #define	RX_MAX			128 
+....................  
+.................... #define ABS(x)			(((x)<0)?(-x):(x)) 
+....................  
+.................... enum { 
+.................... 	e_hold_mode		= 0, 
+.................... 	e_step_dir_mode, 
+.................... 	e_step_mode, 
+.................... 	e_velo_dir_mode, 
+.................... 	e_velo_mode, 
+.................... 	e_start_pos_mode, 
+.................... 	e_pos_mode, 
+.................... 	e_pos_go_mode, 
+.................... 	e_servo_reset_mode, 
+.................... 	e_servo_lock_mode, 
+.................... 	e_servo_unlock_mode, 
+.................... 	e_save_eeprom_mode 
+.................... }; 
+....................  
+.................... /* structures and unions follow */ 
+....................  
+.................... typedef struct { 
+.................... 	char error			: 1;	// LSB 
+.................... 	char saturated		: 1; 
+.................... 	char index			: 1; 
+.................... 	char halt_index		: 1; 
+.................... 	char move_in_prog	: 1; 
+.................... 	char dstep			: 1; 
+.................... 	char pid_lock		: 1; 
+.................... 	char abs_flag		: 1;	// MSB 
+.................... } s_stat; 
+....................  
+.................... typedef union { 
+.................... 	s_stat	s; 
+.................... 	char	byte; 
+.................... } u_stat; 
+....................  
+.................... typedef struct { 
+.................... 	char phase			: 1;	// LSB 
+.................... 	char neg_move		: 1; 
+.................... 	char d5				: 1; 
+.................... 	char d4				: 1; 
+.................... 	char d3				: 1; 
+.................... 	char step_motor		: 1; 
+.................... 	char menu			: 1; 
+.................... 	char ascii			: 1;	// MSB 
+.................... } s_flags; 
+....................  
+.................... typedef union { 
+.................... 	s_flags	f; 
+.................... 	char	byte; 
+.................... } u_flags; 
+....................  
+.................... typedef union { 
+.................... 	int32			ul;		// b[0]		ui[0] 
+.................... 	signed int32	sl;		// b[1]		ui[1] 
+.................... 	long			ui[2];	// b[2] 
+.................... 	signed long		i[2];	// b[3] 
+.................... 	char			b[4]; 
+.................... } u_fix; 
+....................  
+.................... typedef union { 
+.................... 	struct { 
+.................... 		int8 Byte[4]; 
+.................... 	}; 
+.................... 	struct { 
+.................... 		float FP; 
+.................... 	}; 
+.................... } u_BFP; 
+....................  
+....................  
+.................... // EEPROM Data Structure 
+.................... typedef struct {					//		byte addr	Reg16 
+.................... 	char			format;			//		0			256 
+.................... 	char			src_id;			//		1 
+.................... 	u_stat			status;			//		2			258 
+.................... 	u_flags			flags;			//		3 
+.................... 	 
+.................... 	signed long		kp,				//		4-5			260 
+.................... 					ki,				//		6-7			262 
+.................... 					kd,				//		8-9			264 
+.................... 					velcom,			//		10-11		266 
+.................... 					vlim,			//		12-13		268 
+.................... 					windup;			//		14-15		270 
+.................... 	unsigned long 	accel;			//		16-17		272 
+.................... } s_vars; 
+....................  
+.................... /* main.c globals follow */ 
+.................... s_vars 			vars;				//		00-17 
+....................  
+.................... signed long		mode = e_hold_mode;	//		18-19		274 
+....................  
+.................... signed int32 	pos_com,			//		20-23		276 
+.................... 				act_pos;			//		24-27		280 
+.................... 									//------END------- 
+.................... u_fix			cmd_pos, 
+.................... 				mposition, 
+.................... 				velact, 
+.................... 				ypid, 
+.................... 				phase1dist; 
+....................  
+.................... signed long		ypwm			= 0, 
+.................... 				u1				= 0, 
+.................... 				integral		= 0; 
+....................  
+.................... signed long		u0; 
+.................... 									 
+.................... long 			prev_count 		= 0; 
+....................  
+.................... signed int32	fposition		= 0, 
+.................... 				flatcount		= 0, 
+.................... 				servo_cmd		= 0L; 
+.................... 				 
+.................... int16			prev_t1count 	= 0; 
+.................... int16			prev_t5count 	= 0; 
+.................... int				servo_update 	= 0; 
+.................... 	 
+.................... char			rx_timer 		= 0; 
+.................... char			rx_count 		= 0; 
+.................... char			rx_tx[RX_MAX]; 
+....................  
+.................... short int		bServo			= false; 
+.................... short int		bEnable			= false; 
+.................... short int		bDirty			= false; 
+....................  
+.................... //#use rs232(baud=19200,parity=E,xmit=RS485_TX,rcv=RS485_RX) 
+....................  
+....................  
+.................... void Encoder(char state) 
+.................... { 
+.................... 	if (state){						// if state is true then we are activating quadrature 
+*
+02A6:  MOVF   xEC,F
+02A8:  BZ    02BA
+.................... //		set_tris_a(0xfb);			// disable index pin by making it an output 
+.................... //		DFLTCON 		= 0x3C; 
+.................... //		QEICON 			= 0x88;		// 2X clocks 
+.................... 		QEICON 			= 0x98;		// 4X clocks 
+02AA:  MOVLW  98
+02AC:  MOVWF  FB6
+.................... 		POSCNT			= 0; 
+02AE:  CLRF   F67
+02B0:  CLRF   F66
+.................... 		MAXCNT			= 0xFFFF; 
+02B2:  MOVLW  FF
+02B4:  MOVWF  F65
+02B6:  MOVWF  F64
+.................... 	} else { 
+02B8:  BRA    02C4
+.................... 		set_tris_a(0xff);			// make all port a pins inputs 
+02BA:  MOVLW  FF
+02BC:  MOVWF  F92
+.................... 		DFLTCON 		= 0x00;		// shut off filters 
+02BE:  CLRF   F60
+.................... 		QEICON 			= 0x9C;		// disable quad counter		 
+02C0:  MOVLW  9C
+02C2:  MOVWF  FB6
+.................... 	}	 
+.................... } 
+02C4:  GOTO   0E64 (RETURN)
+....................  
+.................... // main routines follow 
+.................... #include "device.c" 
+.................... // device.c 
+....................  
+.................... // device handlers assume that all devices are left in a known good 
+.................... // disabled state 
+....................  
+.................... void write_int_eeprom(int address, int data) 
+.................... {	 
+.................... 	int1 	flag; 
+.................... 	 
+.................... 	flag   = GIE; 
+*
+01AA:  BCF    xF2.0
+01AC:  BTFSC  FF2.7
+01AE:  BSF    xF2.0
+.................... 	GIE    = false; 
+01B0:  BCF    FF2.7
+....................  
+.................... 	EEADR  = address; 
+01B2:  MOVFF  F0,FA9
+.................... 	EEDATA = data; 
+01B6:  MOVFF  F1,FA8
+.................... 	EEPGD  = false; 
+01BA:  BCF    FA6.7
+.................... 	CFGS   = false; 
+01BC:  BCF    FA6.6
+.................... 	WREN   = true; 
+01BE:  BSF    FA6.2
+.................... 	 
+.................... 	EECON2 = 0x55; 
+01C0:  MOVLW  55
+01C2:  MOVWF  FA7
+.................... 	EECON2 = 0xaa; 
+01C4:  MOVLW  AA
+01C6:  MOVWF  FA7
+.................... 	 
+.................... 	WR     = true; 
+01C8:  BSF    FA6.1
+.................... 	while (WR){}; 
+01CA:  BTFSS  FA6.1
+01CC:  BRA    01D0
+01CE:  BRA    01CA
+.................... 	WREN   = false; 
+01D0:  BCF    FA6.2
+.................... 	 
+.................... 	GIE    = flag; 
+01D2:  BCF    FF2.7
+01D4:  BTFSC  xF2.0
+01D6:  BSF    FF2.7
+.................... } 
+01D8:  GOTO   020A (RETURN)
+....................  
+.................... int read_int_eeprom(int address) 
+.................... { 
+.................... 	EEADR = address; 
+*
+00F4:  MOVFF  F2,FA9
+.................... 	EEPGD = false; 
+00F8:  BCF    FA6.7
+.................... 	CFGS  = false; 
+00FA:  BCF    FA6.6
+.................... 	RD    = true; 
+00FC:  BSF    FA6.0
+.................... 	return (EEDATA); 
+00FE:  MOVFF  FA8,01
+.................... } 
+0102:  GOTO   0142 (RETURN)
+....................  
+.................... void SaveEEPROM(void) 
+.................... { 
+.................... 	int x; 
+.................... 	 
+.................... 	for (x=0; x<sizeof(s_vars); x++){		// write all sensor eeprom data 
+*
+01DC:  CLRF   xEC
+01DE:  MOVF   xEC,W
+01E0:  SUBLW  11
+01E2:  BNC   020E
+.................... 		write_int_eeprom(x,*((char*)&vars+x)); 
+01E4:  CLRF   xEE
+01E6:  MOVLW  18
+01E8:  MOVWF  xED
+01EA:  MOVF   xEC,W
+01EC:  ADDWF  xED,W
+01EE:  MOVWF  01
+01F0:  MOVLW  00
+01F2:  ADDWFC xEE,W
+01F4:  MOVWF  03
+01F6:  MOVFF  01,FE9
+01FA:  MOVWF  FEA
+01FC:  MOVFF  FEF,EF
+0200:  MOVFF  EC,F0
+0204:  MOVFF  EF,F1
+0208:  BRA    01AA
+.................... 	} 
+020A:  INCF   xEC,F
+020C:  BRA    01DE
+.................... } 
+020E:  RETLW  00
+....................  
+.................... void LoadEEPROM() 
+.................... { 
+.................... 	long	index; 
+.................... 	memset(&vars,0x00,sizeof(s_vars));	// first clear everything 
+*
+0106:  CLRF   FEA
+0108:  MOVLW  18
+010A:  MOVWF  FE9
+010C:  CLRF   xEE
+010E:  CLRF   xF0
+0110:  MOVLW  12
+0112:  MOVWF  xEF
+0114:  BRA    00D8
+.................... 	for (index=0; index<sizeof(s_vars); index++)	// then read from eeprom 
+0116:  CLRF   xED
+0118:  CLRF   xEC
+011A:  MOVF   xED,F
+011C:  BNZ   0156
+011E:  MOVF   xEC,W
+0120:  SUBLW  11
+0122:  BNC   0156
+.................... 		*((char*)&vars+index) = read_int_eeprom(index);	 
+0124:  CLRF   xEF
+0126:  MOVLW  18
+0128:  MOVWF  xEE
+012A:  MOVF   xEC,W
+012C:  ADDWF  xEE,W
+012E:  MOVWF  01
+0130:  MOVF   xED,W
+0132:  ADDWFC xEF,W
+0134:  MOVWF  03
+0136:  MOVFF  01,F0
+013A:  MOVWF  xF1
+013C:  MOVFF  EC,F2
+0140:  BRA    00F4
+0142:  MOVFF  F1,FEA
+0146:  MOVFF  F0,FE9
+014A:  MOVFF  01,FEF
+014E:  INCF   xEC,F
+0150:  BTFSC  FD8.2
+0152:  INCF   xED,F
+0154:  BRA    011A
+.................... 	 
+.................... } 
+0156:  GOTO   0262 (RETURN)
+....................  
+....................  
+.................... // floating.c 
+.................... // floating point conversion routines for CCSC PIC compiler 
+.................... // 
+....................  
+.................... float Pic2PC(float f) 
+.................... { 
+.................... 	float	r; 
+.................... 	char	sign, lsb; 
+.................... 	// pic floating point is big endian 
+.................... 	sign = (((*((char*)&f+1))& 0x80));			// save sign bit status 
+.................... 	lsb  = (((*((char*)&f  ))& 0x01)) ? 0x80:0;	// save lsb bit status 
+.................... 	// note that pc is little endian 
+.................... 	*((char*)&r+3) = ((*((char*)&f  ))>>1)|sign; 
+.................... 	*((char*)&r+2) = ((*((char*)&f+1)) & 0x7f)|lsb; 
+.................... 	*((char*)&r+1) = ( *((char*)&f+2)); 
+.................... 	*((char*)&r  ) = ( *((char*)&f+3)); 
+.................... 	return r; 
+.................... } 
+....................  
+.................... float PC2Pic(float f) 
+.................... { 
+.................... 	float	r; 
+.................... 	char	sign, lsb; 
+.................... 	// note that pc is little endian 
+.................... 	sign = (((*((char*)&f+3))& 0x80));			// save sign bit status 
+.................... 	lsb  = (((*((char*)&f+2))& 0x80)) ? 0x01:0; // save lsb bit status 
+.................... 	// pic floating point is big endian 
+.................... 	*((char*)&r  ) = ((*((char*)&f+3))<<1)|lsb; 
+.................... 	*((char*)&r+1) = ((*((char*)&f+2))& 0x7f)|sign; 
+.................... 	*((char*)&r+2) = ( *((char*)&f+1)); 
+.................... 	*((char*)&r+3) = ( *((char*)&f  )); 
+.................... 	return r; 
+.................... } 
+....................  
+.................... #include "servo.c" 
+.................... // servo.c 
+....................  
+.................... // moves long into mantissa and int into exponent 
+.................... u_fix LongInt2Fix(signed int32 mant,int exp) 
+.................... { 
+.................... 	u_fix f; 
+.................... 	f.ul = (mant<<8)+exp; 
+*
+030C:  CLRF   xFA
+030E:  MOVF   xF4,W
+0310:  ADDWF  xFA,W
+0312:  MOVWF  xF5
+0314:  MOVLW  00
+0316:  ADDWFC xF0,W
+0318:  MOVWF  xF6
+031A:  MOVLW  00
+031C:  ADDWFC xF1,W
+031E:  MOVWF  xF7
+0320:  MOVLW  00
+0322:  ADDWFC xF2,W
+0324:  MOVWF  xF8
+.................... 	if (mant<0) f.b[3]|=0x80;	// keep sign proper 
+0326:  BTFSS  xF3.7
+0328:  BRA    032E
+032A:  BSF    xF8.7
+.................... 	else f.b[3]&=0x7F; 
+032C:  BRA    0330
+032E:  BCF    xF8.7
+.................... 	return f; 
+0330:  MOVFF  F5,00
+0334:  MOVFF  F6,01
+0338:  MOVFF  F7,02
+033C:  MOVFF  F8,03
+.................... } 
+0340:  RETLW  00
+....................  
+.................... // moves mantissa into 32 bit signed long number 
+.................... signed int32 Fix2LongInt(u_fix f) 
+.................... { 
+.................... 	u_fix r; 
+.................... 	r.sl = f.sl>>8; 
+0342:  CLRF   03
+0344:  MOVFF  03,FF
+0348:  MOVFF  FB,FE
+034C:  MOVFF  FA,FD
+0350:  MOVFF  F9,FC
+.................... 	if (f.b[3]&0x80) r.b[3]=0xff; 
+0354:  BTFSS  xFB.7
+0356:  BRA    035C
+0358:  MOVLW  FF
+035A:  MOVWF  xFF
+.................... 	return r.sl;	 
+035C:  MOVFF  FC,00
+0360:  MOVFF  FD,01
+0364:  MOVFF  FE,02
+0368:  MOVFF  FF,03
+.................... } 
+036C:  RETLW  00
+....................  
+.................... // 32 bit to 16 bit limit truncate rightmost value 
+.................... void LimitI16(u_fix &val) 
+.................... { 
+.................... 	u_fix r; 
+.................... 	 
+.................... 	r.b[2] = val.b[3]; 
+.................... 	r.b[1] = val.b[2]; 
+.................... 	r.b[0] = val.b[1]; 
+.................... 	 
+.................... 	if (r.b[2] & 0x80){ 
+.................... 		r.b[3] = 0xFF; 
+.................... 		if ((r.i[1] != 0xFFFF) || !(r.b[1] & 0x80)){ 
+.................... 			r.ul = 0xFFFF8000; 
+.................... 		} 
+.................... 	} else { 
+.................... 		r.b[3] = 0x00; 
+.................... 		if ((r.i[1] != 0x0000) || (r.b[1] & 0x80)){ 
+.................... 			r.ul = 0x00007FFF; 
+.................... 		} 
+.................... 	} 
+.................... 	val.ul = r.ul; 
+.................... } 
+....................  
+.................... // 32 bit to 24 bit limit strip leftmost value 
+.................... void LimitI24(u_fix &val) 
+.................... { 
+.................... 	u_fix r; 
+....................  
+.................... 	r.ul = val.ul; 
+*
+0C76:  MOVFF  43,F3
+0C7A:  MOVFF  42,F2
+0C7E:  MOVFF  41,F1
+0C82:  MOVFF  40,F0
+....................  
+.................... 	if (r.b[3] & 0x80){ 
+0C86:  BTFSS  xF3.7
+0C88:  BRA    0CA0
+.................... 		if ((r.b[3] < 0xFF) || !(r.b[2] & 0x80)){ 
+0C8A:  INCFSZ xF3,W
+0C8C:  BRA    0C92
+0C8E:  BTFSC  xF2.7
+0C90:  BRA    0C9E
+.................... 			r.ul = 0xFF800000; 
+0C92:  MOVLW  FF
+0C94:  MOVWF  xF3
+0C96:  MOVLW  80
+0C98:  MOVWF  xF2
+0C9A:  CLRF   xF1
+0C9C:  CLRF   xF0
+.................... 		} 
+.................... 	} else { 
+0C9E:  BRA    0CB6
+.................... 		if (r.b[3] || (r.b[2] > 0x7F)){ 
+0CA0:  MOVF   xF3,F
+0CA2:  BNZ   0CAA
+0CA4:  MOVF   xF2,W
+0CA6:  SUBLW  7F
+0CA8:  BC    0CB6
+.................... 			r.ul = 0x007FFFFF; 
+0CAA:  CLRF   xF3
+0CAC:  MOVLW  7F
+0CAE:  MOVWF  xF2
+0CB0:  MOVLW  FF
+0CB2:  MOVWF  xF1
+0CB4:  MOVWF  xF0
+.................... 		} 
+.................... 	} 
+.................... 	val.ul = r.ul; 
+0CB6:  MOVFF  F3,43
+0CBA:  MOVFF  F2,42
+0CBE:  MOVFF  F1,41
+0CC2:  MOVFF  F0,40
+.................... } 
+....................  
+.................... #define PWM_MAX		1000 
+.................... #define PWM_MIN		0 
+....................  
+.................... void UpdatePWM() 
+.................... {		 
+.................... 	if (!STATUS.pid_lock || STATUS.error) ypwm = PWM_MIN; 
+*
+0CEC:  BTFSS  1A.6
+0CEE:  BRA    0CF4
+0CF0:  BTFSS  1A.0
+0CF2:  BRA    0CFA
+0CF4:  CLRF   49
+0CF6:  CLRF   48
+.................... 	else { 
+0CF8:  BRA    0D4C
+.................... 		STATUS.saturated = false; 
+0CFA:  BCF    1A.1
+.................... 		if (ypwm & 0x8000){				/* first determine proper direction */ 
+0CFC:  ANDLW  00
+0CFE:  MOVWF  00
+0D00:  MOVF   49,W
+0D02:  ANDLW  80
+0D04:  MOVWF  03
+0D06:  MOVF   00,W
+0D08:  IORWF  03,W
+0D0A:  BZ    0D2C
+.................... 			if (ypwm == 0x8000){ 
+0D0C:  MOVF   48,F
+0D0E:  BNZ   0D1E
+0D10:  MOVF   49,W
+0D12:  SUBLW  80
+0D14:  BNZ   0D1E
+.................... 				ypwm = PWM_MIN; 
+0D16:  CLRF   49
+0D18:  CLRF   48
+.................... 				STATUS.saturated = true; 
+0D1A:  BSF    1A.1
+.................... 			} else 
+0D1C:  BRA    0D28
+.................... 				ypwm = -ypwm; 
+0D1E:  COMF   48,F
+0D20:  COMF   49,F
+0D22:  INCF   48,F
+0D24:  BTFSC  FD8.2
+0D26:  INCF   49,F
+.................... 			REV_DIR; 
+0D28:  BSF    F82.5
+.................... 		} else 
+0D2A:  BRA    0D2E
+.................... 			FWD_DIR; 
+0D2C:  BCF    F82.5
+.................... 			 
+.................... 		if (ypwm >= PWM_MAX){ 
+0D2E:  BTFSC  49.7
+0D30:  BRA    0D4C
+0D32:  MOVF   49,W
+0D34:  SUBLW  02
+0D36:  BC    0D4C
+0D38:  XORLW  FF
+0D3A:  BNZ   0D42
+0D3C:  MOVF   48,W
+0D3E:  SUBLW  E7
+0D40:  BC    0D4C
+.................... 			ypwm = PWM_MAX; 
+0D42:  MOVLW  03
+0D44:  MOVWF  49
+0D46:  MOVLW  E8
+0D48:  MOVWF  48
+.................... 			STATUS.saturated = true; 
+0D4A:  BSF    1A.1
+.................... 		}	 
+.................... 	} 
+.................... 	set_pwm1_duty(ypwm); 
+0D4C:  MOVFF  49,02
+0D50:  MOVFF  48,01
+0D54:  RRCF   02,F
+0D56:  RRCF   01,F
+0D58:  RRCF   02,F
+0D5A:  RRCF   01,F
+0D5C:  RRCF   02,F
+0D5E:  MOVFF  01,FBE
+0D62:  RRCF   02,F
+0D64:  RRCF   02,W
+0D66:  ANDLW  30
+0D68:  MOVWF  00
+0D6A:  MOVF   FBD,W
+0D6C:  ANDLW  CF
+0D6E:  IORWF  00,W
+0D70:  MOVWF  FBD
+.................... } 
+0D72:  GOTO   0E8A (RETURN)
+....................  
+....................  
+.................... // look at step and direction data inputs at timers 1&5 to generate new position  
+.................... void CalculateExtCount() 
+.................... { 
+.................... 	int16 t1count; 
+.................... 	int16 t5count; 
+.................... 	 
+.................... 	if (!STATUS.pid_lock || STATUS.error) return; 
+*
+09C6:  BTFSS  1A.6
+09C8:  BRA    09CE
+09CA:  BTFSS  1A.0
+09CC:  BRA    09D0
+09CE:  BRA    0A36
+....................  
+.................... 	t1count = prev_t1count; 
+09D0:  MOVFF  5F,ED
+09D4:  MOVFF  5E,EC
+.................... 	t5count = prev_t5count; 
+09D8:  MOVFF  61,EF
+09DC:  MOVFF  60,EE
+.................... 	prev_t1count = get_timer1(); 
+09E0:  MOVF   FCE,W
+09E2:  MOVWF  5E
+09E4:  MOVFF  FCF,5F
+.................... 	prev_t5count = get_timer5(); 
+09E8:  MOVF   F87,W
+09EA:  MOVWF  x60
+09EC:  MOVFF  F88,61
+....................  
+.................... 	servo_cmd+= (signed long)((prev_t1count-t1count)-(prev_t5count-t5count)); 
+09F0:  MOVF   xEC,W
+09F2:  SUBWF  5E,W
+09F4:  MOVWF  xF0
+09F6:  MOVF   xED,W
+09F8:  SUBWFB 5F,W
+09FA:  MOVWF  xF1
+09FC:  MOVF   xEE,W
+09FE:  SUBWF  x60,W
+0A00:  MOVWF  00
+0A02:  MOVF   xEF,W
+0A04:  SUBWFB x61,W
+0A06:  MOVWF  03
+0A08:  MOVF   00,W
+0A0A:  SUBWF  xF0,W
+0A0C:  MOVWF  00
+0A0E:  MOVF   03,W
+0A10:  SUBWFB xF1,W
+0A12:  MOVWF  03
+0A14:  MOVF   00,W
+0A16:  MOVFF  03,01
+0A1A:  CLRF   02
+0A1C:  CLRF   03
+0A1E:  BTFSS  01.7
+0A20:  BRA    0A26
+0A22:  DECF   02,F
+0A24:  DECF   03,F
+0A26:  MOVF   00,W
+0A28:  ADDWF  5A,F
+0A2A:  MOVF   01,W
+0A2C:  ADDWFC 5B,F
+0A2E:  MOVF   02,W
+0A30:  ADDWFC 5C,F
+0A32:  MOVF   03,W
+0A34:  ADDWFC 5D,F
+.................... } 
+0A36:  GOTO   0E86 (RETURN)
+....................  
+.................... // read motor quadrature encoder and determine position 
+.................... void UpdatePosition() 
+.................... { 
+.................... 	long	count; 
+.................... 	count = prev_count; 
+*
+036E:  MOVFF  51,ED
+0372:  MOVFF  50,EC
+.................... 	prev_count = POSCNT;	 
+0376:  MOVFF  F67,51
+037A:  MOVFF  F66,50
+.................... 	mposition.sl+= (signed long)LongInt2Fix((count-prev_count),0); 
+037E:  MOVF   50,W
+0380:  SUBWF  xEC,W
+0382:  MOVWF  xEE
+0384:  MOVF   51,W
+0386:  SUBWFB xED,W
+0388:  MOVWF  xEF
+038A:  CLRF   xF3
+038C:  CLRF   xF2
+038E:  MOVWF  xF1
+0390:  MOVFF  EE,F0
+0394:  CLRF   xF4
+0396:  RCALL  030C
+0398:  MOVFF  01,F0
+039C:  MOVFF  00,EF
+03A0:  MOVFF  00,00
+03A4:  MOVFF  01,01
+03A8:  CLRF   02
+03AA:  CLRF   03
+03AC:  BTFSS  01.7
+03AE:  BRA    03B4
+03B0:  DECF   02,F
+03B2:  DECF   03,F
+03B4:  MOVF   00,W
+03B6:  ADDWF  38,F
+03B8:  MOVF   01,W
+03BA:  ADDWFC 39,F
+03BC:  MOVF   02,W
+03BE:  ADDWFC 3A,F
+03C0:  MOVF   03,W
+03C2:  ADDWFC 3B,F
+.................... 	act_pos = Fix2LongInt(mposition); 
+03C4:  MOVFF  3B,FB
+03C8:  MOVFF  3A,FA
+03CC:  MOVFF  39,F9
+03D0:  MOVFF  38,F8
+03D4:  RCALL  0342
+03D6:  MOVFF  03,33
+03DA:  MOVFF  02,32
+03DE:  MOVFF  01,31
+03E2:  MOVFF  00,30
+.................... } 
+03E6:  GOTO   0E80 (RETURN)
+....................  
+.................... void UpdatePID() 
+.................... {	 
+.................... 	static int			deriv; 
+.................... 	static long			sat_count; 
+.................... 	signed int32		ext_count; 
+.................... 	 
+.................... 	if (!STATUS.pid_lock || STATUS.error) return; 
+*
+0A92:  BTFSS  1A.6
+0A94:  BRA    0A9A
+0A96:  BTFSS  1A.0
+0A98:  BRA    0A9C
+0A9A:  BRA    0CE8
+.................... 	ext_count = (signed int32) LongInt2Fix(servo_cmd,0); 
+0A9C:  MOVFF  5D,F3
+0AA0:  MOVFF  5C,F2
+0AA4:  MOVFF  5B,F1
+0AA8:  MOVFF  5A,F0
+0AAC:  CLRF   xF4
+0AAE:  RCALL  030C
+0AB0:  MOVFF  03,EF
+0AB4:  MOVFF  02,EE
+0AB8:  MOVFF  01,ED
+0ABC:  MOVFF  00,EC
+.................... 	// error = commanded position - measured position	 
+.................... 	u0 = (signed long)Fix2LongInt((ext_count+cmd_pos.sl) - mposition.sl); 
+0AC0:  MOVF   34,W
+0AC2:  ADDWF  xEC,W
+0AC4:  MOVWF  xF0
+0AC6:  MOVF   35,W
+0AC8:  ADDWFC xED,W
+0ACA:  MOVWF  xF1
+0ACC:  MOVF   36,W
+0ACE:  ADDWFC xEE,W
+0AD0:  MOVWF  xF2
+0AD2:  MOVF   37,W
+0AD4:  ADDWFC xEF,W
+0AD6:  MOVWF  xF3
+0AD8:  MOVF   38,W
+0ADA:  SUBWF  xF0,W
+0ADC:  MOVWF  xF4
+0ADE:  MOVF   39,W
+0AE0:  SUBWFB xF1,W
+0AE2:  MOVWF  xF5
+0AE4:  MOVF   3A,W
+0AE6:  SUBWFB xF2,W
+0AE8:  MOVWF  xF6
+0AEA:  MOVF   3B,W
+0AEC:  SUBWFB xF3,W
+0AEE:  MOVWF  xF7
+0AF0:  MOVWF  xFB
+0AF2:  MOVFF  F6,FA
+0AF6:  MOVFF  F5,F9
+0AFA:  MOVFF  F4,F8
+0AFE:  RCALL  0342
+0B00:  MOVFF  01,4F
+0B04:  MOVFF  00,4E
+.................... 		 
+.................... 	if (!STATUS.saturated){ 
+0B08:  BTFSC  1A.1
+0B0A:  BRA    0B1A
+.................... 		integral += u0; 	// add integral value if not saturated 
+0B0C:  MOVF   4E,W
+0B0E:  ADDWF  4C,F
+0B10:  MOVF   4F,W
+0B12:  ADDWFC 4D,F
+.................... 		sat_count = 0; 
+0B14:  CLRF   xE8
+0B16:  CLRF   xE7
+.................... 	} else sat_count++;		// keep track of how long we've been saturated 
+0B18:  BRA    0B20
+0B1A:  INCF   xE7,F
+0B1C:  BTFSC  FD8.2
+0B1E:  INCF   xE8,F
+....................  
+.................... 	if (sat_count == vars.windup) STATUS.error = true; 
+0B20:  MOVF   26,W
+0B22:  SUBWF  xE7,W
+0B24:  BNZ   0B2E
+0B26:  MOVF   27,W
+0B28:  SUBWF  xE8,W
+0B2A:  BTFSC  FD8.2
+0B2C:  BSF    1A.0
+.................... 	 
+.................... 	ypid.sl = (signed int32) vars.kp * u0;		// calc in the kp 
+0B2E:  CLRF   xF3
+0B30:  CLRF   xF2
+0B32:  MOVFF  1D,F1
+0B36:  MOVFF  1C,F0
+0B3A:  BTFSS  1D.7
+0B3C:  BRA    0B42
+0B3E:  DECF   xF2,F
+0B40:  DECF   xF3,F
+0B42:  MOVFF  4E,00
+0B46:  MOVFF  4F,01
+0B4A:  CLRF   02
+0B4C:  CLRF   03
+0B4E:  BTFSS  4F.7
+0B50:  BRA    0B56
+0B52:  DECF   02,F
+0B54:  DECF   03,F
+0B56:  MOVFF  03,F7
+0B5A:  MOVFF  02,F6
+0B5E:  MOVFF  01,F5
+0B62:  MOVFF  00,F4
+0B66:  MOVFF  F3,FB
+0B6A:  MOVFF  F2,FA
+0B6E:  MOVFF  F1,F9
+0B72:  MOVFF  F0,F8
+0B76:  MOVFF  03,FF
+0B7A:  MOVFF  02,FE
+0B7E:  MOVFF  01,FD
+0B82:  MOVFF  00,FC
+0B86:  RCALL  0A3A
+0B88:  MOVFF  03,43
+0B8C:  MOVFF  02,42
+0B90:  MOVFF  01,41
+0B94:  MOVFF  00,40
+.................... 	ypid.sl+= (signed int32) vars.ki * integral;	// calc in the ki	 
+0B98:  CLRF   xF3
+0B9A:  CLRF   xF2
+0B9C:  MOVFF  1F,F1
+0BA0:  MOVFF  1E,F0
+0BA4:  BTFSS  1F.7
+0BA6:  BRA    0BAC
+0BA8:  DECF   xF2,F
+0BAA:  DECF   xF3,F
+0BAC:  MOVFF  4C,00
+0BB0:  MOVFF  4D,01
+0BB4:  CLRF   02
+0BB6:  CLRF   03
+0BB8:  BTFSS  4D.7
+0BBA:  BRA    0BC0
+0BBC:  DECF   02,F
+0BBE:  DECF   03,F
+0BC0:  MOVFF  03,F7
+0BC4:  MOVFF  02,F6
+0BC8:  MOVFF  01,F5
+0BCC:  MOVFF  00,F4
+0BD0:  MOVFF  F3,FB
+0BD4:  MOVFF  F2,FA
+0BD8:  MOVFF  F1,F9
+0BDC:  MOVFF  F0,F8
+0BE0:  MOVFF  03,FF
+0BE4:  MOVFF  02,FE
+0BE8:  MOVFF  01,FD
+0BEC:  MOVFF  00,FC
+0BF0:  RCALL  0A3A
+0BF2:  MOVF   00,W
+0BF4:  ADDWF  40,F
+0BF6:  MOVF   01,W
+0BF8:  ADDWFC 41,F
+0BFA:  MOVF   02,W
+0BFC:  ADDWFC 42,F
+0BFE:  MOVF   03,W
+0C00:  ADDWFC 43,F
+.................... 	ypid.sl+= (signed int32) vars.kd * (u0 - u1);	// calc in the kd 
+0C02:  CLRF   xF3
+0C04:  CLRF   xF2
+0C06:  MOVFF  21,F1
+0C0A:  MOVFF  20,F0
+0C0E:  BTFSS  21.7
+0C10:  BRA    0C16
+0C12:  DECF   xF2,F
+0C14:  DECF   xF3,F
+0C16:  MOVF   4A,W
+0C18:  SUBWF  4E,W
+0C1A:  MOVWF  00
+0C1C:  MOVF   4B,W
+0C1E:  SUBWFB 4F,W
+0C20:  MOVWF  03
+0C22:  MOVF   00,W
+0C24:  MOVFF  03,01
+0C28:  CLRF   02
+0C2A:  CLRF   03
+0C2C:  BTFSS  01.7
+0C2E:  BRA    0C34
+0C30:  DECF   02,F
+0C32:  DECF   03,F
+0C34:  MOVFF  03,F7
+0C38:  MOVFF  02,F6
+0C3C:  MOVFF  01,F5
+0C40:  MOVFF  00,F4
+0C44:  MOVFF  F3,FB
+0C48:  MOVFF  F2,FA
+0C4C:  MOVFF  F1,F9
+0C50:  MOVFF  F0,F8
+0C54:  MOVFF  03,FF
+0C58:  MOVFF  02,FE
+0C5C:  MOVFF  01,FD
+0C60:  MOVFF  00,FC
+0C64:  RCALL  0A3A
+0C66:  MOVF   00,W
+0C68:  ADDWF  40,F
+0C6A:  MOVF   01,W
+0C6C:  ADDWFC 41,F
+0C6E:  MOVF   02,W
+0C70:  ADDWFC 42,F
+0C72:  MOVF   03,W
+0C74:  ADDWFC 43,F
+.................... 	 
+.................... 	// pin to 24 bit limits 
+.................... 	LimitI24(ypid); 
+....................  
+.................... 	// extend derivitive sample time 
+.................... 	if (++deriv > 2){ 
+*
+0CC6:  INCF   xE6,F
+0CC8:  MOVF   xE6,W
+0CCA:  SUBLW  02
+0CCC:  BC    0CD8
+.................... 		deriv = 0; 
+0CCE:  CLRF   xE6
+.................... 		u1 = u0; 
+0CD0:  MOVFF  4F,4B
+0CD4:  MOVFF  4E,4A
+.................... 	} 
+.................... 		 
+.................... 	// use only 16 bit result from 24 bit calculation 
+.................... 	ypid.b[0] = ypid.b[1]; 
+0CD8:  MOVFF  41,40
+.................... 	ypid.b[1] = ypid.b[2]; 
+0CDC:  MOVFF  42,41
+.................... 	ypwm = ypid.i[0];	 
+0CE0:  MOVFF  41,49
+0CE4:  MOVFF  40,48
+.................... } 
+0CE8:  GOTO   0E88 (RETURN)
+....................  
+.................... void StartGoMove() 
+.................... { 
+.................... 	if (STATUS.move_in_prog) return;	// get out if already in move 
+*
+04BC:  BTFSS  1A.4
+04BE:  BRA    04C2
+04C0:  BRA    05DA
+.................... 	 
+.................... 	if (STATUS.abs_flag){ 
+04C2:  BTFSS  1A.7
+04C4:  BRA    0524
+.................... 		phase1dist = LongInt2Fix((pos_com-Fix2LongInt(mposition.sl)),0); 
+04C6:  MOVFF  3B,FB
+04CA:  MOVFF  3A,FA
+04CE:  MOVFF  39,F9
+04D2:  MOVFF  38,F8
+04D6:  RCALL  0342
+04D8:  MOVF   00,W
+04DA:  SUBWF  2C,W
+04DC:  MOVWF  xEC
+04DE:  MOVF   01,W
+04E0:  SUBWFB 2D,W
+04E2:  MOVWF  xED
+04E4:  MOVF   02,W
+04E6:  SUBWFB 2E,W
+04E8:  MOVWF  xEE
+04EA:  MOVF   03,W
+04EC:  SUBWFB 2F,W
+04EE:  MOVWF  xEF
+04F0:  MOVWF  xF3
+04F2:  MOVFF  EE,F2
+04F6:  MOVFF  ED,F1
+04FA:  MOVFF  EC,F0
+04FE:  CLRF   xF4
+0500:  RCALL  030C
+0502:  MOVFF  03,47
+0506:  MOVFF  02,46
+050A:  MOVFF  01,45
+050E:  MOVFF  00,44
+.................... 		fposition = pos_com; 
+0512:  MOVFF  2F,55
+0516:  MOVFF  2E,54
+051A:  MOVFF  2D,53
+051E:  MOVFF  2C,52
+....................  
+.................... 	} else { 
+0522:  BRA    0572
+.................... 		phase1dist.sl = LongInt2Fix(pos_com,0); 
+0524:  MOVFF  2F,F3
+0528:  MOVFF  2E,F2
+052C:  MOVFF  2D,F1
+0530:  MOVFF  2C,F0
+0534:  CLRF   xF4
+0536:  RCALL  030C
+0538:  MOVFF  03,47
+053C:  MOVFF  02,46
+0540:  MOVFF  01,45
+0544:  MOVFF  00,44
+.................... 		fposition = Fix2LongInt(mposition.sl) + pos_com; 
+0548:  MOVFF  3B,FB
+054C:  MOVFF  3A,FA
+0550:  MOVFF  39,F9
+0554:  MOVFF  38,F8
+0558:  RCALL  0342
+055A:  MOVF   2C,W
+055C:  ADDWF  00,W
+055E:  MOVWF  52
+0560:  MOVF   2D,W
+0562:  ADDWFC 01,W
+0564:  MOVWF  53
+0566:  MOVF   2E,W
+0568:  ADDWFC 02,W
+056A:  MOVWF  54
+056C:  MOVF   2F,W
+056E:  ADDWFC 03,W
+0570:  MOVWF  55
+.................... 	} 
+....................  
+.................... 	velact.sl = 0; 
+0572:  CLRF   3F
+0574:  CLRF   3E
+0576:  CLRF   3D
+0578:  CLRF   3C
+....................  
+.................... 	if (phase1dist.sl < 0){ 
+057A:  BTFSC  47.7
+057C:  BRA    0580
+057E:  BRA    059A
+.................... 		FLAGS.neg_move = true; 
+0580:  BSF    1B.1
+.................... 		phase1dist.sl = -phase1dist.sl; 
+0582:  COMF   44,F
+0584:  COMF   45,F
+0586:  COMF   46,F
+0588:  COMF   47,F
+058A:  INCF   44,F
+058C:  BTFSC  FD8.2
+058E:  INCF   45,F
+0590:  BTFSC  FD8.2
+0592:  INCF   46,F
+0594:  BTFSC  FD8.2
+0596:  INCF   47,F
+.................... 	} else FLAGS.neg_move = false; 
+0598:  BRA    059C
+059A:  BCF    1B.1
+....................  
+.................... 	phase1dist.sl = (phase1dist.sl/2); 
+059C:  MOVFF  47,EF
+05A0:  MOVFF  46,EE
+05A4:  MOVFF  45,ED
+05A8:  MOVFF  44,EC
+05AC:  CLRF   xF3
+05AE:  CLRF   xF2
+05B0:  CLRF   xF1
+05B2:  MOVLW  02
+05B4:  MOVWF  xF0
+05B6:  BRA    03EA
+05B8:  MOVFF  03,47
+05BC:  MOVFF  02,46
+05C0:  MOVFF  01,45
+05C4:  MOVFF  00,44
+.................... 	flatcount = 0; 
+05C8:  CLRF   59
+05CA:  CLRF   58
+05CC:  CLRF   57
+05CE:  CLRF   56
+.................... 	FLAGS.phase = false; 
+05D0:  BCF    1B.0
+.................... 	STATUS.move_in_prog = true; 
+05D2:  BSF    1A.4
+.................... 	mode = e_pos_mode;		 
+05D4:  CLRF   2B
+05D6:  MOVLW  06
+05D8:  MOVWF  2A
+.................... } 
+05DA:  GOTO   09C2 (RETURN)
+....................  
+.................... void ResetServo() 
+.................... { 
+.................... 	set_timer1(0); 
+*
+02C8:  CLRF   FCF
+02CA:  CLRF   FCE
+.................... 	set_timer5(0); 
+02CC:  CLRF   F88
+02CE:  CLRF   F87
+.................... 	prev_t1count 	= 0; 
+02D0:  CLRF   5F
+02D2:  CLRF   5E
+.................... 	prev_t5count 	= 0; 
+02D4:  CLRF   x61
+02D6:  CLRF   x60
+.................... 	servo_cmd		= 0; 
+02D8:  CLRF   5D
+02DA:  CLRF   5C
+02DC:  CLRF   5B
+02DE:  CLRF   5A
+....................  
+.................... 	POSCNT			= 0; 
+02E0:  CLRF   F67
+02E2:  CLRF   F66
+.................... 	prev_count		= 0; 
+02E4:  CLRF   51
+02E6:  CLRF   50
+.................... 	velact.ul		= 0; 
+02E8:  CLRF   3F
+02EA:  CLRF   3E
+02EC:  CLRF   3D
+02EE:  CLRF   3C
+.................... 	mposition.ul	= 0; 
+02F0:  CLRF   3B
+02F2:  CLRF   3A
+02F4:  CLRF   39
+02F6:  CLRF   38
+.................... 	cmd_pos.ul		= 0; 
+02F8:  CLRF   37
+02FA:  CLRF   36
+02FC:  CLRF   35
+02FE:  CLRF   34
+.................... 	mode 			= e_hold_mode; 
+0300:  CLRF   2B
+0302:  CLRF   2A
+.................... 	 
+.................... 	STATUS.halt_index 	= false; 
+0304:  BCF    1A.3
+.................... 	STATUS.error 		= false; 
+0306:  BCF    1A.0
+.................... 	STATUS.move_in_prog = false; 
+0308:  BCF    1A.4
+.................... } 
+030A:  RETLW  00
+....................  
+.................... void LockServo() 
+.................... { 
+.................... 	set_timer1(0); 
+*
+05DE:  CLRF   FCF
+05E0:  CLRF   FCE
+.................... 	set_timer5(0); 
+05E2:  CLRF   F88
+05E4:  CLRF   F87
+.................... 	prev_t1count 		= 0; 
+05E6:  CLRF   5F
+05E8:  CLRF   5E
+.................... 	prev_t5count 		= 0; 
+05EA:  CLRF   x61
+05EC:  CLRF   x60
+.................... 	servo_cmd			= 0; 
+05EE:  CLRF   5D
+05F0:  CLRF   5C
+05F2:  CLRF   5B
+05F4:  CLRF   5A
+....................  
+.................... 	cmd_pos				= mposition; 
+05F6:  MOVFF  3B,37
+05FA:  MOVFF  3A,36
+05FE:  MOVFF  39,35
+0602:  MOVFF  38,34
+.................... 	STATUS.pid_lock 	= true; 
+0606:  BSF    1A.6
+.................... 	STATUS.halt_index 	= false; 
+0608:  BCF    1A.3
+.................... 	STATUS.error 		= false; 
+060A:  BCF    1A.0
+.................... 	STATUS.move_in_prog = false; 
+060C:  BCF    1A.4
+.................... 	ypwm				= 0; 
+060E:  CLRF   49
+0610:  CLRF   48
+.................... 	mode 				= e_hold_mode; 
+0612:  CLRF   2B
+0614:  CLRF   2A
+.................... } 
+0616:  RETLW  00
+....................  
+.................... void UpdateTrajectory() 
+.................... {			 
+.................... 	STATUS.index = INDEX_PIN; 
+0618:  BCF    1A.2
+061A:  BTFSC  F80.2
+061C:  BSF    1A.2
+....................  
+.................... 	if (STATUS.index && STATUS.halt_index || STATUS.error){ 
+061E:  BTFSS  1A.2
+0620:  BRA    0626
+0622:  BTFSC  1A.3
+0624:  BRA    062A
+0626:  BTFSS  1A.0
+0628:  BRA    0634
+.................... 		velact = 0; 
+062A:  CLRF   3F
+062C:  CLRF   3E
+062E:  CLRF   3D
+0630:  CLRF   3C
+.................... 		return; 
+0632:  BRA    09C2
+.................... 	} 
+....................  
+.................... 	switch (mode){ 
+0634:  MOVFF  2A,00
+0638:  MOVF   2B,W
+063A:  MOVWF  03
+063C:  BNZ   0644
+063E:  MOVLW  04
+0640:  SUBWF  00,W
+0642:  BZ    068E
+0644:  MOVF   03,W
+0646:  BNZ   0650
+0648:  MOVLW  06
+064A:  SUBWF  00,W
+064C:  BTFSC  FD8.2
+064E:  BRA    0800
+0650:  MOVF   03,W
+0652:  BNZ   065C
+0654:  MOVLW  0B
+0656:  SUBWF  00,W
+0658:  BTFSC  FD8.2
+065A:  BRA    09A8
+065C:  MOVF   03,W
+065E:  BNZ   0668
+0660:  MOVLW  07
+0662:  SUBWF  00,W
+0664:  BTFSC  FD8.2
+0666:  BRA    09B0
+0668:  MOVF   03,W
+066A:  BNZ   0674
+066C:  MOVLW  08
+066E:  SUBWF  00,W
+0670:  BTFSC  FD8.2
+0672:  BRA    09B2
+0674:  MOVF   03,W
+0676:  BNZ   0680
+0678:  MOVLW  09
+067A:  SUBWF  00,W
+067C:  BTFSC  FD8.2
+067E:  BRA    09B6
+0680:  MOVF   03,W
+0682:  BNZ   068C
+0684:  MOVLW  0A
+0686:  SUBWF  00,W
+0688:  BTFSC  FD8.2
+068A:  BRA    09BA
+068C:  BRA    09C2
+.................... 	case e_velo_mode: 
+.................... 		if (!(!STATUS.halt_index && STATUS.saturated)){			  
+068E:  BTFSC  1A.3
+0690:  BRA    0696
+0692:  BTFSC  1A.1
+0694:  BRA    07FE
+....................  
+.................... 			if ((long)Fix2LongInt(velact.ul) < vars.velcom){		// is the velocity lower than target  
+0696:  MOVFF  3F,FB
+069A:  MOVFF  3E,FA
+069E:  MOVFF  3D,F9
+06A2:  MOVFF  3C,F8
+06A6:  RCALL  0342
+06A8:  MOVFF  01,ED
+06AC:  MOVFF  00,EC
+06B0:  BTFSS  01.7
+06B2:  BRA    06BA
+06B4:  BTFSS  23.7
+06B6:  BRA    06CC
+06B8:  BRA    06BE
+06BA:  BTFSC  23.7
+06BC:  BRA    073A
+06BE:  MOVF   xED,W
+06C0:  SUBWF  23,W
+06C2:  BNC   073A
+06C4:  BNZ   06CC
+06C6:  MOVF   22,W
+06C8:  SUBWF  xEC,W
+06CA:  BC    073A
+.................... 				velact.sl += vars.accel; 
+06CC:  MOVF   28,W
+06CE:  ADDWF  3C,F
+06D0:  MOVF   29,W
+06D2:  ADDWFC 3D,F
+06D4:  MOVLW  00
+06D6:  ADDWFC 3E,F
+06D8:  ADDWFC 3F,F
+.................... 				 
+.................... 				if ((long)Fix2LongInt(velact.ul) > vars.velcom) 
+06DA:  MOVFF  3F,FB
+06DE:  MOVFF  3E,FA
+06E2:  MOVFF  3D,F9
+06E6:  MOVFF  3C,F8
+06EA:  RCALL  0342
+06EC:  MOVFF  01,ED
+06F0:  MOVFF  00,EC
+06F4:  BTFSS  23.7
+06F6:  BRA    06FE
+06F8:  BTFSS  xED.7
+06FA:  BRA    0710
+06FC:  BRA    0702
+06FE:  BTFSC  xED.7
+0700:  BRA    0738
+0702:  MOVF   23,W
+0704:  SUBWF  xED,W
+0706:  BNC   0738
+0708:  BNZ   0710
+070A:  MOVF   xEC,W
+070C:  SUBWF  22,W
+070E:  BC    0738
+.................... 					velact = LongInt2Fix(vars.velcom,0); 
+0710:  CLRF   xF3
+0712:  CLRF   xF2
+0714:  MOVFF  23,F1
+0718:  MOVFF  22,F0
+071C:  BTFSS  xF1.7
+071E:  BRA    0724
+0720:  DECF   xF2,F
+0722:  DECF   xF3,F
+0724:  CLRF   xF4
+0726:  RCALL  030C
+0728:  MOVFF  03,3F
+072C:  MOVFF  02,3E
+0730:  MOVFF  01,3D
+0734:  MOVFF  00,3C
+.................... 					 
+.................... 			} else if ((long)Fix2LongInt(velact.ul) > vars.velcom){ 
+0738:  BRA    07DC
+073A:  MOVFF  3F,FB
+073E:  MOVFF  3E,FA
+0742:  MOVFF  3D,F9
+0746:  MOVFF  3C,F8
+074A:  RCALL  0342
+074C:  MOVFF  01,ED
+0750:  MOVFF  00,EC
+0754:  BTFSS  23.7
+0756:  BRA    075E
+0758:  BTFSS  xED.7
+075A:  BRA    0770
+075C:  BRA    0762
+075E:  BTFSC  xED.7
+0760:  BRA    07DC
+0762:  MOVF   23,W
+0764:  SUBWF  xED,W
+0766:  BNC   07DC
+0768:  BNZ   0770
+076A:  MOVF   xEC,W
+076C:  SUBWF  22,W
+076E:  BC    07DC
+.................... 				velact.sl -= vars.accel; 
+0770:  MOVF   28,W
+0772:  SUBWF  3C,F
+0774:  MOVF   29,W
+0776:  SUBWFB 3D,F
+0778:  MOVLW  00
+077A:  SUBWFB 3E,F
+077C:  SUBWFB 3F,F
+.................... 				 
+.................... 				if ((long)Fix2LongInt(velact.ul) < vars.velcom) 
+077E:  MOVFF  3F,FB
+0782:  MOVFF  3E,FA
+0786:  MOVFF  3D,F9
+078A:  MOVFF  3C,F8
+078E:  RCALL  0342
+0790:  MOVFF  01,ED
+0794:  MOVFF  00,EC
+0798:  BTFSS  01.7
+079A:  BRA    07A2
+079C:  BTFSS  23.7
+079E:  BRA    07B4
+07A0:  BRA    07A6
+07A2:  BTFSC  23.7
+07A4:  BRA    07DC
+07A6:  MOVF   xED,W
+07A8:  SUBWF  23,W
+07AA:  BNC   07DC
+07AC:  BNZ   07B4
+07AE:  MOVF   22,W
+07B0:  SUBWF  xEC,W
+07B2:  BC    07DC
+.................... 					velact = LongInt2Fix(vars.velcom,0); 
+07B4:  CLRF   xF3
+07B6:  CLRF   xF2
+07B8:  MOVFF  23,F1
+07BC:  MOVFF  22,F0
+07C0:  BTFSS  xF1.7
+07C2:  BRA    07C8
+07C4:  DECF   xF2,F
+07C6:  DECF   xF3,F
+07C8:  CLRF   xF4
+07CA:  RCALL  030C
+07CC:  MOVFF  03,3F
+07D0:  MOVFF  02,3E
+07D4:  MOVFF  01,3D
+07D8:  MOVFF  00,3C
+.................... 			}	 
+.................... 			 
+.................... 			cmd_pos.sl += Fix2LongInt(velact.ul); 
+07DC:  MOVFF  3F,FB
+07E0:  MOVFF  3E,FA
+07E4:  MOVFF  3D,F9
+07E8:  MOVFF  3C,F8
+07EC:  RCALL  0342
+07EE:  MOVF   00,W
+07F0:  ADDWF  34,F
+07F2:  MOVF   01,W
+07F4:  ADDWFC 35,F
+07F6:  MOVF   02,W
+07F8:  ADDWFC 36,F
+07FA:  MOVF   03,W
+07FC:  ADDWFC 37,F
+.................... 		} 
+.................... 		break; 
+07FE:  BRA    09C2
+....................  
+.................... 	case e_pos_mode: 
+.................... 		if (!(!STATUS.halt_index && STATUS.saturated)){			  
+0800:  BTFSC  1A.3
+0802:  BRA    0808
+0804:  BTFSC  1A.1
+0806:  BRA    09A6
+....................  
+.................... 			if (!FLAGS.phase){							// process the first half of the profile  
+0808:  BTFSC  1B.0
+080A:  BRA    08D8
+.................... 				 
+.................... 				if ((long)Fix2LongInt(velact.ul) < vars.vlim)		// we need to accelerate to start move 
+080C:  MOVFF  3F,FB
+0810:  MOVFF  3E,FA
+0814:  MOVFF  3D,F9
+0818:  MOVFF  3C,F8
+081C:  RCALL  0342
+081E:  MOVFF  01,ED
+0822:  MOVFF  00,EC
+0826:  BTFSS  01.7
+0828:  BRA    0830
+082A:  BTFSS  25.7
+082C:  BRA    0842
+082E:  BRA    0834
+0830:  BTFSC  25.7
+0832:  BRA    0852
+0834:  MOVF   xED,W
+0836:  SUBWF  25,W
+0838:  BNC   0852
+083A:  BNZ   0842
+083C:  MOVF   24,W
+083E:  SUBWF  xEC,W
+0840:  BC    0852
+.................... 					velact.sl += vars.accel;		// keep adding accel value to actual velocity 
+0842:  MOVF   28,W
+0844:  ADDWF  3C,F
+0846:  MOVF   29,W
+0848:  ADDWFC 3D,F
+084A:  MOVLW  00
+084C:  ADDWFC 3E,F
+084E:  ADDWFC 3F,F
+.................... 				else 
+0850:  BRA    0862
+.................... 					flatcount++;				// keep track of visits through this function 
+0852:  MOVLW  01
+0854:  ADDWF  56,F
+0856:  BTFSC  FD8.0
+0858:  INCF   57,F
+085A:  BTFSC  FD8.2
+085C:  INCF   58,F
+085E:  BTFSC  FD8.2
+0860:  INCF   59,F
+.................... 														// after accel has peaked 
+.................... 				phase1dist.sl -= Fix2LongInt(velact.ul);  
+0862:  MOVFF  3F,FB
+0866:  MOVFF  3E,FA
+086A:  MOVFF  3D,F9
+086E:  MOVFF  3C,F8
+0872:  RCALL  0342
+0874:  MOVF   00,W
+0876:  SUBWF  44,F
+0878:  MOVF   01,W
+087A:  SUBWFB 45,F
+087C:  MOVF   02,W
+087E:  SUBWFB 46,F
+0880:  MOVF   03,W
+0882:  SUBWFB 47,F
+....................  
+.................... 				if (FLAGS.neg_move) 
+0884:  BTFSS  1B.1
+0886:  BRA    08AC
+.................... 					cmd_pos.sl -= Fix2LongInt(velact.ul);	// keep moving position 
+0888:  MOVFF  3F,FB
+088C:  MOVFF  3E,FA
+0890:  MOVFF  3D,F9
+0894:  MOVFF  3C,F8
+0898:  RCALL  0342
+089A:  MOVF   00,W
+089C:  SUBWF  34,F
+089E:  MOVF   01,W
+08A0:  SUBWFB 35,F
+08A2:  MOVF   02,W
+08A4:  SUBWFB 36,F
+08A6:  MOVF   03,W
+08A8:  SUBWFB 37,F
+.................... 				else 
+08AA:  BRA    08CE
+.................... 					cmd_pos.sl += Fix2LongInt(velact.ul);	// keep moving position forward 
+08AC:  MOVFF  3F,FB
+08B0:  MOVFF  3E,FA
+08B4:  MOVFF  3D,F9
+08B8:  MOVFF  3C,F8
+08BC:  RCALL  0342
+08BE:  MOVF   00,W
+08C0:  ADDWF  34,F
+08C2:  MOVF   01,W
+08C4:  ADDWFC 35,F
+08C6:  MOVF   02,W
+08C8:  ADDWFC 36,F
+08CA:  MOVF   03,W
+08CC:  ADDWFC 37,F
+.................... 				 
+.................... 				if (phase1dist.sl < 0) 
+08CE:  BTFSC  47.7
+08D0:  BRA    08D4
+08D2:  BRA    08D6
+.................... 					FLAGS.phase = true; 	// if phase distance is neg, then we are finished with first half of profile 
+08D4:  BSF    1B.0
+.................... 	 
+.................... 			} else { 
+08D6:  BRA    09A6
+.................... 												// this is the second half of the profile 
+.................... 				if (flatcount > 0){ 
+08D8:  BTFSC  59.7
+08DA:  BRA    0900
+08DC:  MOVF   59,F
+08DE:  BNZ   08EE
+08E0:  MOVF   58,F
+08E2:  BNZ   08EE
+08E4:  MOVF   57,F
+08E6:  BNZ   08EE
+08E8:  MOVF   56,W
+08EA:  SUBLW  00
+08EC:  BC    0900
+.................... 					flatcount--; 
+08EE:  MOVLW  FF
+08F0:  ADDWF  56,F
+08F2:  BTFSS  FD8.0
+08F4:  ADDWF  57,F
+08F6:  BTFSS  FD8.0
+08F8:  ADDWF  58,F
+08FA:  BTFSS  FD8.0
+08FC:  ADDWF  59,F
+.................... 				 
+.................... 				} else if ((long)Fix2LongInt(velact.ul)>0 ){ 
+08FE:  BRA    095C
+0900:  MOVFF  3F,FB
+0904:  MOVFF  3E,FA
+0908:  MOVFF  3D,F9
+090C:  MOVFF  3C,F8
+0910:  RCALL  0342
+0912:  MOVFF  01,ED
+0916:  MOVFF  00,EC
+091A:  MOVF   xEC,F
+091C:  BNZ   0922
+091E:  MOVF   xED,F
+0920:  BZ    0932
+.................... 					velact.sl -= vars.accel; 
+0922:  MOVF   28,W
+0924:  SUBWF  3C,F
+0926:  MOVF   29,W
+0928:  SUBWFB 3D,F
+092A:  MOVLW  00
+092C:  SUBWFB 3E,F
+092E:  SUBWFB 3F,F
+.................... 				 
+.................... 				} else { 
+0930:  BRA    095C
+.................... 					cmd_pos = LongInt2Fix(fposition,0); 
+0932:  MOVFF  55,F3
+0936:  MOVFF  54,F2
+093A:  MOVFF  53,F1
+093E:  MOVFF  52,F0
+0942:  CLRF   xF4
+0944:  RCALL  030C
+0946:  MOVFF  03,37
+094A:  MOVFF  02,36
+094E:  MOVFF  01,35
+0952:  MOVFF  00,34
+.................... 					STATUS.move_in_prog = false; 
+0956:  BCF    1A.4
+.................... 					mode = e_hold_mode; 
+0958:  CLRF   2B
+095A:  CLRF   2A
+.................... 				} 
+....................  
+.................... 				if (FLAGS.neg_move)							// keep moving position 
+095C:  BTFSS  1B.1
+095E:  BRA    0984
+.................... 					cmd_pos.sl -= Fix2LongInt(velact.ul); 
+0960:  MOVFF  3F,FB
+0964:  MOVFF  3E,FA
+0968:  MOVFF  3D,F9
+096C:  MOVFF  3C,F8
+0970:  RCALL  0342
+0972:  MOVF   00,W
+0974:  SUBWF  34,F
+0976:  MOVF   01,W
+0978:  SUBWFB 35,F
+097A:  MOVF   02,W
+097C:  SUBWFB 36,F
+097E:  MOVF   03,W
+0980:  SUBWFB 37,F
+.................... 				else 
+0982:  BRA    09A6
+.................... 					cmd_pos.sl += Fix2LongInt(velact.ul); 
+0984:  MOVFF  3F,FB
+0988:  MOVFF  3E,FA
+098C:  MOVFF  3D,F9
+0990:  MOVFF  3C,F8
+0994:  RCALL  0342
+0996:  MOVF   00,W
+0998:  ADDWF  34,F
+099A:  MOVF   01,W
+099C:  ADDWFC 35,F
+099E:  MOVF   02,W
+09A0:  ADDWFC 36,F
+09A2:  MOVF   03,W
+09A4:  ADDWFC 37,F
+.................... 			} 
+.................... 		} 
+.................... 		break; 
+09A6:  BRA    09C2
+.................... 	 
+.................... 	case e_save_eeprom_mode: 
+.................... 		mode = e_hold_mode; 
+09A8:  CLRF   2B
+09AA:  CLRF   2A
+.................... 		SaveEEPROM(); 
+09AC:  RCALL  01DC
+.................... 		break; 
+09AE:  BRA    09C2
+.................... 		 
+.................... 	case e_pos_go_mode: 
+.................... 		StartGoMove(); 
+09B0:  BRA    04BC
+.................... 		break; 
+.................... 		 
+.................... 	case e_servo_reset_mode: 
+.................... 		ResetServo(); 
+09B2:  RCALL  02C8
+.................... 		break; 
+09B4:  BRA    09C2
+.................... 	 
+.................... 	case e_servo_lock_mode: 
+.................... 		LockServo(); 
+09B6:  RCALL  05DE
+.................... 		break; 
+09B8:  BRA    09C2
+.................... 	 
+.................... 	case e_servo_unlock_mode: 
+.................... 		STATUS.pid_lock 	= false; 
+09BA:  BCF    1A.6
+.................... 		mode 				= e_hold_mode; 
+09BC:  CLRF   2B
+09BE:  CLRF   2A
+.................... 		break; 
+09C0:  BRA    09C2
+.................... 	} 
+.................... } 
+09C2:  GOTO   0E84 (RETURN)
+....................  
+.................... void HandleErrorTask() 
+.................... { 
+.................... 	static int pulse; 
+.................... 	static int filter; 
+.................... 	static int step_en; 
+....................  
+.................... 	 
+.................... 	if (!STEP_ENABLE){ 
+*
+0D76:  BTFSC  F81.4
+0D78:  BRA    0D8C
+.................... 		if (filter>100){ 
+0D7A:  MOVF   xEA,W
+0D7C:  SUBLW  64
+0D7E:  BC    0D84
+.................... 			step_en = false; 
+0D80:  CLRF   xEB
+.................... 		} else { 
+0D82:  BRA    0D8A
+.................... 			filter++; 
+0D84:  INCF   xEA,F
+.................... 			step_en = true; 
+0D86:  MOVLW  01
+0D88:  MOVWF  xEB
+.................... 		} 
+....................  
+.................... 	} else { 
+0D8A:  BRA    0D92
+.................... 		filter = 0; 
+0D8C:  CLRF   xEA
+.................... 		step_en = true; 
+0D8E:  MOVLW  01
+0D90:  MOVWF  xEB
+.................... 	} 
+....................  
+....................  
+.................... 	if (bEnable != step_en){ 
+0D92:  MOVLW  00
+0D94:  BTFSC  xE5.1
+0D96:  MOVLW  01
+0D98:  SUBWF  xEB,W
+0D9A:  BZ    0DB6
+.................... 		if (!step_en){		// if our step enable pin is deactivated 
+0D9C:  MOVF   xEB,F
+0D9E:  BNZ   0DA4
+.................... 			STATUS.pid_lock	= false; 
+0DA0:  BCF    1A.6
+....................  
+.................... 		} else {			// step enable is active now 
+0DA2:  BRA    0DAE
+.................... 			if (STATUS.error){ 
+0DA4:  BTFSS  1A.0
+0DA6:  BRA    0DAC
+.................... 				ResetServo(); 
+0DA8:  CALL   02C8
+.................... 			} 
+.................... 			LockServo(); 
+0DAC:  RCALL  05DE
+.................... 		} 
+.................... 		bEnable = step_en; 
+0DAE:  BCF    xE5.1
+0DB0:  BTFSC  xEB.0
+0DB2:  BSF    xE5.1
+.................... 	} else { 
+0DB4:  BRA    0DBC
+.................... 		if (STATUS.error){ 
+0DB6:  BTFSS  1A.0
+0DB8:  BRA    0DBC
+.................... 			STATUS.pid_lock	= false; 
+0DBA:  BCF    1A.6
+.................... 		} 
+.................... 	} 
+....................  
+....................  
+....................  
+....................  
+....................  
+.................... 	if (STATUS.pid_lock){		// keep track of pid errors 
+0DBC:  BTFSS  1A.6
+0DBE:  BRA    0DC8
+.................... 		TX_STATE = 1;			// tristate error pin if no errors 
+0DC0:  BSF    F94.6
+.................... 		PID_ERROR = 1;			// keep logic high (pullup high) and 
+0DC2:  BSF    F82.6
+.................... 		pulse = 0;				// clear counter for max pulse width 
+0DC4:  CLRF   xE9
+.................... 	} else { 
+0DC6:  BRA    0DDA
+.................... 		if (pulse > 100){		// we have an error, is the pulse done 
+0DC8:  MOVF   xE9,W
+0DCA:  SUBLW  64
+0DCC:  BC    0DD4
+.................... 			TX_STATE = 1;		// if we finished the pulse, reset for later 
+0DCE:  BSF    F94.6
+.................... 			PID_ERROR = 1;		 
+0DD0:  BSF    F82.6
+.................... 		} else { 
+0DD2:  BRA    0DDA
+.................... 			pulse++;			// keep counting until max pulse count  
+0DD4:  INCF   xE9,F
+.................... 			TX_STATE = 0;		// while holding error pin as an output 
+0DD6:  BCF    F94.6
+.................... 			PID_ERROR = 0;		// with an error logic level low 
+0DD8:  BCF    F82.6
+.................... 		} 
+.................... 	} 
+.................... } 
+0DDA:  GOTO   0E8C (RETURN)
+....................  
+.................... 			 
+....................  
+.................... //#include "modbus_crc.c" 
+.................... //#include "packets.c" 
+.................... #include "init.c" 
+.................... // init.c 
+....................  
+.................... void InitializeVars() 
+.................... { 
+.................... 	vars.kp				= 3000; 
+*
+015A:  MOVLW  0B
+015C:  MOVWF  1D
+015E:  MOVLW  B8
+0160:  MOVWF  1C
+.................... 	vars.ki				= 40; 
+0162:  CLRF   1F
+0164:  MOVLW  28
+0166:  MOVWF  1E
+.................... 	vars.kd				= 6000; 
+0168:  MOVLW  17
+016A:  MOVWF  21
+016C:  MOVLW  70
+016E:  MOVWF  20
+....................  
+.................... 	vars.windup			= 500; 
+0170:  MOVLW  01
+0172:  MOVWF  27
+0174:  MOVLW  F4
+0176:  MOVWF  26
+.................... 	 
+.................... 	vars.velcom			= 1000; 
+0178:  MOVLW  03
+017A:  MOVWF  23
+017C:  MOVLW  E8
+017E:  MOVWF  22
+.................... 	vars.vlim			= 1000; 
+0180:  MOVLW  03
+0182:  MOVWF  25
+0184:  MOVLW  E8
+0186:  MOVWF  24
+.................... 	vars.accel			= 1000; 
+0188:  MOVLW  03
+018A:  MOVWF  29
+018C:  MOVLW  E8
+018E:  MOVWF  28
+.................... 	 
+.................... 	vars.src_id			= 1;		// 0=All, 1=X, 2=Y, 3=Z 
+0190:  MOVLW  01
+0192:  MOVWF  19
+.................... 	vars.format			= FORMATED;	 
+0194:  MOVLW  50
+0196:  MOVWF  18
+.................... 	 
+.................... 	vars.status.byte	= 0; 
+0198:  CLRF   1A
+.................... 	STATUS.abs_flag		= true; 
+019A:  BSF    1A.7
+.................... 	STATUS.pid_lock		= true; 
+019C:  BSF    1A.6
+.................... 	STATUS.halt_index	= true; 
+019E:  BSF    1A.3
+.................... 	 
+.................... 	vars.flags.byte		= 0; 
+01A0:  CLRF   1B
+.................... 	FLAGS.ascii			= true; 
+01A2:  BSF    1B.7
+.................... 	FLAGS.menu			= true; 
+01A4:  BSF    1B.6
+.................... } 
+01A6:  GOTO   026A (RETURN)
+....................  
+.................... void InitHardware() 
+.................... { 
+.................... 	delay_ms(50); 
+*
+0210:  MOVLW  32
+0212:  MOVWF  xEC
+0214:  RCALL  00B2
+....................  
+....................  	set_tris_a(0xFF);			// set port a inputs 
+0216:  MOVLW  FF
+0218:  MOVWF  F92
+.................... 	set_tris_b(0xDF);			// port b i/o direction 
+021A:  MOVLW  DF
+021C:  MOVWF  F93
+.................... 	set_tris_c(0x89); 
+021E:  MOVLW  89
+0220:  MOVWF  F94
+.................... 	 
+.................... 	setup_adc(ADC_OFF); 
+0222:  BCF    FC2.0
+....................  	setup_adc_ports(NO_ANALOGS); 
+0224:  BCF    FB9.0
+0226:  BCF    FC1.6
+0228:  BCF    FC1.7
+022A:  MOVLW  00
+022C:  MOVWF  FB8
+....................  	 
+.................... 	// Up/Dn Counters for Step/Direction inputs 
+.................... 	setup_timer_1(T1_EXTERNAL_SYNC|T1_DIV_BY_1); 
+022E:  MOVLW  83
+0230:  MOVWF  FCD
+.................... 	set_timer1(0); 
+0232:  CLRF   FCF
+0234:  CLRF   FCE
+.................... 	setup_timer_5(T5_EXTERNAL_SYNC|T5_DIV_BY_1|T5_DISABLE_SE_RESET); 
+0236:  MOVLW  43
+0238:  MOVWF  FB7
+.................... 	set_timer5(0); 
+023A:  CLRF   F88
+023C:  CLRF   F87
+.................... 	 
+.................... 	// PWM for Servo 
+....................  	setup_timer_2(T2_DIV_BY_1, 250, 1);	//  
+023E:  MOVLW  00
+0240:  IORLW  04
+0242:  MOVWF  FCA
+0244:  MOVLW  FA
+0246:  MOVWF  FCB
+.................... 	setup_ccp1(CCP_PWM); 
+0248:  BCF    F94.2
+024A:  BCF    F8B.2
+024C:  MOVLW  0C
+024E:  MOVWF  FBD
+.................... 	set_pwm1_duty(0); 
+0250:  CLRF   FBE
+.................... 		 
+.................... 	PORTA			= 0xFF; 
+0252:  MOVLW  FF
+0254:  MOVWF  F80
+.................... 	PORTB 			= 0xFF; 
+0256:  MOVWF  F81
+.................... 	PORTC 			= 0x40; 
+0258:  MOVLW  40
+025A:  MOVWF  F82
+.................... 	TX_ENABLE 		= 0;			// deactivate pic uart 
+025C:  BCF    FAC.5
+....................  	TX_STATE 		= 1;			// make tx pin tristate 
+025E:  BSF    F94.6
+....................  
+.................... 	LoadEEPROM(); 
+0260:  BRA    0106
+.................... 	if (vars.format!=FORMATED){ 
+0262:  MOVF   18,W
+0264:  SUBLW  50
+0266:  BZ    0272
+.................... 		InitializeVars(); 
+0268:  BRA    015A
+.................... 		SaveEEPROM();		// save for later 
+026A:  RCALL  01DC
+.................... 		delay_ms(100); 
+026C:  MOVLW  64
+026E:  MOVWF  xEC
+0270:  RCALL  00B2
+.................... 	} 
+.................... 	 
+.................... 	// read hex switch for device slave ID 
+.................... 	port_b_pullups(true); 
+0272:  BCF    FF1.7
+.................... 	vars.src_id = (PORTB&0x0F); 
+0274:  MOVF   F81,W
+0276:  ANDLW  0F
+0278:  MOVWF  19
+....................  	port_b_pullups(false); 
+027A:  BSF    FF1.7
+....................  
+.................... 	// initialize extra variables 
+.................... //	RCIE = true; 
+.................... //	CREN = false; 
+.................... //	CREN = true; 
+.................... 		 
+.................... 	ypid.ul			= 0; 
+027C:  CLRF   43
+027E:  CLRF   42
+0280:  CLRF   41
+0282:  CLRF   40
+.................... 	velact.ul		= 0; 		 
+0284:  CLRF   3F
+0286:  CLRF   3E
+0288:  CLRF   3D
+028A:  CLRF   3C
+.................... 	phase1dist.ul	= 0; 
+028C:  CLRF   47
+028E:  CLRF   46
+0290:  CLRF   45
+0292:  CLRF   44
+.................... 	pos_com			= 0; 
+0294:  CLRF   2F
+0296:  CLRF   2E
+0298:  CLRF   2D
+029A:  CLRF   2C
+....................  
+.................... 	// fire up interrupts 
+.................... 	enable_interrupts(GLOBAL); 
+029C:  MOVLW  C0
+029E:  IORWF  FF2,F
+.................... 	enable_interrupts(INT_TIMER2); 
+02A0:  BSF    F9D.1
+.................... //	enable_interrupts(INT_RDA);		// allow uart rcv interrupt 
+.................... //	PORT_EN = 0; 
+.................... //	RS485_EN(0); 
+.................... } 
+02A2:  GOTO   0E5C (RETURN)
+....................  
+....................  
+.................... #zero_ram 
+.................... void main() 
+.................... {			 
+*
+0DDE:  CLRF   FF8
+0DE0:  BCF    FD0.7
+0DE2:  BSF    0D.7
+0DE4:  MOVLW  FE
+0DE6:  MOVWF  00
+0DE8:  MOVLW  03
+0DEA:  MOVWF  01
+0DEC:  MOVLW  02
+0DEE:  MOVWF  FE9
+0DF0:  MOVLW  00
+0DF2:  MOVWF  FEA
+0DF4:  CLRF   FEE
+0DF6:  DECFSZ 00,F
+0DF8:  BRA    0DF4
+0DFA:  DECFSZ 01,F
+0DFC:  BRA    0DF4
+0DFE:  CLRF   FEA
+0E00:  CLRF   FE9
+0E02:  BCF    FB9.0
+0E04:  BCF    FC1.6
+0E06:  BCF    FC1.7
+0E08:  MOVLW  00
+0E0A:  MOVWF  FB8
+0E0C:  CLRF   2A
+0E0E:  CLRF   2B
+0E10:  CLRF   48
+0E12:  CLRF   49
+0E14:  CLRF   4A
+0E16:  CLRF   4B
+0E18:  CLRF   4C
+0E1A:  CLRF   4D
+0E1C:  CLRF   50
+0E1E:  CLRF   51
+0E20:  CLRF   52
+0E22:  CLRF   53
+0E24:  CLRF   54
+0E26:  CLRF   55
+0E28:  CLRF   56
+0E2A:  CLRF   57
+0E2C:  CLRF   58
+0E2E:  CLRF   59
+0E30:  CLRF   5A
+0E32:  CLRF   5B
+0E34:  CLRF   5C
+0E36:  CLRF   5D
+0E38:  CLRF   5E
+0E3A:  CLRF   5F
+0E3C:  CLRF   x60
+0E3E:  CLRF   x61
+0E40:  CLRF   x62
+0E42:  CLRF   x63
+0E44:  CLRF   x64
+0E46:  BCF    xE5.0
+0E48:  BCF    xE5.1
+0E4A:  BCF    xE5.2
+0E4C:  CLRF   xE6
+0E4E:  CLRF   xE7
+0E50:  CLRF   xE8
+0E52:  CLRF   xE9
+0E54:  CLRF   xEA
+0E56:  CLRF   xEB
+.................... 	InitHardware(); 
+0E58:  GOTO   0210
+.................... 	Encoder(true); 
+0E5C:  MOVLW  01
+0E5E:  MOVWF  xEC
+0E60:  GOTO   02A6
+.................... 	 
+.................... 	ResetServo(); 
+0E64:  CALL   02C8
+.................... 	delay_ms(200); 
+0E68:  MOVLW  C8
+0E6A:  MOVWF  xEC
+0E6C:  CALL   00B2
+....................  
+.................... 	bEnable = !STEP_ENABLE; 
+0E70:  BCF    xE5.1
+0E72:  BTFSS  F81.4
+0E74:  BSF    xE5.1
+.................... 		 
+.................... 	// run these asynch tasks 
+.................... 	for (;;){ 
+.................... 		if (bServo){ 
+0E76:  BTFSS  xE5.0
+0E78:  BRA    0E90
+.................... 			SYNC = true; 
+0E7A:  BSF    F81.5
+.................... 			UpdatePosition(); 
+0E7C:  GOTO   036E
+.................... 			UpdateTrajectory(); 
+0E80:  GOTO   0618
+.................... 			CalculateExtCount(); 
+0E84:  BRA    09C6
+.................... 			UpdatePID(); 
+0E86:  BRA    0A92
+.................... 			UpdatePWM(); 
+0E88:  BRA    0CEC
+.................... 			HandleErrorTask(); 
+0E8A:  BRA    0D76
+.................... 			bServo = false; 
+0E8C:  BCF    xE5.0
+.................... 		} else {		 
+0E8E:  BRA    0EA4
+.................... 			//HandleRXData(); 
+.................... 			 
+.................... 			if (SYNC){ 
+0E90:  BTFSS  F81.5
+0E92:  BRA    0EA4
+.................... 				if (bDirty && !bEnable){ 
+0E94:  BTFSS  xE5.2
+0E96:  BRA    0EA2
+0E98:  BTFSC  xE5.1
+0E9A:  BRA    0EA2
+.................... 					bDirty = false; 
+0E9C:  BCF    xE5.2
+.................... 					SaveEEPROM(); 
+0E9E:  CALL   01DC
+.................... 				} 
+.................... 				SYNC = false;	 
+0EA2:  BCF    F81.5
+.................... 			} 
+....................  
+....................  
+.................... 		} 
+.................... 	} 
+0EA4:  BRA    0E76
+.................... } 
+....................  
+....................  
+.................... #INT_TIMER2 
+.................... void servoisr() 
+0EA6:  SLEEP 
+.................... { 
+.................... 	if (servo_update++ > 15){ 
+*
+009E:  MOVF   x62,W
+00A0:  INCF   x62,F
+00A2:  SUBLW  0F
+00A4:  BC    00AC
+.................... 		servo_update = 0; 
+00A6:  CLRF   x62
+.................... 		bServo = true; 
+00A8:  BSF    xE5.0
+.................... 		rx_timer++; 
+00AA:  INCF   x63,F
+.................... 	}	 
+.................... } 
+00AC:  BCF    F9E.1
+00AE:  GOTO   0058
+
+Configuration Fuses:
+   Word  1: C200   HS IESO FCMEN
+   Word  2: 3E0E   BROWNOUT NOWDT PUT NOWINEN WDT32768
+   Word  3: 9D3C   T1LOWPOWER HPOL_HIGH LPOL_HIGH PWMPIN MCLR
+   Word  4: 0081   STVREN NODEBUG NOLVP
+   Word  5: C000   PROTECT NOCPD NOCPB
+   Word  6: E00F   NOWRT NOWRTD NOWRTC NOWRTB
+   Word  7: 400F   NOEBTR NOEBTRB
+
+ID Locations:
+   06 F0 0E F0 05 F0 08 F0 

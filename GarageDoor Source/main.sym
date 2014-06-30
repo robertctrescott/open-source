@@ -1,0 +1,275 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004     @INTERRUPT_AREA
+005     @INTERRUPT_AREA
+006     @INTERRUPT_AREA
+007     @INTERRUPT_AREA
+008     @INTERRUPT_AREA
+009     @INTERRUPT_AREA
+00A     @INTERRUPT_AREA
+00B     @INTERRUPT_AREA
+00C     @INTERRUPT_AREA
+00D     @INTERRUPT_AREA
+00E     @INTERRUPT_AREA
+00F     @INTERRUPT_AREA
+010     @INTERRUPT_AREA
+011     @INTERRUPT_AREA
+012     @INTERRUPT_AREA
+013     @INTERRUPT_AREA
+014     @INTERRUPT_AREA
+015     @INTERRUPT_AREA
+016     @INTERRUPT_AREA
+017.0   b50ms
+017.1   bRX_ready
+018     cur_cmd
+019     dest_id
+01A-023 RF_RXBUF
+024     in_ptr
+025     HandleUIButtons.prev_button
+026     HandleEvents.phase
+027     HandleEvents.level
+028     HandleEvents.prev_cmd
+029     timer2_isr.count
+02A     HandleRfTraffic.i
+02A     HandleUIButtons.button
+02A     InitHardware.pb
+02B     HandleRfTraffic.lsb
+02B     HandleUIButtons.@SCRATCH1
+02B     InitHardware.@SCRATCH1
+02C     @delay_ms1.P1
+02C     HandleRfTraffic.msb
+02D-02E HandleRfTraffic.crc
+02F-038 HandleRfTraffic.in_bytes
+039-03A WriteCMD.CMD
+039-03A _CRC16_.array
+039     HandleRfTraffic.@SCRATCH1
+03A     HandleRfTraffic.@SCRATCH2
+03B     WriteCMD.n
+03B     _CRC16_.len
+03B     HandleRfTraffic.@SCRATCH3
+03C-03D _CRC16_.test_crc
+03C     HandleRfTraffic.@SCRATCH4
+03E     _CRC16_.@SCRATCH1
+03F     update_crc.ch
+040     update_crc.i
+041.0   update_crc.j
+042     update_crc.@SCRATCH1
+043     update_crc.@SCRATCH2
+046     portb_isr.rx
+046     timer2_isr.@SCRATCH1
+047     RF12_RDFIFO.i
+047     portb_isr.@SCRATCH1
+048     RF12_RDFIFO.Result
+048     portb_isr.@SCRATCH2
+F80     PORTA
+F80.0   LED_M1
+F80.1   LED_M2
+F81.0   LED_B1
+F81     PORTB
+F81.1   LED_B2
+F81.2   LED_B4
+F81.3   LED_B8
+F81.4   SERVO_CS
+F81.5   RF_IRQ
+F81.6   SW_SET
+F81.7   SW_MODE
+F82.0   RF_EN
+F82     PORTC
+F82.1   RF_RES
+F82.2   SERVO_PWR
+F82.3   SCK
+F82.4   SDA
+F82.5   SDO
+F82.6   TXO
+F82.7   RXI
+F83     PORTD
+F84     PORTE
+F89     LATA
+F8A     LATB
+F8B     LATC
+F8C     LATD
+F8D     LATE
+F92     TRISA
+F93     TRISB
+F94     TRISC
+F95     TRISD
+F96     TRISE
+F9D     PIE1
+F9D.5   RCIE
+F9E     PIR1
+F9E.5   RCIF
+F9F     IPR1
+FA0     PIE2
+FA1     PIR2
+FA2     IPR2
+FA6     EECON1
+FA6.0   RD
+FA6.1   WR
+FA6.2   WREN
+FA6.3   WRERR
+FA6.4   FREE
+FA6.6   CFGS
+FA6.7   EEPGD
+FA7     EECON2
+FA8     EEDATA
+FA9     EEADR
+FAB     RCSTA
+FAB.4   CREN
+FAC     TXSTA
+FAC.1   TRMT
+FAD     TXREG
+FAE     RCREG
+FAF     SPBRG
+FB1     T3CON
+FB2     TMR3L
+FB3     TMR3H
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBA     CCP2CON
+FBB     CCPR2L
+FBB     CCP_2
+FBB     CCP_2_LOW
+FBC     CCPR2H
+FBC     CCP_2_HIGH
+FBD     CCP1CON
+FBE     CCP_1
+FBE     CCP_1_LOW
+FBE     CCPR1L
+FBF     CCPR1H
+FBF     CCP_1_HIGH
+FC1     ADCON1
+FC2     ADCON0
+FC3     ADRESL
+FC4     ADRESH
+FC5     SSPCON2
+FC6     SSPCON1
+FC7     SSPSTAT
+FC8     SSPADD
+FC9     SSPBUF
+FCA     T2CON
+FCB     PR2
+FCC     TMR2
+FCD     T1CON
+FCE     TMR1L
+FCF     TMR1H
+FD0     RCON
+FD1     WDTCON
+FD2     LVDCON
+FD3     OSCCON
+FD5     T0CON
+FD6     TMR0L
+FD7     TMR0H
+FD8     STATUS
+FD9     FSR2L
+FDA     FSR2H
+FDB     PLUSW2
+FDC     PREINC2
+FDD     POSTDEC2
+FDE     POSTINC2
+FDF     INDF2
+FE0     BSR
+FE1-FE2 @READ_PACKED_MEMORY.P1
+FE1-FE2 @WRITE_PACKED_MEMORY.P2
+FE1     FSR1L
+FE2     FSR1H
+FE3     PLUSW1
+FE4     PREINC1
+FE5     POSTDEC1
+FE6     POSTINC1
+FE7     INDF1
+FE8     WREG
+FE9-FEA @READ_PACKED_MEMORY.P1
+FE9-FEA @WRITE_PROGRAM_MEMORY.P2
+FE9     FSR0L
+FE9-FEA @READ_PROGRAM_MEMORY.P1
+FE9-FEA @WRITE_PACKED_MEMORY.P2
+FEA     FSR0H
+FEB     PLUSW0
+FEC     PREINC0
+FED     POSTDEC0
+FEE     POSTINC0
+FEF     INDF0
+FF0     INTCON3
+FF1     INTCON2
+FF1.7   RBPU
+FF2     INTCON
+FF2.0   RBIF
+FF2.7   GIE
+FF3     PRODL
+FF4     PRODH
+FF5     TABLAT
+FF6-FF8 @READ_PROGRAM_MEMORY.P1
+FF6     TBLPTRL
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P1
+FF7     TBLPTRH
+FF8     TBLPTRU
+FF9     PCL
+FFA     PCLATH
+FFB     PCLATU
+FFC     STKPTR
+FFD     TOSL
+FFE     TOSH
+FFF     TOSU
+
+ROM Allocation:
+0000A2  timer2_isr
+0000B4  RF12_RDFIFO
+0000F6  portb_isr
+000138  @delay_ms1
+00015E  InitHardware
+0001E2  Write1
+0001FC  Write0
+000216  WriteCMD
+00024C  Init_RF12RX
+000302  HandleEvents
+000368  HandleUILeds
+000388  HandleUIButtons
+0003C4  _CRC16_
+0003EA  update_crc
+00042A  HandleRfTraffic
+000534  @cinit1
+000534  main
+000552  @cinit2
+0136  Loop
+
+Project Directory:
+    Z:\Robs Folder\GarageDoor Source\
+
+Project Files:
+    main.c                                                  [24-Dec-12 15:33  CRC=F428D0DF]
+    C:\Program Files (x86)\PICC\devices\18F2520.h           [28-May-13 12:10  CRC=5C326614]
+    18F4520.inc                                             [23-Jun-12 15:34  CRC=808348AD]
+    buttons.c                                               [24-Dec-12 15:53  CRC=9794EFF9]
+    modbus_crc.c                                            [15-Dec-12 12:35  CRC=0998EF37]
+    radio.c                                                 [15-Dec-12 13:06  CRC=46666574]
+
+Source signature=FED929B8
+
+Units:
+    main (main)
+
+Compiler Settings:
+    Processor:      PIC18F2520
+    Pointer Size:   16
+    ADC Range:      0-1023
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+    Case Sensitive: Yes
+    ICD Provisions: Yes
+    Predefined symbols:
+       #define __DEBUG 1
+       #define __18F2520 TRUE
+
+Output Files:
+    Errors:      main.err
+    INHX32:      DOOR1_00.hex
+    Symbols:     main.sym
+    List:        main.lst
+    Debug/COFF:  main.cof
+    Project:     main.ccspjt
+    Call Tree:   main.tre
+    Statistics:  main.STA

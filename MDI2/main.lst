@@ -1,0 +1,514 @@
+CCS PCH C Compiler, Version 4.084, 46866               17-Aug-09 23:02
+
+               Filename: main.lst
+
+               ROM used: 660 bytes (2%)
+                         Largest free fragment is 32104
+               RAM used: 99 (6%) at main() level
+                         102 (7%) worst case
+               Stack:    3 worst case (2 in main + 1 for interrupts)
+
+*
+0000:  GOTO   01B8
+*
+0008:  MOVWF  05
+000A:  MOVFF  FD8,06
+000E:  MOVFF  FE0,07
+0012:  MOVLB  0
+0014:  MOVFF  FE9,0D
+0018:  MOVFF  FEA,08
+001C:  MOVFF  FE1,09
+0020:  MOVFF  FE2,0A
+0024:  MOVFF  FD9,0B
+0028:  MOVFF  FDA,0C
+002C:  MOVFF  FF3,14
+0030:  MOVFF  FF4,15
+0034:  MOVFF  FFA,16
+0038:  MOVFF  00,0F
+003C:  MOVFF  01,10
+0040:  MOVFF  02,11
+0044:  MOVFF  03,12
+0048:  MOVFF  04,13
+004C:  BTFSS  F9D.1
+004E:  GOTO   0058
+0052:  BTFSC  F9E.1
+0054:  GOTO   00AA
+0058:  BTFSS  F9D.5
+005A:  GOTO   0064
+005E:  BTFSC  F9E.5
+0060:  GOTO   00B0
+0064:  MOVFF  0F,00
+0068:  MOVFF  10,01
+006C:  MOVFF  11,02
+0070:  MOVFF  12,03
+0074:  MOVFF  13,04
+0078:  MOVFF  0D,FE9
+007C:  MOVFF  08,FEA
+0080:  BSF    08.7
+0082:  MOVFF  09,FE1
+0086:  MOVFF  0A,FE2
+008A:  MOVFF  0B,FD9
+008E:  MOVFF  0C,FDA
+0092:  MOVFF  14,FF3
+0096:  MOVFF  15,FF4
+009A:  MOVFF  16,FFA
+009E:  MOVF   05,W
+00A0:  MOVFF  07,FE0
+00A4:  MOVFF  06,FD8
+00A8:  RETFIE 0
+.................... /* main.c 
+....................  
+.................... 	05/02/09 by Robert Trescott Jr. 
+.................... 	(C)2009 Analogic 
+....................  
+.................... 	Microchip MPLAB ICD2 Emulation 
+....................  
+.................... 	History: 
+.................... 		05/18/09 - ORIGINAL WORK for PICDEM 2 PLUS PCB - rct 
+....................  
+.................... */ 
+....................  
+.................... // compiler and hardware special settings 
+.................... // *** Microchip stores "little-endian" ex. $4F52 = 0x52 0x4F in memory *** 
+.................... // *** DO NOT USE ICD2 THROUGH A USB HUB! ********** 
+....................  
+.................... #case 
+.................... #define ICD2 
+....................  
+.................... #include <18F452.h> 
+.................... //////// Standard Header file for the PIC18F452 device //////////////// 
+.................... #device PIC18F452 
+.................... #list 
+....................  
+.................... #device *=16 
+.................... #device ADC=10 
+....................  
+.................... #ifdef ICD2 
+.................... #fuses HS,NOWDT,NOPROTECT,NOBROWNOUT,PUT,NOCPD,NOCPB,NOLVP,DEBUG 
+.................... #else 
+.................... #fuses HS,NOWDT,PROTECT,BROWNOUT,PUT,NODEBUG,NOLVP,NOCPD,CPB 
+.................... #endif 
+.................... #use delay(clock=20000000) 
+....................  
+.................... #include "PIC18F452.inc"		// standard ccs io defs 
+.................... #list 
+.................... // P18F452.INC  Standard Header File, Version 1.4   Microchip Technology, Inc. 
+.................... #list 
+....................  
+....................  
+.................... #define	VERSION		   "1.00" 
+.................... #export (hex,file="MDI2_1_00.hex") 
+....................  
+....................  
+.................... #define false			0 
+.................... #define true			1 
+.................... #define byte			int 
+.................... #define boolean			short int 
+.................... #define RS232_TX		PIN_C6 
+.................... #define RS232_RX		PIN_C7 
+.................... #define NOTEON			0x90 
+.................... #define NOTEOFF			0x80 
+.................... #define SYSEXON			0xF0 
+.................... #define SYSEXOFF		0xF7 
+.................... #define REALTIME		0xF8 
+.................... #define PROGCHNG		0xC0 
+.................... #define CHANPRSR		0xDF 
+.................... #define MIDICHAN		PORTC 
+....................  
+....................  
+....................  
+.................... #define RX_BUFFER_SIZE 	64 
+....................  
+.................... #BIT LITE0            	= PORTB.0 
+.................... #BIT LITE1            	= PORTB.1 
+.................... #BIT LITE2            	= PORTB.2 
+.................... #BIT LITE3            	= PORTB.3 
+....................  
+....................  
+....................  
+.................... #use rs232(baud=31250,xmit=RS232_TX,rcv=RS232_RX) 
+....................  
+.................... static int1 mvalid; 
+.................... static int1 rxempty; 
+.................... static int1 byteflag; 
+.................... static int1 insysex; 
+.................... static int8 mstatus; 
+.................... static int8 mkey; 
+.................... static int8 mvel; 
+.................... static int8 mval; 
+.................... static int8	mchan; 
+.................... static int16 mword; 
+....................  
+.................... static int8 in_ptr; 
+.................... static int8 out_ptr; 
+.................... static int8 in_buffer[RX_BUFFER_SIZE]; 
+....................  
+....................  
+....................  
+.................... void InitHardware() 
+.................... { 
+.................... 	rxempty = true; 
+*
+00E6:  BSF    18.1
+.................... 	mstatus = 0; 
+00E8:  CLRF   19
+.................... 	mkey	= 0xFF; 
+00EA:  MOVLW  FF
+00EC:  MOVWF  1A
+.................... 	mvel 	= 0xFF; 
+00EE:  MOVWF  1B
+.................... 	mword 	= 0xFFFF; 
+00F0:  MOVWF  1F
+00F2:  MOVWF  1E
+.................... 	mvalid	= false; 
+00F4:  BCF    18.0
+.................... 	mchan 	= MIDICHAN & 0x0F; 
+00F6:  MOVF   F82,W
+00F8:  ANDLW  0F
+00FA:  MOVWF  1D
+....................  
+.................... 	enable_interrupts(GLOBAL); 
+00FC:  MOVLW  C0
+00FE:  IORWF  FF2,F
+.................... 	enable_interrupts(INT_TIMER2); 
+0100:  BSF    F9D.1
+.................... 	enable_interrupts(INT_RDA);		// allow uart rcv interrupt 
+0102:  BSF    F9D.5
+.................... } 
+0104:  GOTO   0272 (RETURN)
+....................  
+....................  
+.................... void RxMIDI() 
+.................... { 
+.................... 	if (rxempty){ 
+0108:  BTFSS  18.1
+010A:  BRA    0114
+.................... 		mword 	= 0xFFFF;			// make midi word invalid 
+010C:  MOVLW  FF
+010E:  MOVWF  1F
+0110:  MOVWF  1E
+.................... 	} else { 
+0112:  BRA    0140
+.................... 		mword = in_buffer[out_ptr]; 
+0114:  CLRF   03
+0116:  MOVF   21,W
+0118:  ADDLW  22
+011A:  MOVWF  FE9
+011C:  MOVLW  00
+011E:  ADDWFC 03,W
+0120:  MOVWF  FEA
+0122:  MOVF   FEF,W
+0124:  CLRF   03
+0126:  MOVWF  1E
+0128:  MOVFF  03,1F
+.................... 		out_ptr++; 
+012C:  INCF   21,F
+.................... 		if (out_ptr >= RX_BUFFER_SIZE) out_ptr = 0; 
+012E:  MOVF   21,W
+0130:  SUBLW  3F
+0132:  BTFSS  FD8.0
+0134:  CLRF   21
+.................... 		rxempty = (in_ptr == out_ptr); 
+0136:  BCF    18.1
+0138:  MOVF   21,W
+013A:  SUBWF  20,W
+013C:  BNZ   0140
+013E:  BSF    18.1
+.................... 	} 
+.................... } 
+0140:  GOTO   0148 (RETURN)
+....................  
+.................... void HandleMIDI() 
+.................... { 
+.................... 	mvalid = false; 
+0144:  BCF    18.0
+.................... 	RxMIDI(); 
+0146:  BRA    0108
+....................  
+.................... 	if (mword < REALTIME){					// data must be valid and not realtime status 
+0148:  MOVF   1F,F
+014A:  BNZ   01B4
+014C:  MOVF   1E,W
+014E:  SUBLW  F7
+0150:  BNC   01B4
+.................... 		if (mword == SYSEXOFF){				// sysex message has ended so recognize it and 
+0152:  MOVF   1E,W
+0154:  SUBLW  F7
+0156:  BNZ   0162
+0158:  MOVF   1F,F
+015A:  BNZ   0162
+.................... 			insysex = false;				// cancel its flag 
+015C:  BCF    18.3
+.................... 			mstatus = 0;					// we also want to clear running status buffer 
+015E:  CLRF   19
+.................... 		} else { 
+0160:  BRA    01B4
+.................... 	 
+.................... 			if (mword == SYSEXON || insysex){	// we are either in sysex or getting into it so 
+0162:  MOVF   1E,W
+0164:  SUBLW  F0
+0166:  BNZ   016C
+0168:  MOVF   1F,F
+016A:  BZ    0170
+016C:  BTFSS  18.3
+016E:  BRA    0176
+.................... 				insysex = true;				// flag sysex mode 
+0170:  BSF    18.3
+.................... 				mstatus = 0;				// and make sure status buffer is cleared 
+0172:  CLRF   19
+.................... 			} else { 
+0174:  BRA    01B4
+.................... 		 
+.................... 				if (mword >= NOTEOFF){		// this must be a status byte 
+0176:  MOVF   1F,F
+0178:  BNZ   0180
+017A:  MOVF   1E,W
+017C:  SUBLW  7F
+017E:  BC    0188
+.................... 					mstatus = mword;		// so remember it and 
+0180:  MOVFF  1E,19
+.................... 					byteflag = false;		// clear thirdbyte flag 
+0184:  BCF    18.2
+.................... 				} else {					// we must be a data byte 
+0186:  BRA    01B4
+....................  
+.................... 					if (byteflag){			// are we at the third byte yet 
+0188:  BTFSS  18.2
+018A:  BRA    0196
+.................... 						byteflag = false;	// if so then reset flag and 
+018C:  BCF    18.2
+.................... 						mvel = mword;		// record thirdbyte as velocity 
+018E:  MOVFF  1E,1B
+.................... 						mvalid = true;		// and let system know we are valid 
+0192:  BSF    18.0
+.................... 					} else {				// we are not third byte yet 
+0194:  BRA    01B4
+....................  
+.................... 						if (mstatus){ 
+0196:  MOVF   19,F
+0198:  BZ    01B4
+.................... 							if (mstatus >= PROGCHNG && mstatus <= CHANPRSR){ 
+019A:  MOVF   19,W
+019C:  SUBLW  BF
+019E:  BC    01AE
+01A0:  MOVF   19,W
+01A2:  SUBLW  DF
+01A4:  BNC   01AE
+.................... 								mval = mword;		// save this value but not as third byte 
+01A6:  MOVFF  1E,1C
+.................... 								mvalid = true;		// and let system know we are valid 
+01AA:  BSF    18.0
+.................... 							} else { 
+01AC:  BRA    01B4
+.................... 								byteflag = true;	// we now have data bytes that req 3 bytes	 
+01AE:  BSF    18.2
+.................... 								mkey = mword;		// save key value 
+01B0:  MOVFF  1E,1A
+.................... 			 
+.................... 							} 
+.................... 						} 
+.................... 					} 
+.................... 				} 
+.................... 			} 
+.................... 		} 
+.................... 	} 
+.................... } 
+01B4:  GOTO   0274 (RETURN)
+....................  
+....................  
+....................  
+....................  
+.................... void main() 
+.................... {	 
+01B8:  CLRF   FF8
+01BA:  BCF    FD0.7
+01BC:  BSF    08.7
+01BE:  CLRF   FEA
+01C0:  CLRF   FE9
+01C2:  MOVLW  09
+01C4:  MOVWF  FAF
+01C6:  MOVLW  A2
+01C8:  MOVWF  FAC
+01CA:  MOVLW  90
+01CC:  MOVWF  FAB
+01CE:  BSF    FC1.0
+01D0:  BSF    FC1.1
+01D2:  BSF    FC1.2
+01D4:  BCF    FC1.3
+01D6:  BCF    18.0
+01D8:  BCF    18.1
+01DA:  BCF    18.2
+01DC:  BCF    18.3
+01DE:  CLRF   19
+01E0:  CLRF   1A
+01E2:  CLRF   1B
+01E4:  CLRF   1C
+01E6:  CLRF   1D
+01E8:  CLRF   1E
+01EA:  CLRF   1F
+01EC:  CLRF   20
+01EE:  CLRF   21
+01F0:  CLRF   22
+01F2:  CLRF   23
+01F4:  CLRF   24
+01F6:  CLRF   25
+01F8:  CLRF   26
+01FA:  CLRF   27
+01FC:  CLRF   28
+01FE:  CLRF   29
+0200:  CLRF   2A
+0202:  CLRF   2B
+0204:  CLRF   2C
+0206:  CLRF   2D
+0208:  CLRF   2E
+020A:  CLRF   2F
+020C:  CLRF   30
+020E:  CLRF   31
+0210:  CLRF   32
+0212:  CLRF   33
+0214:  CLRF   34
+0216:  CLRF   35
+0218:  CLRF   36
+021A:  CLRF   37
+021C:  CLRF   38
+021E:  CLRF   39
+0220:  CLRF   3A
+0222:  CLRF   3B
+0224:  CLRF   3C
+0226:  CLRF   3D
+0228:  CLRF   3E
+022A:  CLRF   3F
+022C:  CLRF   40
+022E:  CLRF   41
+0230:  CLRF   42
+0232:  CLRF   43
+0234:  CLRF   44
+0236:  CLRF   45
+0238:  CLRF   46
+023A:  CLRF   47
+023C:  CLRF   48
+023E:  CLRF   49
+0240:  CLRF   4A
+0242:  CLRF   4B
+0244:  CLRF   4C
+0246:  CLRF   4D
+0248:  CLRF   4E
+024A:  CLRF   4F
+024C:  CLRF   50
+024E:  CLRF   51
+0250:  CLRF   52
+0252:  CLRF   53
+0254:  CLRF   54
+0256:  CLRF   55
+0258:  CLRF   56
+025A:  CLRF   57
+025C:  CLRF   58
+025E:  CLRF   59
+0260:  CLRF   5A
+0262:  CLRF   5B
+0264:  CLRF   5C
+0266:  CLRF   5D
+0268:  CLRF   5E
+026A:  CLRF   5F
+026C:  CLRF   60
+026E:  CLRF   61
+.................... 	InitHardware(); 
+0270:  BRA    00E6
+.................... 	 
+.................... 	for (;;){										// forever loop 
+.................... 		HandleMIDI();								// parse MIDI stream 
+0272:  BRA    0144
+.................... 		if (mvalid){								// handle if valid 
+0274:  BTFSS  18.0
+0276:  BRA    0294
+.................... 			if ((mstatus&0x0F) == mchan){			// also must be our channel 
+0278:  MOVF   19,W
+027A:  ANDLW  0F
+027C:  SUBWF  1D,W
+027E:  BNZ   0294
+.................... 				switch (mstatus&0xF0){				// only respond to NOTEON/OFF status 
+0280:  MOVF   19,W
+0282:  ANDLW  F0
+0284:  XORLW  80
+0286:  BZ    028E
+0288:  XORLW  10
+028A:  BZ    0290
+028C:  BRA    0292
+.................... 					case NOTEOFF: break; 
+028E:  BRA    0294
+.................... 					case NOTEON: break; 
+0290:  BRA    0294
+.................... 					default: break; 
+0292:  BRA    0294
+.................... 				} 
+.................... 			} 
+.................... 		} 
+.................... 	} 
+0294:  BRA    0272
+.................... } 
+....................  
+....................  
+....................  
+.................... #INT_TIMER2 
+.................... void timer2_isr() 
+0296:  SLEEP 
+.................... {	 
+....................  
+.................... } 
+....................  
+*
+00AA:  BCF    F9E.1
+00AC:  GOTO   0064
+.................... #INT_RDA 
+.................... void rx_isr() 
+.................... { 
+.................... 	char in; 
+.................... 		 
+.................... 	if (RCIF){					// we may have a valid char in uart					 
+00B0:  BTFSS  F9E.5
+00B2:  BRA    00E0
+.................... 		if (RCSTA & 0x06){		// if we have an error, clear error flags 
+00B4:  MOVF   FAB,W
+00B6:  ANDLW  06
+00B8:  BZ    00BE
+.................... 			CREN = FALSE; 
+00BA:  BCF    FAB.4
+.................... 			CREN = TRUE; 
+00BC:  BSF    FAB.4
+.................... 		} 
+.................... 		 
+.................... 		in = RCREG; 
+00BE:  MOVFF  FAE,63
+.................... 		rxempty = false;		// we now have something in the rxbuffer 
+00C2:  BCF    18.1
+.................... 		 
+.................... 		in_buffer[in_ptr] = in;	// read to clear interrupt status flag 
+00C4:  CLRF   03
+00C6:  MOVF   20,W
+00C8:  ADDLW  22
+00CA:  MOVWF  FE9
+00CC:  MOVLW  00
+00CE:  ADDWFC 03,W
+00D0:  MOVWF  FEA
+00D2:  MOVFF  63,FEF
+.................... 		in_ptr++; 
+00D6:  INCF   20,F
+.................... 		if (in_ptr >= RX_BUFFER_SIZE) 
+00D8:  MOVF   20,W
+00DA:  SUBLW  3F
+00DC:  BC    00E0
+.................... 			in_ptr=0;	 
+00DE:  CLRF   20
+.................... 	}	 
+.................... } 
+00E0:  BCF    F9E.5
+00E2:  GOTO   0064
+
+Configuration Fuses:
+   Word  1: 2200   HS NOOSCSEN
+   Word  2: 0E0C   NOBROWNOUT WDT128 NOWDT BORV20 PUT
+   Word  3: 0100   CCP2C1
+   Word  4: 0001   STVREN DEBUG NOLVP
+   Word  5: C00F   NOPROTECT NOCPD NOCPB
+   Word  6: E00F   NOWRT NOWRTD NOWRTB NOWRTC
+   Word  7: 400F   NOEBTR NOEBTRB

@@ -1,0 +1,304 @@
+CCS PCM C Compiler, Version 4.066, 42283               11-Sep-11 22:27
+
+               Filename: main.lst
+
+               ROM used: 192 words (19%)
+                         Largest free fragment is 832
+               RAM used: 14 (22%) at main() level
+                         15 (23%) worst case
+               Stack:    1 locations
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   004
+0003:  NOP
+0004:  CALL   3FF
+0005:  BSF    03.5
+0006:  MOVWF  10
+0007:  MOVLW  00
+0008:  MOVWF  0A
+0009:  GOTO   04D
+.................... /* main.c 
+....................  
+.................... 	09/11/2011 by Robert Trescott Jr. 
+.................... 	(C)2011 Analogic 
+....................  
+.................... 	History: 
+.................... 		09/11/11 - original work 
+....................  
+.................... */ 
+....................  
+.................... // compiler and hardware special settings 
+.................... #case 
+....................  
+.................... #include <12F675.h> 
+.................... //////// Standard Header file for the PIC12F675 device //////////////// 
+.................... #device PIC12F675 
+.................... #list 
+....................  
+....................  
+.................... #fuses INTRC_IO,PUT,NOWDT,BROWNOUT,CPD,PROTECT 
+....................  
+.................... #use delay (clock=4000000) 
+*
+000C:  MOVLW  2E
+000D:  MOVWF  04
+000E:  MOVF   00,W
+000F:  BTFSC  03.2
+0010:  GOTO   01F
+0011:  MOVLW  01
+0012:  MOVWF  21
+0013:  CLRF   20
+0014:  DECFSZ 20,F
+0015:  GOTO   014
+0016:  DECFSZ 21,F
+0017:  GOTO   013
+0018:  MOVLW  4A
+0019:  MOVWF  20
+001A:  DECFSZ 20,F
+001B:  GOTO   01A
+001C:  GOTO   01D
+001D:  DECFSZ 00,F
+001E:  GOTO   011
+.................... #include "PIC12F629.inc" 
+.................... #list	 
+....................  
+....................  
+.................... #define	true			1 
+.................... #define	false			0 
+....................  
+.................... #define MAX_CHANS		3 
+.................... #define PREAMBLE		0xE5 
+....................  
+....................  
+.................... // "little-endian" ex. 0xA8 0x31 0x52 0x4F in memory = int32 4F5231A8 
+.................... typedef union {		 
+.................... 	struct { 
+.................... 		int8 byte; 
+.................... 	}; 
+.................... 	struct { 
+.................... 		int8 pre		: 5; 
+.................... 		int8 ch3		: 1; 
+.................... 		int8 ch2		: 1; 
+.................... 		int8 ch1		: 1; 
+.................... 	}; 
+.................... } u_OUT; 
+....................  
+....................  
+.................... static int16	chan[MAX_CHANS]; 
+*
+006A:  CLRF   25
+006B:  CLRF   26
+006C:  CLRF   27
+006D:  CLRF   28
+006E:  CLRF   29
+006F:  CLRF   2A
+.................... static u_OUT 	out; 
+0070:  CLRF   2B
+....................  
+.................... #use rs232(baud=1200, xmit=PIN_A0,rcv=PIN_A3) 
+*
+0024:  BSF    03.5
+0025:  BCF    05.0
+0026:  BCF    03.5
+0027:  BCF    05.0
+0028:  MOVLW  08
+0029:  MOVWF  21
+002A:  GOTO   02B
+002B:  NOP
+002C:  BSF    21.7
+002D:  GOTO   03C
+002E:  BCF    21.7
+002F:  RRF    2E,F
+0030:  BTFSC  03.0
+0031:  BSF    05.0
+0032:  BTFSS  03.0
+0033:  BCF    05.0
+0034:  BSF    21.6
+0035:  GOTO   03C
+0036:  BCF    21.6
+0037:  DECFSZ 21,F
+0038:  GOTO   02F
+0039:  GOTO   03A
+003A:  NOP
+003B:  BSF    05.0
+003C:  MOVLW  01
+003D:  MOVWF  20
+003E:  CLRF   04
+003F:  DECFSZ 04,F
+0040:  GOTO   03F
+0041:  DECFSZ 20,F
+0042:  GOTO   03E
+0043:  MOVLW  0E
+0044:  MOVWF  04
+0045:  DECFSZ 04,F
+0046:  GOTO   045
+0047:  NOP
+0048:  BTFSC  21.7
+0049:  GOTO   02E
+004A:  BTFSC  21.6
+004B:  GOTO   036
+004C:  GOTO   0B4 (RETURN)
+....................  
+....................  
+.................... void initialize() 
+.................... {	 
+.................... 	delay_ms(50); 
+*
+000A:  MOVLW  32
+000B:  MOVWF  2E
+.................... 	set_tris_a(0xFE);		// set io direction 
+*
+001F:  MOVLW  FE
+0020:  BSF    03.5
+0021:  MOVWF  05
+.................... } 
+0022:  BCF    03.5
+0023:  GOTO   072 (RETURN)
+....................  
+....................  
+.................... #zero_ram 
+.................... void main() 
+.................... {	 
+*
+004D:  MOVF   03,W
+004E:  ANDLW  1F
+004F:  MOVWF  03
+0050:  MOVLW  3F
+0051:  MOVWF  20
+0052:  MOVLW  21
+0053:  MOVWF  04
+0054:  BCF    03.7
+0055:  CLRF   00
+0056:  INCF   04,F
+0057:  DECFSZ 20,F
+0058:  GOTO   055
+0059:  CLRF   20
+005A:  CLRF   04
+005B:  MOVLW  1F
+005C:  ANDWF  03,F
+005D:  BSF    03.5
+005E:  BCF    05.0
+005F:  BCF    03.5
+0060:  BSF    05.0
+0061:  BCF    1F.6
+0062:  BSF    03.5
+0063:  BCF    1F.0
+0064:  BCF    1F.1
+0065:  BCF    1F.2
+0066:  BCF    1F.3
+0067:  MOVLW  07
+0068:  BCF    03.5
+0069:  MOVWF  19
+.................... 	int16	count; 
+....................  
+.................... 	initialize(); 
+*
+0071:  GOTO   00A
+.................... 		 
+.................... 	for(;;){ 
+.................... 		// look at incoming signal and filter ac over .5 seconds 
+.................... 		// we should see a some logic level change over that time 
+.................... 		// record count value in each register, then test again and again 
+.................... 		for (count=0; count<4000; count++){ 
+0072:  CLRF   2D
+0073:  CLRF   2C
+0074:  MOVF   2D,W
+0075:  SUBLW  0F
+0076:  BTFSS  03.0
+0077:  GOTO   095
+0078:  BTFSS  03.2
+0079:  GOTO   07E
+007A:  MOVF   2C,W
+007B:  SUBLW  9F
+007C:  BTFSS  03.0
+007D:  GOTO   095
+.................... 			if (!GPIO4) chan[0]++;	 
+007E:  BTFSC  05.4
+007F:  GOTO   083
+0080:  INCF   25,F
+0081:  BTFSC  03.2
+0082:  INCF   26,F
+.................... 			if (!GPIO5) chan[1]++;	 
+0083:  BTFSC  05.5
+0084:  GOTO   088
+0085:  INCF   27,F
+0086:  BTFSC  03.2
+0087:  INCF   28,F
+.................... 			if (!GPIO2) chan[2]++; 
+0088:  BTFSC  05.2
+0089:  GOTO   08D
+008A:  INCF   29,F
+008B:  BTFSC  03.2
+008C:  INCF   2A,F
+.................... 			delay_us(100); 
+008D:  MOVLW  21
+008E:  MOVWF  20
+008F:  DECFSZ 20,F
+0090:  GOTO   08F
+.................... 		} 
+0091:  INCF   2C,F
+0092:  BTFSC  03.2
+0093:  INCF   2D,F
+0094:  GOTO   074
+.................... 		 
+.................... 		// if register has some counts in it, then we must be active 
+.................... 		out.ch1 = (chan[0]>100); 
+0095:  BCF    2B.7
+0096:  MOVF   26,F
+0097:  BTFSS  03.2
+0098:  GOTO   09C
+0099:  MOVF   25,W
+009A:  SUBLW  64
+009B:  BTFSS  03.0
+009C:  BSF    2B.7
+.................... 		out.ch2 = (chan[1]>100); 
+009D:  BCF    2B.6
+009E:  MOVF   28,F
+009F:  BTFSS  03.2
+00A0:  GOTO   0A4
+00A1:  MOVF   27,W
+00A2:  SUBLW  64
+00A3:  BTFSS  03.0
+00A4:  BSF    2B.6
+.................... 		out.ch3 = (chan[2]>100); 
+00A5:  BCF    2B.5
+00A6:  MOVF   2A,F
+00A7:  BTFSS  03.2
+00A8:  GOTO   0AC
+00A9:  MOVF   29,W
+00AA:  SUBLW  64
+00AB:  BTFSS  03.0
+00AC:  BSF    2B.5
+....................  
+.................... 		// send preamble and channel status 
+.................... 		out.pre = PREAMBLE; 
+00AD:  MOVLW  E0
+00AE:  ANDWF  2B,W
+00AF:  IORLW  05
+00B0:  MOVWF  2B
+.................... 		putchar(out.byte); 
+00B1:  MOVF   2B,W
+00B2:  MOVWF  2E
+00B3:  GOTO   024
+....................  
+.................... 		// clear the counter registers for next test 
+.................... 		chan[0] = chan[1] = chan[2] = 0; 
+00B4:  CLRF   2A
+00B5:  CLRF   29
+00B6:  MOVF   2A,W
+00B7:  MOVWF  28
+00B8:  MOVF   29,W
+00B9:  MOVWF  27
+00BA:  MOVF   28,W
+00BB:  MOVWF  26
+00BC:  MOVF   27,W
+00BD:  MOVWF  25
+.................... 	} 
+00BE:  GOTO   072
+.................... } 
+00BF:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3064   NOWDT CPD PROTECT MCLR PUT INTRC_IO BROWNOUT BANDGAP_HIGH

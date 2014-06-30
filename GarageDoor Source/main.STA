@@ -1,0 +1,65 @@
+
+ROM used:   1432/15968 (4%)
+            1432/15968 (4%) including unused fragments
+
+            1.0 Average locations per line
+            5.6 Average locations per statement
+
+RAM used:   42/1524 (3%) at main() level
+            73/1524 (5%) worst case
+
+Stack used: 1 worst case (0 in main + 1 for interrupts)
+Stack size: 30
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+  300   109  42  main.c
+  762     0   0  C:\Program Files (x86)\PICC\devices\18F2520.h
+  118     0   0  18F4520.inc
+   33    18   7  buttons.c
+   32    10   4  modbus_crc.c
+  195   121  47  radio.c
+----- -----
+ 1440   258 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     38   1    1             @delay_ms1
+0     60   2    2   380  5.8  HandleUIButtons
+0     32   1    0   115  2.0  HandleUILeds
+ Inline         7   270  6.0  update_crc
+0    102   4    6   133  4.3  _CRC16_
+0     26   1    0   108  1.7  Write1
+0     26   1    0   108  1.7  Write0
+0     54   2    3   230  4.5  WriteCMD
+0     66   2    2   538  5.7  RF12_RDFIFO
+0    182   6    0   445  1.9  Init_RF12RX
+0    102   4    0   727  6.7  HandleEvents
+0    266   9   19  1305  8.9  HandleRfTraffic
+0    132   5    2   764  2.4  InitHardware
+0    104   4    0   157  2.5  main
+0     18   1    1    88  2.9  timer2_isr
+0     66   2    3   300  5.1  portb_isr
+ Inline         0             @cinit1
+
+Program metrics:
+    Functions               15
+    Statements              258
+    Comments                300
+    Volume (V)              9290
+    Difficulty (D)          63.0
+    Effort to implement (E) 585054
+    Time to implement (T)   9 hours, 2 minutes
+    Est Delivered Bugs (B)  2
+    Cyclomatic Complexity   33
+    Maintainability (MI)    121
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00002     4  0  
+00004-00006     0  4  
+00008-000A0   154  0  
+000A2-07CBE  1274  30500  
+
+
+

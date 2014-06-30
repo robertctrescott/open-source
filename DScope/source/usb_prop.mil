@@ -1,0 +1,503 @@
+_Mass_Storage_SetConfiguration:
+  begin   (midx: 0)
+//usb_prop.c,104 :: 		void Mass_Storage_SetConfiguration(void)
+_Mass_Storage_SetConfiguration:
+  begin   (midx: 0)
+//usb_prop.c,106 :: 		if (pInformation->Current_Configuration)
+	R0 <4> <- addr(_pInformation)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R0 <4> <-  R0 + 10   (midx: 2)
+	R0 <1> <- *R0   (midx: 0)
+	if (!R0) then goto 0   (midx: 0)
+//usb_prop.c,108 :: 		ClearDTOG_TX(ENDP1);
+	R0 <1> <- 1   (midx: 0)
+	CALL _ClearDTOG_TX   (midx: 0)
+//usb_prop.c,109 :: 		ClearDTOG_RX(ENDP2);
+	R0 <1> <- 2   (midx: 0)
+	CALL _ClearDTOG_RX   (midx: 0)
+//usb_prop.c,110 :: 		Bot_State = BOT_IDLE; /* set the Bot state machine to the IDLE state */
+	R1 <1> <- 0   (midx: 0)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_prop.c,111 :: 		}
+0:   (midx: 0)
+  end
+   (midx: 0)
+_Mass_Storage_ClearFeature:
+  begin   (midx: 0)
+//usb_prop.c,121 :: 		void Mass_Storage_ClearFeature(void)
+_Mass_Storage_ClearFeature:
+  begin   (midx: 0)
+//usb_prop.c,125 :: 		if (CBW.dSignature != BOT_CBW_SIGNATURE)
+	R0 <4> <- addr(_CBW+0)   (midx: 0)
+	R1 <4> <- [R0]   (midx: 0)
+	R0 <4> <- 1128420181   (midx: 0)
+	if ( R1 = R0) then goto 1   (midx: 2)
+//usb_prop.c,126 :: 		Bot_Abort(BOTH_DIR);
+	R0 <1> <- 2   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+1:   (midx: 0)
+  end
+   (midx: 0)
+_MASS_init:
+  begin   (midx: 0)
+//usb_prop.c,136 :: 		void MASS_init()
+_MASS_init:
+  begin   (midx: 0)
+//usb_prop.c,138 :: 		pInformation->Current_Configuration = 0;
+	R2 <4> <- addr(_pInformation)   (midx: 0)
+	R0 <4> <- [R2]   (midx: 0)
+	R1 <4> <-  R0 + 10   (midx: 2)
+	R0 <1> <- 0   (midx: 0)
+	[R1] <1> <- R0   (midx: 0)
+//usb_prop.c,145 :: 		_SetISTR(0);
+	R1 <2> <- 0   (midx: 0)
+	R0 <4> <- addr(LitPtrAbs: 40005C44)   (midx: 0)
+	[R0] <2> <- R1   (midx: 0)
+//usb_prop.c,146 :: 		wInterrupt_Mask = IMR_MSK;
+	R1 <1> <- 33792   (midx: 0)
+	R0 <4> <- addr(_wInterrupt_Mask)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_prop.c,148 :: 		_SetCNTR(IMR_MSK);
+	R1 <2> <- 0   (midx: 0)
+	R0 <4> <- addr(LitPtrAbs: 40005C40)   (midx: 0)
+	[R0] <2> <- R1   (midx: 0)
+//usb_prop.c,150 :: 		pInformation->Current_Feature = MASS_ConfigDescriptor[7];
+	R0 <4> <- R2   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R1 <4> <-  R0 + 9   (midx: 2)
+	R0 <4> <- addr(0)   (midx: 0)
+	R0 <4> <-  R0 + 7   (midx: 2)
+	R0 <1> <- *R0   (midx: 0)
+	[R1] <1> <- R0   (midx: 0)
+//usb_prop.c,158 :: 		for(tmp=0;tmp<100000;++tmp) NOP_Process();//CXG:加上这段取代上面的死循环 12/08
+   (midx: 0)
+   (midx: 0)
+	R1 <2> <- 0   (midx: 0)
+	R1 <2> <- R1   (midx: 0)
+2:   (midx: 0)
+   (midx: 0)
+	R0 <4> <- 100000   (midx: 0)
+	if ( R1 >= R0) then goto 3   (midx: 6)
+	R1 <2> <- PUSH(R1)   (midx: 255)
+	CALL _NOP_Process   (midx: 0)
+	R1 <2> <- POP   (midx: 255)
+	R1 <2> <-  R1 + 1   (midx: 1)
+	R1 <2> <- R1   (midx: 0)
+   (midx: 0)
+	R1 <2> <- R1   (midx: 0)
+	goto	2   (midx: 0)
+3:   (midx: 0)
+//usb_prop.c,160 :: 		bDeviceState = CONFIGURED;
+	R1 <1> <- 5   (midx: 0)
+	R0 <4> <- addr(_bDeviceState)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+  end
+   (midx: 0)
+_MASS_Reset:
+  begin   (midx: 0)
+//usb_prop.c,170 :: 		void MASS_Reset()
+_MASS_Reset:
+  begin   (midx: 0)
+//usb_prop.c,173 :: 		Device_Info.Current_Configuration = 0;
+	R1 <1> <- 0   (midx: 0)
+	R0 <4> <- addr(_Device_Info+10)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_prop.c,175 :: 		SetBTABLE(BTABLE_ADDRESS);
+	R0 <1> <- 0   (midx: 0)
+	CALL _SetBTABLE   (midx: 0)
+//usb_prop.c,178 :: 		SetEPType(ENDP0, EP_CONTROL);
+	R1 <1> <- 512   (midx: 0)
+	R0 <1> <- 0   (midx: 0)
+	CALL _SetEPType   (midx: 0)
+//usb_prop.c,179 :: 		SetEPTxStatus(ENDP0, EP_TX_NAK);
+	R1 <1> <- 32   (midx: 0)
+	R0 <1> <- 0   (midx: 0)
+	CALL _SetEPTxStatus   (midx: 0)
+//usb_prop.c,180 :: 		SetEPRxAddr(ENDP0, ENDP0_RXADDR);
+	R1 <1> <- 24   (midx: 0)
+	R0 <1> <- 0   (midx: 0)
+	CALL _SetEPRxAddr   (midx: 0)
+//usb_prop.c,181 :: 		SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
+	R0 <4> <- addr(_Device_Property+44)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	R1 <1> <- R0   (midx: 0)
+	R0 <1> <- 0   (midx: 0)
+	CALL _SetEPRxCount   (midx: 0)
+//usb_prop.c,182 :: 		SetEPTxAddr(ENDP0, ENDP0_TXADDR);
+	R1 <1> <- 88   (midx: 0)
+	R0 <1> <- 0   (midx: 0)
+	CALL _SetEPTxAddr   (midx: 0)
+//usb_prop.c,183 :: 		Clear_Status_Out(ENDP0);
+	R0 <1> <- 0   (midx: 0)
+	CALL _Clear_Status_Out   (midx: 0)
+//usb_prop.c,184 :: 		SetEPRxValid(ENDP0);
+	R0 <1> <- 0   (midx: 0)
+	CALL _SetEPRxValid   (midx: 0)
+//usb_prop.c,187 :: 		SetEPType(ENDP1, EP_BULK);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _SetEPType   (midx: 0)
+//usb_prop.c,188 :: 		SetEPTxAddr(ENDP1, ENDP1_TXADDR);
+	R1 <1> <- 152   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _SetEPTxAddr   (midx: 0)
+//usb_prop.c,189 :: 		SetEPTxStatus(ENDP1, EP_TX_NAK);
+	R1 <1> <- 32   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _SetEPTxStatus   (midx: 0)
+//usb_prop.c,190 :: 		SetEPRxStatus(ENDP1, EP_RX_DIS);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _SetEPRxStatus   (midx: 0)
+//usb_prop.c,193 :: 		SetEPType(ENDP2, EP_BULK);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _SetEPType   (midx: 0)
+//usb_prop.c,194 :: 		SetEPRxAddr(ENDP2, ENDP2_RXADDR);
+	R1 <1> <- 216   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _SetEPRxAddr   (midx: 0)
+//usb_prop.c,195 :: 		SetEPRxCount(ENDP2, Device_Property.MaxPacketSize);
+	R0 <4> <- addr(_Device_Property+44)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	R1 <1> <- R0   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _SetEPRxCount   (midx: 0)
+//usb_prop.c,196 :: 		SetEPRxStatus(ENDP2, EP_RX_VALID);
+	R1 <1> <- 12288   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _SetEPRxStatus   (midx: 0)
+//usb_prop.c,197 :: 		SetEPTxStatus(ENDP2, EP_TX_DIS);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _SetEPTxStatus   (midx: 0)
+//usb_prop.c,200 :: 		SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
+	R0 <4> <- addr(_Device_Property+44)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	R1 <1> <- R0   (midx: 0)
+	R0 <1> <- 0   (midx: 0)
+	CALL _SetEPRxCount   (midx: 0)
+//usb_prop.c,201 :: 		SetEPRxValid(ENDP0);
+	R0 <1> <- 0   (midx: 0)
+	CALL _SetEPRxValid   (midx: 0)
+//usb_prop.c,204 :: 		SetDeviceAddress(0);
+	R0 <1> <- 0   (midx: 0)
+	CALL _SetDeviceAddress   (midx: 0)
+//usb_prop.c,205 :: 		CBW.dSignature = BOT_CBW_SIGNATURE;
+	R1 <4> <- 1128420181   (midx: 0)
+	R0 <4> <- addr(_CBW+0)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//usb_prop.c,206 :: 		Bot_State = BOT_IDLE;
+	R1 <1> <- 0   (midx: 0)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+  end
+   (midx: 0)
+_MASS_Status_In:
+  begin   (midx: 0)
+//usb_prop.c,216 :: 		void MASS_Status_In(void)
+_MASS_Status_In:
+  begin   (midx: 0)
+//usb_prop.c,218 :: 		return;
+	return   (midx: 0)
+  end
+   (midx: 0)
+_MASS_Status_Out:
+  begin   (midx: 0)
+//usb_prop.c,228 :: 		void MASS_Status_Out(void)
+_MASS_Status_Out:
+  begin   (midx: 0)
+//usb_prop.c,230 :: 		return;
+	return   (midx: 0)
+  end
+   (midx: 0)
+_MASS_Data_Setup:
+  begin   (midx: 0)
+//usb_prop.c,240 :: 		RESULT MASS_Data_Setup(u8 RequestNo)
+_MASS_Data_Setup:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+//usb_prop.c,245 :: 		if ((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT))
+	R1 <4> <- addr(_pInformation)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	R1 <1> <- *R1   (midx: 0)
+	R1 <1> <-  R1 & 127   (midx: 0)
+//usb_prop.c,246 :: 		&& (RequestNo == GET_MAX_LUN) && (pInformation->USBwValue == 0)
+	if ( R1 != 33) then goto 23   (midx: 0)
+   (midx: 0)
+	if ( R0 != 254) then goto 22   (midx: 0)
+	R1 <4> <- addr(_pInformation)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	R1 <4> <-  R1 + 2   (midx: 2)
+	R1 <1> <- *R1   (midx: 0)
+	if ( R1 != 0) then goto 21   (midx: 0)
+//usb_prop.c,247 :: 		&& (pInformation->USBwIndex == 0) && (pInformation->USBwLength == 0x01))
+	R1 <4> <- addr(_pInformation)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	R1 <4> <-  R1 + 4   (midx: 2)
+	R1 <1> <- *R1   (midx: 0)
+	if ( R1 != 0) then goto 20   (midx: 0)
+	R1 <4> <- addr(_pInformation)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	R1 <4> <-  R1 + 6   (midx: 2)
+	R1 <1> <- *R1   (midx: 0)
+	if ( R1 != 1) then goto 19   (midx: 0)
+18:   (midx: 0)
+//usb_prop.c,249 :: 		CopyRoutine = Get_Max_Lun;
+   (midx: 0)
+	R0 <4> <- #_Get_Max_Lun   (midx: 0)
+//usb_prop.c,250 :: 		}
+   (midx: 0)
+	goto	8   (midx: 0)
+//usb_prop.c,246 :: 		&& (RequestNo == GET_MAX_LUN) && (pInformation->USBwValue == 0)
+23:   (midx: 0)
+22:   (midx: 0)
+21:   (midx: 0)
+//usb_prop.c,247 :: 		&& (pInformation->USBwIndex == 0) && (pInformation->USBwLength == 0x01))
+20:   (midx: 0)
+19:   (midx: 0)
+//usb_prop.c,253 :: 		return USB_UNSUPPORT;
+	R0 <1> <- 2   (midx: 0)
+	return   (midx: 0)
+//usb_prop.c,254 :: 		}
+8:   (midx: 0)
+//usb_prop.c,256 :: 		if (CopyRoutine == NULL)
+   (midx: 0)
+   (midx: 0)
+	if ( R0 != 0) then goto 9   (midx: 2)
+//usb_prop.c,258 :: 		return USB_UNSUPPORT;
+	R0 <1> <- 2   (midx: 0)
+	return   (midx: 0)
+//usb_prop.c,259 :: 		}
+9:   (midx: 0)
+//usb_prop.c,261 :: 		pInformation->Ctrl_Info.CopyData = CopyRoutine;
+   (midx: 0)
+	R2 <4> <- addr(_pInformation)   (midx: 0)
+	R1 <4> <- [R2]   (midx: 0)
+	R1 <4> <-  R1 + 16   (midx: 2)
+	R1 <4> <-  R1 + 4   (midx: 2)
+	[R1] <4> <- R0   (midx: 0)
+//usb_prop.c,262 :: 		pInformation->Ctrl_Info.Usb_wOffset = 0;
+	R1 <4> <- R2   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	R1 <4> <-  R1 + 16   (midx: 2)
+	R2 <4> <-  R1 + 1   (midx: 2)
+	R1 <1> <- 0   (midx: 0)
+	[R2] <1> <- R1   (midx: 0)
+//usb_prop.c,263 :: 		(*CopyRoutine)(0);
+	R0 <4> <- PUSH(R0)   (midx: 255)
+	R0 <1> <- 0   (midx: 0)
+   (midx: 0)
+	R12 <4> <- POP   (midx: 255)
+	CALL (*R12)   (midx: 0)
+//usb_prop.c,265 :: 		return USB_SUCCESS;
+	R0 <1> <- 0   (midx: 0)
+	return   (midx: 0)
+  end
+   (midx: 0)
+_MASS_NoData_Setup:
+  begin   (midx: 0)
+//usb_prop.c,276 :: 		RESULT MASS_NoData_Setup(u8 RequestNo)
+_MASS_NoData_Setup:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+//usb_prop.c,278 :: 		if ((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT))
+	R1 <4> <- addr(_pInformation)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	R1 <1> <- *R1   (midx: 0)
+	R1 <1> <-  R1 & 127   (midx: 0)
+//usb_prop.c,279 :: 		&& (RequestNo == MASS_STORAGE_RESET) && (pInformation->USBwValue == 0)
+	if ( R1 != 33) then goto 29   (midx: 0)
+   (midx: 0)
+	if ( R0 != 255) then goto 28   (midx: 0)
+	R1 <4> <- addr(_pInformation)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	R1 <4> <-  R1 + 2   (midx: 2)
+	R1 <1> <- *R1   (midx: 0)
+	if ( R1 != 0) then goto 27   (midx: 0)
+//usb_prop.c,280 :: 		&& (pInformation->USBwIndex == 0) && (pInformation->USBwLength == 0x00))
+	R1 <4> <- addr(_pInformation)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	R1 <4> <-  R1 + 4   (midx: 2)
+	R1 <1> <- *R1   (midx: 0)
+	if ( R1 != 0) then goto 26   (midx: 0)
+	R1 <4> <- addr(_pInformation)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	R1 <4> <-  R1 + 6   (midx: 2)
+	R1 <1> <- *R1   (midx: 0)
+	if ( R1 != 0) then goto 25   (midx: 0)
+24:   (midx: 0)
+//usb_prop.c,283 :: 		ClearDTOG_TX(ENDP1);
+	R0 <1> <- 1   (midx: 0)
+	CALL _ClearDTOG_TX   (midx: 0)
+//usb_prop.c,286 :: 		ClearDTOG_RX(ENDP2);
+	R0 <1> <- 2   (midx: 0)
+	CALL _ClearDTOG_RX   (midx: 0)
+//usb_prop.c,289 :: 		CBW.dSignature = BOT_CBW_SIGNATURE;
+	R2 <4> <- 1128420181   (midx: 0)
+	R1 <4> <- addr(_CBW+0)   (midx: 0)
+	[R1] <4> <- R2   (midx: 0)
+//usb_prop.c,290 :: 		Bot_State = BOT_IDLE;
+	R2 <1> <- 0   (midx: 0)
+	R1 <4> <- addr(_Bot_State)   (midx: 0)
+	[R1] <1> <- R2   (midx: 0)
+//usb_prop.c,292 :: 		return USB_SUCCESS;
+	R0 <1> <- 0   (midx: 0)
+	return   (midx: 0)
+//usb_prop.c,279 :: 		&& (RequestNo == MASS_STORAGE_RESET) && (pInformation->USBwValue == 0)
+29:   (midx: 0)
+28:   (midx: 0)
+27:   (midx: 0)
+//usb_prop.c,280 :: 		&& (pInformation->USBwIndex == 0) && (pInformation->USBwLength == 0x00))
+26:   (midx: 0)
+25:   (midx: 0)
+//usb_prop.c,294 :: 		return USB_UNSUPPORT;
+	R0 <1> <- 2   (midx: 0)
+	return   (midx: 0)
+  end
+   (midx: 0)
+_MASS_Get_Interface_Setting:
+  begin   (midx: 0)
+//usb_prop.c,305 :: 		RESULT MASS_Get_Interface_Setting(u8 Interface, u8 AlternateSetting)
+_MASS_Get_Interface_Setting:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R1 <1> <- R1   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+//usb_prop.c,307 :: 		if (AlternateSetting > 0)
+   (midx: 0)
+   (midx: 0)
+	if ( R1 <= 0) then goto 13   (midx: 0)
+//usb_prop.c,309 :: 		return USB_UNSUPPORT;/* in this application we don't have AlternateSetting*/
+	R0 <1> <- 2   (midx: 0)
+	return   (midx: 0)
+//usb_prop.c,310 :: 		}
+13:   (midx: 0)
+//usb_prop.c,311 :: 		else if (Interface > 0)
+   (midx: 0)
+   (midx: 0)
+	if ( R0 <= 0) then goto 15   (midx: 0)
+//usb_prop.c,313 :: 		return USB_UNSUPPORT;/*in this application we have only 1 interfaces*/
+	R0 <1> <- 2   (midx: 0)
+	return   (midx: 0)
+//usb_prop.c,314 :: 		}
+15:   (midx: 0)
+//usb_prop.c,315 :: 		return USB_SUCCESS;
+	R0 <1> <- 0   (midx: 0)
+	return   (midx: 0)
+  end
+   (midx: 0)
+_MASS_GetDeviceDescriptor:
+  begin   (midx: 0)
+//usb_prop.c,325 :: 		u8 *MASS_GetDeviceDescriptor(u16 Length)
+_MASS_GetDeviceDescriptor:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+//usb_prop.c,327 :: 		return Standard_GetDescriptorData(Length, &Device_Descriptor );
+	R1 <4> <- #_Device_Descriptor   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+	CALL _Standard_GetDescriptorData   (midx: 0)
+	R0 <4> <- R0   (midx: 0)
+	return   (midx: 0)
+  end
+   (midx: 0)
+_MASS_GetConfigDescriptor:
+  begin   (midx: 0)
+//usb_prop.c,337 :: 		u8 *MASS_GetConfigDescriptor(u16 Length)
+_MASS_GetConfigDescriptor:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+//usb_prop.c,339 :: 		return Standard_GetDescriptorData(Length, &Config_Descriptor );
+	R1 <4> <- #_Config_Descriptor   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+	CALL _Standard_GetDescriptorData   (midx: 0)
+	R0 <4> <- R0   (midx: 0)
+	return   (midx: 0)
+  end
+   (midx: 0)
+_MASS_GetStringDescriptor:
+  begin   (midx: 0)
+//usb_prop.c,349 :: 		u8 *MASS_GetStringDescriptor(u16 Length)
+_MASS_GetStringDescriptor:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+//usb_prop.c,351 :: 		u8 wValue0 = pInformation->USBwValue0;
+	R1 <4> <- addr(_pInformation)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	R1 <4> <-  R1 + 2   (midx: 2)
+	R1 <4> <-  R1 + 1   (midx: 2)
+	R1 <1> <- *R1   (midx: 0)
+//usb_prop.c,352 :: 		return Standard_GetDescriptorData( Length, &String_Descriptor[wValue0] );
+	R2 <4> <-  R1 shl 3   (midx: 2)
+	R1 <4> <- #_String_Descriptor   (midx: 0)
+	R1 <4> <-  R1 + R2   (midx: 2)
+	R1 <4> <- R1   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+	CALL _Standard_GetDescriptorData   (midx: 0)
+	R0 <4> <- R0   (midx: 0)
+	return   (midx: 0)
+  end
+   (midx: 0)
+_Get_Max_Lun:
+  begin   (midx: 0)
+//usb_prop.c,362 :: 		u8 *Get_Max_Lun(u16 Length)
+_Get_Max_Lun:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+//usb_prop.c,364 :: 		if (Length == 0)
+   (midx: 0)
+	if ( R0 != 0) then goto 16   (midx: 0)
+//usb_prop.c,366 :: 		pInformation->Ctrl_Info.Usb_wLength = LUN_DATA_LENGTH;
+	R1 <4> <- addr(_pInformation)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	R2 <4> <-  R1 + 16   (midx: 2)
+	R1 <1> <- 1   (midx: 0)
+	[R2] <1> <- R1   (midx: 0)
+//usb_prop.c,367 :: 		return 0;
+	R0 <4> <- 0   (midx: 0)
+	return   (midx: 0)
+//usb_prop.c,368 :: 		}
+16:   (midx: 0)
+//usb_prop.c,371 :: 		return((u8*)(&Max_Lun));
+	R0 <4> <- #_Max_Lun   (midx: 0)
+	return   (midx: 0)
+  end
+   (midx: 0)
+usb_prop____?ag:
+  begin   (midx: 0)
+  end
+   (midx: 0)

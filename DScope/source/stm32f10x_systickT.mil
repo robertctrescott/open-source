@@ -1,0 +1,202 @@
+_SysTick_CLKSourceConfig:
+  begin   (midx: 0)
+//stm32f10x_systickT.c,44 :: 		void SysTick_CLKSourceConfig(u32 SysTick_CLKSource)
+_SysTick_CLKSourceConfig:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <4> <- R0   (midx: 0)
+   (midx: 0)
+//stm32f10x_systickT.c,49 :: 		if (SysTick_CLKSource == SysTick_CLKSource_HCLK)
+   (midx: 0)
+	if ( R0 != 4) then goto 0   (midx: 2)
+//stm32f10x_systickT.c,51 :: 		SysTick->CTRL |= SysTick_CLKSource_HCLK;
+	R2 <4> <- addr(LitPtrAbs: E000E010+0)   (midx: 0)
+	R1 <4> <- [R2]   (midx: 0)
+	R1 <4> <-  R1 | 4   (midx: 2)
+	[R2] <4> <- R1   (midx: 0)
+//stm32f10x_systickT.c,52 :: 		}
+	goto	1   (midx: 0)
+0:   (midx: 0)
+//stm32f10x_systickT.c,55 :: 		SysTick->CTRL &= SysTick_CLKSource_HCLK_Div8;
+	R3 <4> <- addr(LitPtrAbs: E000E010+0)   (midx: 0)
+	R2 <4> <- [R3]   (midx: 0)
+	R1 <4> <- 4294967291   (midx: 0)
+	R1 <4> <-  R2 & R1   (midx: 2)
+	[R3] <4> <- R1   (midx: 0)
+//stm32f10x_systickT.c,56 :: 		}
+1:   (midx: 0)
+  end
+   (midx: 0)
+_SysTick_SetReload:
+  begin   (midx: 0)
+//stm32f10x_systickT.c,67 :: 		void SysTick_SetReload(u32 Reload)
+_SysTick_SetReload:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <4> <- R0   (midx: 0)
+   (midx: 0)
+//stm32f10x_systickT.c,72 :: 		SysTick->LOAD = Reload;
+	R1 <4> <- addr(LitPtrAbs: E000E010+4)   (midx: 0)
+   (midx: 0)
+	[R1] <4> <- R0   (midx: 0)
+  end
+   (midx: 0)
+_SysTick_CounterCmd:
+  begin   (midx: 0)
+//stm32f10x_systickT.c,86 :: 		void SysTick_CounterCmd(u32 SysTick_Counter)
+_SysTick_CounterCmd:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <4> <- R0   (midx: 0)
+   (midx: 0)
+//stm32f10x_systickT.c,91 :: 		if (SysTick_Counter == SysTick_Counter_Enable)
+   (midx: 0)
+	if ( R0 != 1) then goto 2   (midx: 2)
+//stm32f10x_systickT.c,93 :: 		SysTick->CTRL |= SysTick_Counter_Enable;
+	R2 <4> <- addr(LitPtrAbs: E000E010+0)   (midx: 0)
+	R1 <4> <- [R2]   (midx: 0)
+	R1 <4> <-  R1 | 1   (midx: 2)
+	[R2] <4> <- R1   (midx: 0)
+//stm32f10x_systickT.c,94 :: 		}
+	goto	3   (midx: 0)
+2:   (midx: 0)
+//stm32f10x_systickT.c,95 :: 		else if (SysTick_Counter == SysTick_Counter_Disable)
+   (midx: 0)
+	R1 <4> <- 4294967294   (midx: 0)
+   (midx: 0)
+	if ( R0 != R1) then goto 4   (midx: 2)
+//stm32f10x_systickT.c,97 :: 		SysTick->CTRL &= SysTick_Counter_Disable;
+	R3 <4> <- addr(LitPtrAbs: E000E010+0)   (midx: 0)
+	R2 <4> <- [R3]   (midx: 0)
+	R1 <4> <- 4294967294   (midx: 0)
+	R1 <4> <-  R2 & R1   (midx: 2)
+	[R3] <4> <- R1   (midx: 0)
+//stm32f10x_systickT.c,98 :: 		}
+	goto	5   (midx: 0)
+4:   (midx: 0)
+//stm32f10x_systickT.c,101 :: 		SysTick->VAL = SysTick_Counter_Clear;
+	R2 <4> <- 0   (midx: 0)
+	R1 <4> <- addr(LitPtrAbs: E000E010+8)   (midx: 0)
+	[R1] <4> <- R2   (midx: 0)
+//stm32f10x_systickT.c,102 :: 		}
+5:   (midx: 0)
+3:   (midx: 0)
+  end
+   (midx: 0)
+_SysTick_ITConfig:
+  begin   (midx: 0)
+//stm32f10x_systickT.c,113 :: 		void SysTick_ITConfig(FunctionalState NewState)
+_SysTick_ITConfig:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+//stm32f10x_systickT.c,118 :: 		if (NewState != DISABLE)
+   (midx: 0)
+	if ( R0 = 0) then goto 6   (midx: 0)
+//stm32f10x_systickT.c,120 :: 		SysTick->CTRL |= CTRL_TICKINT_Set;
+	R2 <4> <- addr(LitPtrAbs: E000E010+0)   (midx: 0)
+	R1 <4> <- [R2]   (midx: 0)
+	R1 <4> <-  R1 | 2   (midx: 2)
+	[R2] <4> <- R1   (midx: 0)
+//stm32f10x_systickT.c,121 :: 		}
+	goto	7   (midx: 0)
+6:   (midx: 0)
+//stm32f10x_systickT.c,124 :: 		SysTick->CTRL &= CTRL_TICKINT_Reset;
+	R3 <4> <- addr(LitPtrAbs: E000E010+0)   (midx: 0)
+	R2 <4> <- [R3]   (midx: 0)
+	R1 <4> <- 4294967293   (midx: 0)
+	R1 <4> <-  R2 & R1   (midx: 2)
+	[R3] <4> <- R1   (midx: 0)
+//stm32f10x_systickT.c,125 :: 		}
+7:   (midx: 0)
+  end
+   (midx: 0)
+_SysTick_GetCounter:
+  begin   (midx: 0)
+//stm32f10x_systickT.c,135 :: 		u32 SysTick_GetCounter(void)
+_SysTick_GetCounter:
+  begin   (midx: 0)
+//stm32f10x_systickT.c,137 :: 		return(SysTick->VAL);
+	R0 <4> <- addr(LitPtrAbs: E000E010+8)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	return   (midx: 0)
+  end
+   (midx: 0)
+_SysTick_GetFlagStatus:
+  begin   (midx: 0)
+//stm32f10x_systickT.c,151 :: 		FlagStatus SysTick_GetFlagStatus(u8 SysTick_FLAG)
+_SysTick_GetFlagStatus:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+//stm32f10x_systickT.c,153 :: 		u32 statusreg = 0, tmp = 0 ;
+   (midx: 0)
+   (midx: 0)
+//stm32f10x_systickT.c,154 :: 		FlagStatus bitstatus = RESET;
+   (midx: 0)
+//stm32f10x_systickT.c,160 :: 		tmp = SysTick_FLAG >> 3;
+	R1 <1> <-  R0 shr 3   (midx: 0)
+   (midx: 0)
+	R1 <4> <- R1   (midx: 0)
+//stm32f10x_systickT.c,162 :: 		if (tmp == 2) /* The flag to check is in CTRL register */
+   (midx: 0)
+	if ( R1 != 2) then goto 8   (midx: 2)
+//stm32f10x_systickT.c,164 :: 		statusreg = SysTick->CTRL;
+	R1 <4> <- addr(LitPtrAbs: E000E010+0)   (midx: 0)
+   (midx: 0)
+	R2 <4> <- [R1]   (midx: 0)
+//stm32f10x_systickT.c,165 :: 		}
+   (midx: 0)
+	R2 <4> <- R2   (midx: 0)
+	goto	9   (midx: 0)
+8:   (midx: 0)
+//stm32f10x_systickT.c,168 :: 		statusreg = SysTick->CALIB;
+	R1 <4> <- addr(LitPtrAbs: E000E010+12)   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R2 <4> <- [R1]   (midx: 0)
+	R2 <4> <- R2   (midx: 0)
+//stm32f10x_systickT.c,169 :: 		}
+9:   (midx: 0)
+//stm32f10x_systickT.c,171 :: 		if ((statusreg & ((u32)1 << SysTick_FLAG)) != (u32)RESET)
+   (midx: 0)
+	R1 <4> <- 1   (midx: 0)
+   (midx: 0)
+	R1 <4> <-  R1 shl R0   (midx: 2)
+   (midx: 0)
+	R1 <4> <-  R2 & R1   (midx: 2)
+	if ( R1 = 0) then goto 10   (midx: 2)
+//stm32f10x_systickT.c,173 :: 		bitstatus = SET;
+   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+//stm32f10x_systickT.c,174 :: 		}
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+	goto	11   (midx: 0)
+10:   (midx: 0)
+//stm32f10x_systickT.c,177 :: 		bitstatus = RESET;
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- 0   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+//stm32f10x_systickT.c,178 :: 		}
+11:   (midx: 0)
+//stm32f10x_systickT.c,179 :: 		return bitstatus;
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+	return   (midx: 0)
+  end
+   (midx: 0)

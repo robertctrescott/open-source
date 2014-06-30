@@ -1,0 +1,380 @@
+_Get_Medium_Characteristics:
+  begin   (midx: 0)
+//memory.c,33 :: 		void Get_Medium_Characteristics(void)
+_Get_Medium_Characteristics:
+  begin   (midx: 0)
+//memory.c,35 :: 		unsigned int temp1 = 0;
+   (midx: 0)
+//memory.c,36 :: 		unsigned int temp2 = 0;
+   (midx: 0)
+//memory.c,38 :: 		MSD_GetCSDRegister(&MSD_csd);
+	R0 <4> <- #_MSD_csd   (midx: 0)
+	CALL _MSD_GetCSDRegister   (midx: 0)
+//memory.c,39 :: 		temp1 = MSD_csd.DeviceSize + 1;
+	R0 <4> <- addr(_MSD_csd+13)   (midx: 0)
+	R0 <2> <- [R0]   (midx: 0)
+	R2 <2> <-  R0 + 1   (midx: 0)
+//memory.c,40 :: 		temp2 = 1 << (MSD_csd.DeviceSizeMul + 2);
+	R0 <4> <- addr(_MSD_csd+18)   (midx: 0)
+	R0 <2> <- [R0]   (midx: 0)
+	R1 <2> <-  R0 + 2   (midx: 0)
+	R0 <2> <- 1   (midx: 0)
+	R1 <2> <-  R0 shl R1   (midx: 1)
+//memory.c,41 :: 		Mass_Block_Count = temp1 * temp2;
+	R0 <2> <- R2   (midx: 0)
+	R0 <2> <-  R0 * R1   (midx: 1)
+	R2 <4> <- addr(_Mass_Block_Count)   (midx: 0)
+	[R2] <4> <- R0   (midx: 0)
+//memory.c,42 :: 		Mass_Block_Size =  1 << MSD_csd.RdBlockLen;
+	R0 <4> <- addr(_MSD_csd+7)   (midx: 0)
+	R1 <2> <- [R0]   (midx: 0)
+	R0 <2> <- 1   (midx: 0)
+	R1 <2> <-  R0 shl R1   (midx: 1)
+	R0 <4> <- addr(_Mass_Block_Size)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,43 :: 		Mass_Memory_Size = (Mass_Block_Count * Mass_Block_Size);
+	R0 <4> <- R0   (midx: 0)
+	R1 <4> <- [R0]   (midx: 0)
+	R0 <4> <- R2   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R1 <4> <-  R0 * R1   (midx: 2)
+	R0 <4> <- addr(_Mass_Memory_Size)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+  end
+   (midx: 0)
+_Read_Memory:
+  begin   (midx: 0)
+//memory.c,52 :: 		void Read_Memory(void)
+_Read_Memory:
+  begin   (midx: 0)
+//memory.c,54 :: 		if (!Block_Read_count)
+	R0 <4> <- addr(_Block_Read_count)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	if (R0) then goto 0   (midx: 0)
+//memory.c,56 :: 		MSD_ReadBlock(Data_Buffer, Memory_Offset, 512);
+	R0 <4> <- addr(_Memory_Offset)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R2 <1> <- 512   (midx: 0)
+	R1 <4> <- R0   (midx: 0)
+	R0 <4> <- #_Data_Buffer   (midx: 0)
+	CALL _MSD_ReadBlock   (midx: 0)
+//memory.c,57 :: 		UserToPMABufferCopy(Data_Buffer, ENDP1_TXADDR, BULK_MAX_PACKET_SIZE);
+	R2 <1> <- 64   (midx: 0)
+	R1 <1> <- 152   (midx: 0)
+	R0 <4> <- #_Data_Buffer   (midx: 0)
+	CALL _UserToPMABufferCopy   (midx: 0)
+//memory.c,58 :: 		Block_Read_count = 512 - BULK_MAX_PACKET_SIZE;
+	R1 <4> <- 448   (midx: 0)
+	R0 <4> <- addr(_Block_Read_count)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,59 :: 		Block_offset = BULK_MAX_PACKET_SIZE;
+	R1 <4> <- 64   (midx: 0)
+	R0 <4> <- addr(_Block_offset)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,60 :: 		}
+	goto	1   (midx: 0)
+0:   (midx: 0)
+//memory.c,63 :: 		UserToPMABufferCopy(Data_Buffer + Block_offset, ENDP1_TXADDR, BULK_MAX_PACKET_SIZE);
+	R0 <4> <- addr(_Block_offset)   (midx: 0)
+	R1 <4> <- [R0]   (midx: 0)
+	R0 <4> <- #_Data_Buffer   (midx: 0)
+	R0 <4> <-  R0 + R1   (midx: 2)
+	R2 <1> <- 64   (midx: 0)
+	R1 <1> <- 152   (midx: 0)
+	R0 <4> <- R0   (midx: 0)
+	CALL _UserToPMABufferCopy   (midx: 0)
+//memory.c,64 :: 		Block_Read_count -= BULK_MAX_PACKET_SIZE;
+	R0 <4> <- addr(_Block_Read_count)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R1 <4> <-  R0 - 64   (midx: 2)
+	R0 <4> <- addr(_Block_Read_count)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,65 :: 		Block_offset += BULK_MAX_PACKET_SIZE;
+	R0 <4> <- addr(_Block_offset)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R1 <4> <-  R0 + 64   (midx: 2)
+	R0 <4> <- addr(_Block_offset)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,66 :: 		}
+1:   (midx: 0)
+//memory.c,68 :: 		SetEPTxCount(ENDP1, BULK_MAX_PACKET_SIZE);
+	R1 <1> <- 64   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _SetEPTxCount   (midx: 0)
+//memory.c,69 :: 		SetEPTxStatus(ENDP1, EP_TX_VALID);
+	R1 <1> <- 48   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _SetEPTxStatus   (midx: 0)
+//memory.c,72 :: 		Memory_Offset += BULK_MAX_PACKET_SIZE;
+	R0 <4> <- addr(_Memory_Offset)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R1 <4> <-  R0 + 64   (midx: 2)
+	R0 <4> <- addr(_Memory_Offset)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,73 :: 		Transfer_Length -= BULK_MAX_PACKET_SIZE;
+	R1 <4> <- addr(_Transfer_Length)   (midx: 0)
+	R0 <4> <- [R1]   (midx: 0)
+	R2 <4> <-  R0 - 64   (midx: 2)
+	[R1] <4> <- R2   (midx: 0)
+//memory.c,75 :: 		CSW.dDataResidue -= BULK_MAX_PACKET_SIZE;
+	R1 <4> <- addr(_CSW+8)   (midx: 0)
+	R0 <4> <- [R1]   (midx: 0)
+	R0 <4> <-  R0 - 64   (midx: 2)
+	[R1] <4> <- R0   (midx: 0)
+//memory.c,77 :: 		if (Transfer_Length == 0)
+	if ( R2 != 0) then goto 2   (midx: 2)
+//memory.c,79 :: 		Block_Read_count = 0;
+	R1 <4> <- 0   (midx: 0)
+	R0 <4> <- addr(_Block_Read_count)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,80 :: 		Block_offset = 0;
+	R1 <4> <- 0   (midx: 0)
+	R0 <4> <- addr(_Block_offset)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,81 :: 		Memory_Offset = 0;
+	R1 <4> <- 0   (midx: 0)
+	R0 <4> <- addr(_Memory_Offset)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,82 :: 		Bot_State = BOT_DATA_IN_LAST;
+	R1 <1> <- 3   (midx: 0)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//memory.c,83 :: 		}
+2:   (midx: 0)
+  end
+   (midx: 0)
+_Write_Memory:
+  begin   (midx: 0)
+//memory.c,93 :: 		void Write_Memory(void)
+_Write_Memory:
+  begin   (midx: 0)
+//memory.c,95 :: 		u32 temp =  Counter + 64;
+	R0 <4> <- addr(_Counter)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R4 <4> <-  R0 + 64   (midx: 2)
+   (midx: 0)
+	R4 <4> <- R4   (midx: 0)
+//memory.c,98 :: 		i = 0;
+	R1 <4> <- 0   (midx: 0)
+	R0 <4> <- addr(_i)   (midx: 0)
+   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+	R4 <4> <- R4   (midx: 0)
+//memory.c,99 :: 		for (; Counter < temp; Counter++)
+3:   (midx: 0)
+   (midx: 0)
+	R0 <4> <- addr(_Counter)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	if ( R0 >= R4) then goto 4   (midx: 2)
+//memory.c,101 :: 		Data_Buffer[Counter] = Bulk_Data_Buff[i];
+	R0 <4> <- addr(_Counter)   (midx: 0)
+	R1 <4> <- [R0]   (midx: 0)
+	R0 <4> <- #_Data_Buffer   (midx: 0)
+	R3 <4> <-  R0 + R1   (midx: 2)
+	R2 <4> <- addr(_i)   (midx: 0)
+	R1 <4> <- [R2]   (midx: 0)
+	R0 <4> <- #_Bulk_Data_Buff   (midx: 0)
+	R0 <4> <-  R0 + R1   (midx: 2)
+	R0 <1> <- *R0   (midx: 0)
+	[R3] <1> <- R0   (midx: 0)
+//memory.c,102 :: 		i++;
+	R0 <4> <- R2   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R0 <4> <-  R0 + 1   (midx: 2)
+	[R2] <4> <- R0   (midx: 0)
+//memory.c,99 :: 		for (; Counter < temp; Counter++)
+	R0 <4> <- addr(_Counter)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R1 <4> <-  R0 + 1   (midx: 2)
+	R0 <4> <- addr(_Counter)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,103 :: 		}
+   (midx: 0)
+	R4 <4> <- R4   (midx: 0)
+	goto	3   (midx: 0)
+4:   (midx: 0)
+//memory.c,105 :: 		Memory_Offset += Data_Len;
+	R2 <4> <- addr(_Data_Len)   (midx: 0)
+	R1 <4> <- [R2]   (midx: 0)
+	R0 <4> <- addr(_Memory_Offset)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R1 <4> <-  R0 + R1   (midx: 2)
+	R0 <4> <- addr(_Memory_Offset)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,106 :: 		Transfer_Length -= Data_Len;
+	R0 <4> <- R2   (midx: 0)
+	R1 <4> <- [R0]   (midx: 0)
+	R2 <4> <- addr(_Transfer_Length)   (midx: 0)
+	R0 <4> <- [R2]   (midx: 0)
+	R1 <4> <-  R0 - R1   (midx: 2)
+	[R2] <4> <- R1   (midx: 0)
+//memory.c,108 :: 		if (!(Transfer_Length % 512))
+	R0 <4> <- 511   (midx: 0)
+	R0 <4> <-  R1 & R0   (midx: 2)
+	if (R0) then goto 6   (midx: 0)
+//memory.c,110 :: 		Counter = 0;
+	R1 <4> <- 0   (midx: 0)
+	R0 <4> <- addr(_Counter)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,111 :: 		MSD_WriteBlock(Data_Buffer, Memory_Offset - 512, 512);
+	R0 <4> <- addr(_Memory_Offset)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	R0 <4> <-  R0 - 512   (midx: 2)
+	R2 <1> <- 512   (midx: 0)
+	R1 <4> <- R0   (midx: 0)
+	R0 <4> <- #_Data_Buffer   (midx: 0)
+	CALL _MSD_WriteBlock   (midx: 0)
+//memory.c,112 :: 		}
+6:   (midx: 0)
+//memory.c,114 :: 		CSW.dDataResidue -= Data_Len;
+	R0 <4> <- addr(_Data_Len)   (midx: 0)
+	R2 <4> <- [R0]   (midx: 0)
+	R1 <4> <- addr(_CSW+8)   (midx: 0)
+	R0 <4> <- [R1]   (midx: 0)
+	R0 <4> <-  R0 - R2   (midx: 2)
+	[R1] <4> <- R0   (midx: 0)
+//memory.c,115 :: 		SetEPRxStatus(ENDP2, EP_RX_VALID); //enable the next transaction
+	R1 <1> <- 12288   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _SetEPRxStatus   (midx: 0)
+//memory.c,117 :: 		if ((Transfer_Length == 0) || (Bot_State == BOT_CSW_Send))
+	R0 <4> <- addr(_Transfer_Length)   (midx: 0)
+	R0 <4> <- [R0]   (midx: 0)
+	if ( R0 = 0) then goto 17   (midx: 2)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 4) then goto 16   (midx: 0)
+	goto	9   (midx: 0)
+17:   (midx: 0)
+16:   (midx: 0)
+//memory.c,119 :: 		Counter = 0;
+	R1 <4> <- 0   (midx: 0)
+	R0 <4> <- addr(_Counter)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//memory.c,120 :: 		Set_CSW (CSW_CMD_PASSED, SEND_CSW_ENABLE);
+	R1 <1> <- 1   (midx: 0)
+	R0 <1> <- 0   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//memory.c,121 :: 		}
+9:   (midx: 0)
+  end
+   (midx: 0)
+_Address_Management_Test:
+  begin   (midx: 0)
+//memory.c,131 :: 		int Address_Management_Test(u8 Cmd)
+_Address_Management_Test:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+//memory.c,138 :: 		(CBW.CB[3] << 16) |
+	R1 <4> <- addr(_CBW+18)   (midx: 0)
+	R1 <2> <- [R1]   (midx: 0)
+	R2 <2> <-  R1 shl 16   (midx: 1)
+//memory.c,139 :: 		(CBW.CB[4] <<  8) |
+	R1 <4> <- addr(_CBW+19)   (midx: 0)
+	R1 <2> <- [R1]   (midx: 0)
+	R1 <2> <-  R1 shl 8   (midx: 1)
+	R2 <2> <-  R2 | R1   (midx: 1)
+//memory.c,140 :: 		(CBW.CB[5] <<  0);
+	R1 <4> <- addr(_CBW+20)   (midx: 0)
+	R1 <2> <- [R1]   (midx: 1)
+	R1 <2> <-  R2 | R1   (midx: 1)
+   (midx: 0)
+	R4 <4> <- R1   (midx: 0)
+//memory.c,142 :: 		temp2 = (CBW.CB[7] <<  8) |
+	R1 <4> <- addr(_CBW+22)   (midx: 0)
+	R1 <2> <- [R1]   (midx: 0)
+	R2 <2> <-  R1 shl 8   (midx: 1)
+//memory.c,143 :: 		(CBW.CB[8] <<  0);
+	R1 <4> <- addr(_CBW+23)   (midx: 0)
+	R1 <2> <- [R1]   (midx: 1)
+	R1 <2> <-  R2 | R1   (midx: 1)
+   (midx: 0)
+	R5 <4> <- R1   (midx: 0)
+//memory.c,145 :: 		Memory_Offset = temp1 * Mass_Block_Size;
+	R3 <4> <- addr(_Mass_Block_Size)   (midx: 0)
+	R1 <4> <- [R3]   (midx: 0)
+   (midx: 0)
+	R2 <4> <-  R4 * R1   (midx: 2)
+	R1 <4> <- addr(_Memory_Offset)   (midx: 0)
+	[R1] <4> <- R2   (midx: 0)
+//memory.c,146 :: 		Transfer_Length = temp2 * Mass_Block_Size;
+	R1 <4> <- R3   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+   (midx: 0)
+	R2 <4> <-  R5 * R1   (midx: 2)
+	R1 <4> <- addr(_Transfer_Length)   (midx: 0)
+	[R1] <4> <- R2   (midx: 0)
+//memory.c,148 :: 		if ((Memory_Offset + Transfer_Length) > Mass_Memory_Size)
+	R1 <4> <- addr(_Memory_Offset)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	R2 <4> <-  R1 + R2   (midx: 2)
+	R1 <4> <- addr(_Mass_Memory_Size)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	if ( R2 <= R1) then goto 10   (midx: 2)
+//memory.c,150 :: 		if (Cmd == SCSI_WRITE10)
+   (midx: 0)
+	if ( R0 != 42) then goto 11   (midx: 0)
+//memory.c,152 :: 		Bot_Abort(BOTH_DIR);
+	R0 <1> <- 2   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//memory.c,153 :: 		}
+11:   (midx: 0)
+//memory.c,154 :: 		Bot_Abort(DIR_IN);
+	R0 <1> <- 0   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//memory.c,155 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, ADDRESS_OUT_OF_RANGE);
+	R1 <1> <- 33   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//memory.c,156 :: 		Set_CSW (CSW_CMD_FAILED, SEND_CSW_DISABLE);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//memory.c,157 :: 		return (0);
+	R0 <2> <- 0   (midx: 0)
+	return   (midx: 0)
+//memory.c,158 :: 		}
+10:   (midx: 0)
+//memory.c,161 :: 		if (CBW.dDataLength != Transfer_Length)
+   (midx: 0)
+	R1 <4> <- addr(_Transfer_Length)   (midx: 0)
+	R2 <4> <- [R1]   (midx: 0)
+	R1 <4> <- addr(_CBW+8)   (midx: 0)
+	R1 <4> <- [R1]   (midx: 0)
+	if ( R1 = R2) then goto 12   (midx: 2)
+//memory.c,163 :: 		if (Cmd == SCSI_WRITE10)
+   (midx: 0)
+	if ( R0 != 42) then goto 13   (midx: 0)
+//memory.c,165 :: 		Bot_Abort(BOTH_DIR);
+	R0 <1> <- 2   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//memory.c,166 :: 		}
+	goto	14   (midx: 0)
+13:   (midx: 0)
+//memory.c,169 :: 		Bot_Abort(DIR_IN);
+	R0 <1> <- 0   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//memory.c,170 :: 		}
+14:   (midx: 0)
+//memory.c,171 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, INVALID_FIELED_IN_COMMAND);
+	R1 <1> <- 36   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//memory.c,172 :: 		Set_CSW (CSW_CMD_FAILED, SEND_CSW_DISABLE);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//memory.c,173 :: 		return (0);
+	R0 <2> <- 0   (midx: 0)
+	return   (midx: 0)
+//memory.c,174 :: 		}
+12:   (midx: 0)
+//memory.c,175 :: 		return (1);
+	R0 <2> <- 1   (midx: 0)
+	return   (midx: 0)
+  end
+   (midx: 0)

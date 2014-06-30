@@ -1,0 +1,4 @@
+>>> Warning 202 "main.c" Line 196(14,22): Variable never used:   rx_count
+>>> Warning 202 "main.c" Line 197(5,10): Variable never used:   rx_tx
+      Memory usage:   ROM=23%      RAM=31% - 34%
+      0 Errors,  2 Warnings.

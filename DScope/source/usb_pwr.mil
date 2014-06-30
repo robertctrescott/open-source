@@ -1,0 +1,200 @@
+_Suspend:
+  begin   (midx: 0)
+//usb_pwr.c,39 :: 		void Suspend(void)
+_Suspend:
+  begin   (midx: 0)
+//usb_pwr.c,46 :: 		wCNTR = _GetCNTR();
+	R0 <4> <- addr(LitPtrAbs: 40005C40)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+//usb_pwr.c,47 :: 		wCNTR |= CNTR_FSUSP;
+	R1 <1> <-  R0 | 8   (midx: 0)
+//usb_pwr.c,48 :: 		_SetCNTR(wCNTR);
+	R0 <4> <- addr(LitPtrAbs: 40005C40)   (midx: 0)
+	[R0] <2> <- R1   (midx: 0)
+//usb_pwr.c,56 :: 		wCNTR = _GetCNTR();
+	R0 <4> <- addr(LitPtrAbs: 40005C40)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+//usb_pwr.c,57 :: 		wCNTR |= CNTR_LPMODE;
+	R1 <1> <-  R0 | 4   (midx: 0)
+//usb_pwr.c,58 :: 		_SetCNTR(wCNTR);
+	R0 <4> <- addr(LitPtrAbs: 40005C40)   (midx: 0)
+	[R0] <2> <- R1   (midx: 0)
+  end
+   (midx: 0)
+_Resume_Init:
+  begin   (midx: 0)
+//usb_pwr.c,73 :: 		void Resume_Init(void)
+_Resume_Init:
+  begin   (midx: 0)
+//usb_pwr.c,81 :: 		wCNTR = _GetCNTR();
+	R0 <4> <- addr(LitPtrAbs: 40005C40)   (midx: 0)
+	R1 <1> <- [R0]   (midx: 0)
+//usb_pwr.c,82 :: 		wCNTR &= (~CNTR_LPMODE);
+	R0 <2> <- -5   (midx: 0)
+	R0 <2> <-  R1 & R0   (midx: 0)
+//usb_pwr.c,83 :: 		_SetCNTR(wCNTR);
+	R1 <2> <- R0   (midx: 0)
+	R0 <4> <- addr(LitPtrAbs: 40005C40)   (midx: 0)
+	[R0] <2> <- R1   (midx: 0)
+//usb_pwr.c,90 :: 		_SetCNTR(IMR_MSK);
+	R1 <2> <- 0   (midx: 0)
+	R0 <4> <- addr(LitPtrAbs: 40005C40)   (midx: 0)
+	[R0] <2> <- R1   (midx: 0)
+  end
+   (midx: 0)
+_Resume:
+  begin   (midx: 0)
+//usb_pwr.c,109 :: 		void Resume(RESUME_STATE eResumeSetVal)
+_Resume:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+//usb_pwr.c,113 :: 		if (eResumeSetVal != RESUME_ESOF)
+	if ( R0 = 7) then goto 0   (midx: 0)
+//usb_pwr.c,114 :: 		ResumeS.eState = eResumeSetVal;
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+   (midx: 0)
+	[R1] <1> <- R0   (midx: 0)
+0:   (midx: 0)
+//usb_pwr.c,116 :: 		switch (ResumeS.eState)
+	goto	1   (midx: 0)
+//usb_pwr.c,118 :: 		case RESUME_EXTERNAL:
+3:   (midx: 0)
+//usb_pwr.c,119 :: 		Resume_Init();
+	CALL _Resume_Init   (midx: 0)
+//usb_pwr.c,120 :: 		ResumeS.eState = RESUME_OFF;
+	R2 <1> <- 6   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	[R1] <1> <- R2   (midx: 0)
+//usb_pwr.c,121 :: 		break;
+	goto	2   (midx: 0)
+//usb_pwr.c,122 :: 		case RESUME_INTERNAL:
+4:   (midx: 0)
+//usb_pwr.c,123 :: 		Resume_Init();
+	CALL _Resume_Init   (midx: 0)
+//usb_pwr.c,124 :: 		ResumeS.eState = RESUME_START;
+	R2 <1> <- 4   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	[R1] <1> <- R2   (midx: 0)
+//usb_pwr.c,125 :: 		break;
+	goto	2   (midx: 0)
+//usb_pwr.c,126 :: 		case RESUME_LATER:
+5:   (midx: 0)
+//usb_pwr.c,127 :: 		ResumeS.bESOFcnt = 2;
+	R2 <1> <- 2   (midx: 0)
+	R1 <4> <- addr(_ResumeS+1)   (midx: 0)
+	[R1] <1> <- R2   (midx: 0)
+//usb_pwr.c,128 :: 		ResumeS.eState = RESUME_WAIT;
+	R2 <1> <- 3   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	[R1] <1> <- R2   (midx: 0)
+//usb_pwr.c,129 :: 		break;
+	goto	2   (midx: 0)
+//usb_pwr.c,130 :: 		case RESUME_WAIT:
+6:   (midx: 0)
+//usb_pwr.c,131 :: 		ResumeS.bESOFcnt--;
+	R2 <4> <- addr(_ResumeS+1)   (midx: 0)
+	R1 <1> <- [R2]   (midx: 0)
+	R1 <1> <-  R1 - 1   (midx: 0)
+	[R2] <1> <- R1   (midx: 0)
+//usb_pwr.c,132 :: 		if (ResumeS.bESOFcnt == 0)
+	if ( R1 != 0) then goto 7   (midx: 0)
+//usb_pwr.c,133 :: 		ResumeS.eState = RESUME_START;
+	R2 <1> <- 4   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	[R1] <1> <- R2   (midx: 0)
+7:   (midx: 0)
+//usb_pwr.c,134 :: 		break;
+	goto	2   (midx: 0)
+//usb_pwr.c,135 :: 		case RESUME_START:
+8:   (midx: 0)
+//usb_pwr.c,136 :: 		wCNTR = _GetCNTR();
+	R1 <4> <- addr(LitPtrAbs: 40005C40)   (midx: 0)
+	R1 <1> <- [R1]   (midx: 0)
+//usb_pwr.c,137 :: 		wCNTR |= CNTR_RESUME;
+	R2 <1> <-  R1 | 16   (midx: 0)
+//usb_pwr.c,138 :: 		_SetCNTR(wCNTR);
+	R1 <4> <- addr(LitPtrAbs: 40005C40)   (midx: 0)
+	[R1] <2> <- R2   (midx: 0)
+//usb_pwr.c,139 :: 		ResumeS.eState = RESUME_ON;
+	R2 <1> <- 5   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	[R1] <1> <- R2   (midx: 0)
+//usb_pwr.c,140 :: 		ResumeS.bESOFcnt = 10;
+	R2 <1> <- 10   (midx: 0)
+	R1 <4> <- addr(_ResumeS+1)   (midx: 0)
+	[R1] <1> <- R2   (midx: 0)
+//usb_pwr.c,141 :: 		break;
+	goto	2   (midx: 0)
+//usb_pwr.c,142 :: 		case RESUME_ON:
+9:   (midx: 0)
+//usb_pwr.c,143 :: 		ResumeS.bESOFcnt--;
+	R2 <4> <- addr(_ResumeS+1)   (midx: 0)
+	R1 <1> <- [R2]   (midx: 0)
+	R1 <1> <-  R1 - 1   (midx: 0)
+	[R2] <1> <- R1   (midx: 0)
+//usb_pwr.c,144 :: 		if (ResumeS.bESOFcnt == 0)
+	if ( R1 != 0) then goto 10   (midx: 0)
+//usb_pwr.c,146 :: 		wCNTR = _GetCNTR();
+	R1 <4> <- addr(LitPtrAbs: 40005C40)   (midx: 0)
+	R2 <1> <- [R1]   (midx: 0)
+//usb_pwr.c,147 :: 		wCNTR &= (~CNTR_RESUME);
+	R1 <2> <- -17   (midx: 0)
+	R1 <2> <-  R2 & R1   (midx: 0)
+//usb_pwr.c,148 :: 		_SetCNTR(wCNTR);
+	R2 <2> <- R1   (midx: 0)
+	R1 <4> <- addr(LitPtrAbs: 40005C40)   (midx: 0)
+	[R1] <2> <- R2   (midx: 0)
+//usb_pwr.c,149 :: 		ResumeS.eState = RESUME_OFF;
+	R2 <1> <- 6   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	[R1] <1> <- R2   (midx: 0)
+//usb_pwr.c,150 :: 		}
+10:   (midx: 0)
+//usb_pwr.c,151 :: 		break;
+	goto	2   (midx: 0)
+//usb_pwr.c,152 :: 		case RESUME_OFF:
+11:   (midx: 0)
+//usb_pwr.c,153 :: 		case RESUME_ESOF:
+12:   (midx: 0)
+//usb_pwr.c,154 :: 		default:
+13:   (midx: 0)
+//usb_pwr.c,155 :: 		ResumeS.eState = RESUME_OFF;
+	R2 <1> <- 6   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	[R1] <1> <- R2   (midx: 0)
+//usb_pwr.c,156 :: 		break;
+	goto	2   (midx: 0)
+//usb_pwr.c,157 :: 		}
+1:   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	R1 <1> <- [R1]   (midx: 0)
+	if ( R1 = 0) then goto 3   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	R1 <1> <- [R1]   (midx: 0)
+	if ( R1 = 1) then goto 4   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	R1 <1> <- [R1]   (midx: 0)
+	if ( R1 = 2) then goto 5   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	R1 <1> <- [R1]   (midx: 0)
+	if ( R1 = 3) then goto 6   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	R1 <1> <- [R1]   (midx: 0)
+	if ( R1 = 4) then goto 8   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	R1 <1> <- [R1]   (midx: 0)
+	if ( R1 = 5) then goto 9   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	R1 <1> <- [R1]   (midx: 0)
+	if ( R1 = 6) then goto 11   (midx: 0)
+	R1 <4> <- addr(_ResumeS+0)   (midx: 0)
+	R1 <1> <- [R1]   (midx: 0)
+	if ( R1 = 7) then goto 12   (midx: 0)
+	goto	13   (midx: 0)
+2:   (midx: 0)
+  end
+   (midx: 0)

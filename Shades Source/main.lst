@@ -1,0 +1,2268 @@
+CCS PCH C Compiler, Version 4.112, 93508135               21-Dec-12 09:36
+
+               Filename: Z:\Robs Folder\Shades Source\main.lst
+
+               ROM used: 3434 bytes (10%)
+                         Largest free fragment is 29330
+               RAM used: 126 (8%) at main() level
+                         162 (11%) worst case
+               Stack:    7 worst case (5 in main + 2 for interrupts)
+
+*
+0000:  GOTO   0C7A
+*
+0008:  MOVWF  04
+000A:  MOVFF  FD8,05
+000E:  MOVFF  FE0,06
+0012:  MOVLB  0
+0014:  MOVFF  FE9,0C
+0018:  MOVFF  FEA,07
+001C:  MOVFF  FE1,08
+0020:  MOVFF  FE2,09
+0024:  MOVFF  FD9,0A
+0028:  MOVFF  FDA,0B
+002C:  MOVFF  FF3,12
+0030:  MOVFF  FF4,13
+0034:  MOVFF  FFA,14
+0038:  MOVFF  FF5,15
+003C:  MOVFF  FF6,16
+0040:  MOVFF  FF7,17
+0044:  MOVFF  00,0E
+0048:  MOVFF  01,0F
+004C:  MOVFF  02,10
+0050:  MOVFF  03,11
+0054:  BTFSS  F9D.1
+0056:  GOTO   0060
+005A:  BTFSC  F9E.1
+005C:  GOTO   00BA
+0060:  BTFSS  FF2.3
+0062:  GOTO   006C
+0066:  BTFSC  FF2.0
+0068:  GOTO   0128
+006C:  MOVFF  0E,00
+0070:  MOVFF  0F,01
+0074:  MOVFF  10,02
+0078:  MOVFF  11,03
+007C:  MOVFF  0C,FE9
+0080:  MOVFF  07,FEA
+0084:  BSF    07.7
+0086:  MOVFF  08,FE1
+008A:  MOVFF  09,FE2
+008E:  MOVFF  0A,FD9
+0092:  MOVFF  0B,FDA
+0096:  MOVFF  12,FF3
+009A:  MOVFF  13,FF4
+009E:  MOVFF  14,FFA
+00A2:  MOVFF  15,FF5
+00A6:  MOVFF  16,FF6
+00AA:  MOVFF  17,FF7
+00AE:  MOVF   04,W
+00B0:  MOVFF  06,FE0
+00B4:  MOVFF  05,FD8
+00B8:  RETFIE 0
+.................... /* main.c 
+....................  
+.................... 	05/02/09 by Robert Trescott Jr. 
+.................... 	(C)2009 Analogic 
+....................  
+.................... 	Microchip MPLAB ICD2 Emulation 
+....................  
+.................... 	History: 
+.................... 		05/02/09 - ORIGINAL WORK for PICDEM 2 PLUS PCB - rct 
+.................... 		05/25/09 - Port to 18F252 PCB09051401 - rct 
+.................... 		08/24/12 - Accelerometer test code 
+.................... 		12/14/12 - rev 1.02 added RF receiver for remote control 
+....................  
+.................... */ 
+....................  
+.................... // compiler and hardware special settings 
+.................... // *** Microchip stores "little-endian" ex. $4F52 = 0x52 0x4F in memory *** 
+.................... // *** DO NOT USE ICD2 THROUGH A USB HUB! ********** 
+....................  
+....................  
+.................... #case 
+.................... //#define ICD2 
+....................  
+.................... #include <18F2520.h> 
+.................... //////// Standard Header file for the PIC18F2520 device //////////////// 
+.................... #device PIC18F2520 
+.................... #list 
+....................  
+.................... #device *=16 
+.................... #device ADC=10 
+....................  
+.................... #ifdef ICD2 
+.................... #fuses INTRC_IO,NOWDT,NOPROTECT,NOBROWNOUT,PUT,NOCPD,NOCPB,NOLVP,DEBUG 
+.................... #else 
+.................... #fuses INTRC_IO,NOWDT,PROTECT,BROWNOUT,PUT,NODEBUG,NOLVP,NOCPD,CPB 
+.................... //#fuses HS,NOWDT,PROTECT,BROWNOUT,PUT,NODEBUG,NOLVP,NOCPD,CPB 
+.................... #endif 
+.................... #use delay(clock=32000000) 
+*
+016E:  CLRF   FEA
+0170:  MOVLW  7A
+0172:  MOVWF  FE9
+0174:  MOVF   FEF,W
+0176:  BZ    0192
+0178:  MOVLW  0A
+017A:  MOVWF  01
+017C:  CLRF   00
+017E:  DECFSZ 00,F
+0180:  BRA    017E
+0182:  DECFSZ 01,F
+0184:  BRA    017C
+0186:  MOVLW  5F
+0188:  MOVWF  00
+018A:  DECFSZ 00,F
+018C:  BRA    018A
+018E:  DECFSZ FEF,F
+0190:  BRA    0178
+0192:  RETLW  00
+....................  
+.................... #include "18F4520.inc"		// standard ccs io defs 
+.................... #list	 
+....................  
+....................  
+.................... #define	VERSION		    "1.02" 
+.................... #export (hex,file="SHADES1_02.hex") 
+....................  
+.................... #define START_ID		0x52		 
+.................... #define TX_ID			0xA0 
+.................... #define	SRC_ID			0x30 
+.................... #define RX_ID			0xB0 
+.................... #define UNIT_ID			0x31 
+....................  
+.................... #define false			0 
+.................... #define true			1 
+.................... #define byte			int 
+.................... #define boolean			short int 
+....................  
+.................... #define BUTTON_NONE			0 
+.................... #define	BUTTON_SET			1 
+.................... #define BUTTON_MODE			2 
+.................... #define BUTTON_BOTH			3 
+....................  
+.................... #define CMD_DONE			0 
+.................... #define CMD_OPEN			1 
+.................... #define CMD_CLOSE			2 
+.................... #define CMD_OFF			0x31 
+.................... #define	CMD_ON			0x32 
+....................  
+....................  
+.................... #define SERVO_VAL_STOP		0 
+.................... #define SERVO_VAL_OPEN		1 
+.................... #define SERVO_VAL_CLOSE		2 
+....................  
+.................... #define _SDO  			PIN_C5 
+.................... #define _SDA  			PIN_C4 
+.................... #define _SCK  			PIN_C3 
+.................... #define ADC_DATA_MAX	16 
+.................... #define RF_MAX			10 
+.................... #define RF_LEN			8 
+....................  
+.................... // accelerometer values 
+.................... const int 				SCALE = 2; 
+.................... const int16 			MAX_CLOSED	= 980;		// Y axis value only 
+.................... const int16 			MAX_OPENED	= 600;		// Y axis value only 
+....................  
+.................... #BIT	RCIF			= PIR1.5 
+.................... #BIT	RBPU			= INTCON2.7 
+.................... #BIT	RBIF			= INTCON.0 
+....................  
+.................... #BIT LED_M1		    	= PORTA.0 
+.................... #BIT LED_M2          	= PORTA.1 
+.................... #BIT LED_B1           	= PORTB.0 
+.................... #BIT LED_B2           	= PORTB.1 
+.................... #BIT LED_B4           	= PORTB.2 
+.................... #BIT LED_B8           	= PORTB.3 
+.................... #BIT SERVO_CS			= PORTB.4 
+.................... #BIT RF_IRQ				= PORTB.5 
+.................... #BIT SW_SET				= PORTB.6 
+.................... #BIT SW_MODE			= PORTB.7 
+.................... #BIT RF_EN				= PORTC.0 
+.................... #BIT RF_RES				= PORTC.1 
+.................... #BIT SERVO_PWR			= PORTC.2 
+.................... #BIT SCK				= PORTC.3 
+.................... #BIT SDA				= PORTC.4 
+.................... #BIT SDO				= PORTC.5 
+.................... #BIT TXO				= PORTC.6 
+.................... #BIT RXI				= PORTC.7 
+....................  
+.................... #use i2c(master, scl=PIN_C3, sda=PIN_C4) 
+*
+0344:  MOVLW  08
+0346:  MOVWF  01
+0348:  MOVLW  0A
+034A:  MOVWF  00
+034C:  DECFSZ 00,F
+034E:  BRA    034C
+0350:  BCF    F8B.3
+0352:  BCF    F94.3
+0354:  MOVLW  0B
+0356:  MOVWF  00
+0358:  DECFSZ 00,F
+035A:  BRA    0358
+035C:  RLCF   x8B,F
+035E:  BCF    F8B.4
+0360:  BTFSC  FD8.0
+0362:  BSF    F94.4
+0364:  BTFSS  FD8.0
+0366:  BCF    F94.4
+0368:  BSF    F94.3
+036A:  BTFSS  F82.3
+036C:  BRA    036A
+036E:  DECFSZ 01,F
+0370:  BRA    0348
+0372:  MOVLW  0A
+0374:  MOVWF  00
+0376:  DECFSZ 00,F
+0378:  BRA    0376
+037A:  BCF    F8B.3
+037C:  BCF    F94.3
+037E:  NOP   
+0380:  BSF    F94.4
+0382:  MOVLW  0B
+0384:  MOVWF  00
+0386:  DECFSZ 00,F
+0388:  BRA    0386
+038A:  MOVLW  0B
+038C:  MOVWF  00
+038E:  DECFSZ 00,F
+0390:  BRA    038E
+0392:  BSF    F94.3
+0394:  BTFSS  F82.3
+0396:  BRA    0394
+0398:  CLRF   01
+039A:  MOVLW  0B
+039C:  MOVWF  00
+039E:  DECFSZ 00,F
+03A0:  BRA    039E
+03A2:  BTFSC  F82.4
+03A4:  BSF    01.0
+03A6:  BCF    F8B.3
+03A8:  BCF    F94.3
+03AA:  BCF    F8B.4
+03AC:  BCF    F94.4
+03AE:  RETLW  00
+*
+040C:  MOVLW  08
+040E:  MOVWF  x8B
+0410:  MOVFF  00,8C
+0414:  BSF    F94.4
+0416:  MOVLW  0B
+0418:  MOVWF  00
+041A:  DECFSZ 00,F
+041C:  BRA    041A
+041E:  BSF    F94.3
+0420:  BTFSS  F82.3
+0422:  BRA    0420
+0424:  BTFSC  F82.4
+0426:  BSF    FD8.0
+0428:  BTFSS  F82.4
+042A:  BCF    FD8.0
+042C:  RLCF   01,F
+042E:  MOVLW  0A
+0430:  MOVWF  00
+0432:  DECFSZ 00,F
+0434:  BRA    0432
+0436:  BCF    F94.3
+0438:  BCF    F8B.3
+043A:  DECFSZ x8B,F
+043C:  BRA    0414
+043E:  BSF    F94.4
+0440:  MOVLW  0B
+0442:  MOVWF  00
+0444:  DECFSZ 00,F
+0446:  BRA    0444
+0448:  BCF    F8B.4
+044A:  MOVF   x8C,W
+044C:  BTFSS  FD8.2
+044E:  BCF    F94.4
+0450:  NOP   
+0452:  BSF    F94.3
+0454:  BTFSS  F82.3
+0456:  BRA    0454
+0458:  MOVLW  0A
+045A:  MOVWF  00
+045C:  DECFSZ 00,F
+045E:  BRA    045C
+0460:  BCF    F8B.3
+0462:  BCF    F94.3
+0464:  MOVLW  0B
+0466:  MOVWF  00
+0468:  DECFSZ 00,F
+046A:  BRA    0468
+046C:  BCF    F8B.4
+046E:  BCF    F94.4
+0470:  RETLW  00
+....................  
+.................... signed int32	adc_raw[ADC_DATA_MAX]; 
+.................... static signed int32	adc_smooth; 
+....................  
+.................... signed int16 	accelCount[3];  // Stores the 12-bit signed value 
+.................... static int1 	b50ms; 
+.................... static int1		bRX_ready; 
+.................... static int		servo_val; 
+.................... static int		cur_cmd; 
+.................... static int8		dest_id; 
+....................  
+.................... static int8 	RF_RXBUF[RF_MAX]; 
+.................... static int8		in_ptr; 
+....................  
+....................  
+.................... #include "buttons.c" 
+.................... // buttons.c 
+....................  
+.................... void HandleUIButtons() 
+.................... { 
+*
+0ACC:  CLRF   78
+.................... 	static int prev_button; 
+.................... 	int button = BUTTON_NONE; 
+.................... 	 
+.................... 	if (SW_MODE == 0) button = BUTTON_MODE; 
+0ACE:  BTFSC  F81.7
+0AD0:  BRA    0AD6
+0AD2:  MOVLW  02
+0AD4:  MOVWF  78
+.................... 	if (SW_SET == 0) button++; 
+0AD6:  BTFSS  F81.6
+0AD8:  INCF   78,F
+....................  
+.................... 	if (button != prev_button){ 
+0ADA:  MOVF   73,W
+0ADC:  SUBWF  78,W
+0ADE:  BZ    0B04
+.................... 		prev_button = button; 
+0AE0:  MOVFF  78,73
+.................... 		LED_M1=0;	// indicate we came from manual mode 
+0AE4:  BCF    F80.0
+.................... 		LED_M2=0; 
+0AE6:  BCF    F80.1
+.................... 		switch (button){ 
+0AE8:  MOVF   78,W
+0AEA:  BZ    0AF6
+0AEC:  XORLW  01
+0AEE:  BZ    0AF8
+0AF0:  XORLW  03
+0AF2:  BZ    0AFE
+0AF4:  BRA    0B04
+.................... 			case BUTTON_NONE: break; 
+0AF6:  BRA    0B04
+.................... 			case BUTTON_SET: cur_cmd = CMD_OPEN; break; 
+0AF8:  MOVLW  01
+0AFA:  MOVWF  66
+0AFC:  BRA    0B04
+.................... 			case BUTTON_MODE:cur_cmd = CMD_CLOSE; break; 
+0AFE:  MOVLW  02
+0B00:  MOVWF  66
+0B02:  BRA    0B04
+.................... 		} 
+....................  
+.................... 	} 
+.................... } 
+0B04:  GOTO   0D68 (RETURN)
+....................  
+....................  
+.................... void HandleUILeds() 
+.................... { 
+.................... //	LED_M1 = ;			see HandleRfTraffic() 
+.................... //	LED_M2 = ; 
+.................... 	LED_B1 = (cur_cmd == CMD_OPEN); 
+*
+0AAC:  BCF    F81.0
+0AAE:  DECFSZ 66,W
+0AB0:  BRA    0AB4
+0AB2:  BSF    F81.0
+.................... 	LED_B2 = (cur_cmd == CMD_DONE); 
+0AB4:  BCF    F81.1
+0AB6:  MOVF   66,F
+0AB8:  BNZ   0ABC
+0ABA:  BSF    F81.1
+.................... 	LED_B4 = (cur_cmd == CMD_CLOSE); 
+0ABC:  BCF    F81.2
+0ABE:  MOVF   66,W
+0AC0:  SUBLW  02
+0AC2:  BNZ   0AC6
+0AC4:  BSF    F81.2
+.................... 	LED_B8 = 0;	 
+0AC6:  BCF    F81.3
+.................... } 
+0AC8:  GOTO   0D66 (RETURN)
+....................  
+.................... #include "MMA8452Q.c" 
+.................... /*  
+.................... 	08/24/2012- port from Arduino sketch -rct  
+.................... ******************************************************************************* 
+.................... 	Initialize the MMA8452 registers  
+....................    	See the many application notes for more info on setting  
+....................    	all of these registers: 
+....................    	http://www.freescale.com/webapp/sps/site/prod_summary.jsp?code=MMA8452Q 
+....................    	Feel free to modify any values, these are settings that work well for me. 
+.................... *******************************************************************************/ 
+.................... #define SA0 1 
+.................... #ifdef SA0 
+.................... 	#define MMA8452_ADDRESS 0x1D  // SA0 is high, 0x1C if low 
+.................... #else 
+.................... 	#define MMA8452_ADDRESS 0x1C 
+.................... #endif 
+....................  
+....................  
+.................... // let the on board pullups do their job! 
+.................... void init_i2c_device() 
+.................... { 
+.................... 	output_float(_SCK); 
+*
+021C:  BSF    F94.3
+.................... 	output_float(_SDA); 
+021E:  BSF    F94.4
+.................... } 
+0220:  GOTO   0CDC (RETURN)
+....................  
+.................... // active polling of i2c ready status 
+.................... int1 i2c_device_ready() 
+.................... { 
+.................... 	int1 ack; 
+.................... 	i2c_start();            				// If the write command is acknowledged, 
+*
+03B0:  BSF    F94.4
+03B2:  MOVLW  0A
+03B4:  MOVWF  00
+03B6:  DECFSZ 00,F
+03B8:  BRA    03B6
+03BA:  BSF    F94.3
+03BC:  MOVLW  0B
+03BE:  MOVWF  00
+03C0:  DECFSZ 00,F
+03C2:  BRA    03C0
+03C4:  BCF    F8B.4
+03C6:  BCF    F94.4
+03C8:  MOVLW  0A
+03CA:  MOVWF  00
+03CC:  DECFSZ 00,F
+03CE:  BRA    03CC
+03D0:  BCF    F8B.3
+03D2:  BCF    F94.3
+.................... 	ack = i2c_write((MMA8452_ADDRESS<<1));  // then the device is ready. 
+03D4:  MOVLW  3A
+03D6:  MOVWF  x8B
+03D8:  RCALL  0344
+03DA:  MOVF   01,W
+03DC:  BCF    x8A.0
+03DE:  BTFSC  01.0
+03E0:  BSF    x8A.0
+.................... 	i2c_stop(); 
+03E2:  BCF    F94.4
+03E4:  NOP   
+03E6:  BSF    F94.3
+03E8:  BTFSS  F82.3
+03EA:  BRA    03E8
+03EC:  MOVLW  0A
+03EE:  MOVWF  00
+03F0:  DECFSZ 00,F
+03F2:  BRA    03F0
+03F4:  BRA    03F6
+03F6:  NOP   
+03F8:  BSF    F94.4
+03FA:  MOVLW  0A
+03FC:  MOVWF  00
+03FE:  DECFSZ 00,F
+0400:  BRA    03FE
+.................... 	return !ack; 
+0402:  MOVLW  00
+0404:  BTFSS  x8A.0
+0406:  MOVLW  01
+0408:  MOVWF  01
+.................... } 
+040A:  RETLW  00
+....................  
+.................... /* read a single byte from address and return it as a byte */ 
+.................... int readRegister(int8 address) 
+.................... { 
+.................... 	int8 data; 
+....................    
+....................   	while (!i2c_device_ready()); 
+*
+0472:  RCALL  03B0
+0474:  MOVF   01,F
+0476:  BZ    0472
+....................   	i2c_start(); 
+0478:  BSF    F94.4
+047A:  MOVLW  0A
+047C:  MOVWF  00
+047E:  DECFSZ 00,F
+0480:  BRA    047E
+0482:  BSF    F94.3
+0484:  MOVLW  0B
+0486:  MOVWF  00
+0488:  DECFSZ 00,F
+048A:  BRA    0488
+048C:  BCF    F8B.4
+048E:  BCF    F94.4
+0490:  MOVLW  0A
+0492:  MOVWF  00
+0494:  DECFSZ 00,F
+0496:  BRA    0494
+0498:  BCF    F8B.3
+049A:  BCF    F94.3
+.................... 	i2c_write((MMA8452_ADDRESS<<1));		// write 0xB4 
+049C:  MOVLW  3A
+049E:  MOVWF  x8B
+04A0:  RCALL  0344
+....................    	i2c_write(address); 
+04A2:  MOVFF  7B,8B
+04A6:  RCALL  0344
+....................    	i2c_start(); 
+04A8:  BSF    F94.4
+04AA:  MOVLW  0A
+04AC:  MOVWF  00
+04AE:  DECFSZ 00,F
+04B0:  BRA    04AE
+04B2:  BSF    F94.3
+04B4:  MOVLW  0B
+04B6:  MOVWF  00
+04B8:  DECFSZ 00,F
+04BA:  BRA    04B8
+04BC:  BTFSS  F82.3
+04BE:  BRA    04BC
+04C0:  BCF    F8B.4
+04C2:  BCF    F94.4
+04C4:  MOVLW  0A
+04C6:  MOVWF  00
+04C8:  DECFSZ 00,F
+04CA:  BRA    04C8
+04CC:  BCF    F8B.3
+04CE:  BCF    F94.3
+.................... 	 
+.................... 	i2c_write((MMA8452_ADDRESS<<1)|0x01);	// write 0xB5	 
+04D0:  MOVLW  3B
+04D2:  MOVWF  x8B
+04D4:  RCALL  0344
+....................    	data=i2c_read(0);						// use nack 
+04D6:  CLRF   00
+04D8:  RCALL  040C
+04DA:  MOVFF  01,7C
+....................    	i2c_stop(); 
+04DE:  BCF    F94.4
+04E0:  NOP   
+04E2:  BSF    F94.3
+04E4:  BTFSS  F82.3
+04E6:  BRA    04E4
+04E8:  MOVLW  0A
+04EA:  MOVWF  00
+04EC:  DECFSZ 00,F
+04EE:  BRA    04EC
+04F0:  BRA    04F2
+04F2:  NOP   
+04F4:  BSF    F94.4
+04F6:  MOVLW  0A
+04F8:  MOVWF  00
+04FA:  DECFSZ 00,F
+04FC:  BRA    04FA
+.................... 	 
+.................... 	return data; 
+04FE:  MOVFF  7C,01
+.................... } 
+0502:  RETLW  00
+....................  
+.................... /* Read i registers sequentially, starting at address  
+....................    into the dest byte array */ 
+.................... void readRegisters(int8 address, int i, char* dest) 
+.................... { 
+.................... 	int j; 
+.................... 	int8 val; 
+.................... 	 
+....................   	while (!i2c_device_ready()); 
+*
+0616:  RCALL  03B0
+0618:  MOVF   01,F
+061A:  BZ    0616
+....................   	i2c_start(); 
+061C:  BSF    F94.4
+061E:  MOVLW  0A
+0620:  MOVWF  00
+0622:  DECFSZ 00,F
+0624:  BRA    0622
+0626:  BSF    F94.3
+0628:  MOVLW  0B
+062A:  MOVWF  00
+062C:  DECFSZ 00,F
+062E:  BRA    062C
+0630:  BCF    F8B.4
+0632:  BCF    F94.4
+0634:  MOVLW  0A
+0636:  MOVWF  00
+0638:  DECFSZ 00,F
+063A:  BRA    0638
+063C:  BCF    F8B.3
+063E:  BCF    F94.3
+.................... 	i2c_write((MMA8452_ADDRESS<<1));			// write 0xB4   
+0640:  MOVLW  3A
+0642:  MOVWF  x8B
+0644:  RCALL  0344
+.................... 	i2c_write(address); 
+0646:  MOVFF  84,8B
+064A:  RCALL  0344
+....................    	i2c_start(); 
+064C:  BSF    F94.4
+064E:  MOVLW  0A
+0650:  MOVWF  00
+0652:  DECFSZ 00,F
+0654:  BRA    0652
+0656:  BSF    F94.3
+0658:  MOVLW  0B
+065A:  MOVWF  00
+065C:  DECFSZ 00,F
+065E:  BRA    065C
+0660:  BTFSS  F82.3
+0662:  BRA    0660
+0664:  BCF    F8B.4
+0666:  BCF    F94.4
+0668:  MOVLW  0A
+066A:  MOVWF  00
+066C:  DECFSZ 00,F
+066E:  BRA    066C
+0670:  BCF    F8B.3
+0672:  BCF    F94.3
+....................  
+.................... 	i2c_write((MMA8452_ADDRESS<<1)|0x01);		// write 0xB5   
+0674:  MOVLW  3B
+0676:  MOVWF  x8B
+0678:  RCALL  0344
+....................     for (j=0; j<i-1; j++){ 
+067A:  CLRF   x88
+067C:  MOVLW  01
+067E:  SUBWF  x85,W
+0680:  SUBWF  x88,W
+0682:  BC    06A4
+.................... 	    val = i2c_read(1);						// use ack for multibyte up to last byte 
+0684:  MOVLW  01
+0686:  MOVWF  00
+0688:  RCALL  040C
+068A:  MOVFF  01,89
+.................... 	    dest[j] = val; 
+068E:  CLRF   03
+0690:  MOVF   x88,W
+0692:  ADDWF  x86,W
+0694:  MOVWF  FE9
+0696:  MOVF   x87,W
+0698:  ADDWFC 03,W
+069A:  MOVWF  FEA
+069C:  MOVFF  89,FEF
+....................   	} 
+06A0:  INCF   x88,F
+06A2:  BRA    067C
+....................   	 
+.................... 	val = i2c_read(0);							// use nack for last byte read 
+06A4:  CLRF   00
+06A6:  RCALL  040C
+06A8:  MOVFF  01,89
+....................    	i2c_stop(); 
+06AC:  BCF    F94.4
+06AE:  NOP   
+06B0:  BSF    F94.3
+06B2:  BTFSS  F82.3
+06B4:  BRA    06B2
+06B6:  MOVLW  0A
+06B8:  MOVWF  00
+06BA:  DECFSZ 00,F
+06BC:  BRA    06BA
+06BE:  BRA    06C0
+06C0:  NOP   
+06C2:  BSF    F94.4
+06C4:  MOVLW  0A
+06C6:  MOVWF  00
+06C8:  DECFSZ 00,F
+06CA:  BRA    06C8
+.................... 	dest[j] = val; 
+06CC:  CLRF   03
+06CE:  MOVF   x88,W
+06D0:  ADDWF  x86,W
+06D2:  MOVWF  FE9
+06D4:  MOVF   x87,W
+06D6:  ADDWFC 03,W
+06D8:  MOVWF  FEA
+06DA:  MOVFF  89,FEF
+.................... } 
+06DE:  GOTO   06F2 (RETURN)
+....................  
+....................  
+.................... /* Writes a single byte (data) into address */ 
+.................... void writeRegister(int8 address, int8 data) 
+.................... { 
+....................   	while (!i2c_device_ready()); 
+*
+0504:  RCALL  03B0
+0506:  MOVF   01,F
+0508:  BZ    0504
+....................   	i2c_start(); 
+050A:  BSF    F94.4
+050C:  MOVLW  0A
+050E:  MOVWF  00
+0510:  DECFSZ 00,F
+0512:  BRA    0510
+0514:  BSF    F94.3
+0516:  MOVLW  0B
+0518:  MOVWF  00
+051A:  DECFSZ 00,F
+051C:  BRA    051A
+051E:  BCF    F8B.4
+0520:  BCF    F94.4
+0522:  MOVLW  0A
+0524:  MOVWF  00
+0526:  DECFSZ 00,F
+0528:  BRA    0526
+052A:  BCF    F8B.3
+052C:  BCF    F94.3
+.................... 	i2c_write((MMA8452_ADDRESS<<1));		// write 0xB4   
+052E:  MOVLW  3A
+0530:  MOVWF  x8B
+0532:  RCALL  0344
+.................... 	i2c_write(address); 
+0534:  MOVFF  7C,8B
+0538:  RCALL  0344
+.................... 	i2c_write(data); 
+053A:  MOVFF  7D,8B
+053E:  RCALL  0344
+.................... 	i2c_stop(); 
+0540:  BCF    F94.4
+0542:  NOP   
+0544:  BSF    F94.3
+0546:  BTFSS  F82.3
+0548:  BRA    0546
+054A:  MOVLW  0A
+054C:  MOVWF  00
+054E:  DECFSZ 00,F
+0550:  BRA    054E
+0552:  BRA    0554
+0554:  NOP   
+0556:  BSF    F94.4
+0558:  MOVLW  0A
+055A:  MOVWF  00
+055C:  DECFSZ 00,F
+055E:  BRA    055C
+.................... } 
+0560:  RETLW  00
+....................  
+.................... /* Sets the MMA8452 to standby mode. 
+....................    It must be in standby to change most register settings */ 
+.................... void MMA8452Standby() 
+.................... { 
+0562:  MOVLW  2A
+0564:  MOVWF  7B
+0566:  RCALL  0472
+0568:  MOVFF  01,7A
+.................... 	int8 c = readRegister(0x2A); 
+.................... 	writeRegister(0x2A, c & ~(0x01)); 
+056C:  MOVF   7A,W
+056E:  ANDLW  FE
+0570:  MOVWF  7B
+0572:  MOVLW  2A
+0574:  MOVWF  7C
+0576:  MOVFF  7B,7D
+057A:  RCALL  0504
+.................... } 
+057C:  GOTO   05A0 (RETURN)
+....................  
+.................... /* Sets the MMA8452 to active mode. 
+....................    Needs to be in this mode to output data */ 
+.................... void MMA8452Active() 
+.................... { 
+0580:  MOVLW  2A
+0582:  MOVWF  7B
+0584:  RCALL  0472
+0586:  MOVFF  01,7A
+.................... 	int8 c = readRegister(0x2A); 
+.................... 	writeRegister(0x2A, c | 0x01); 
+058A:  MOVF   7A,W
+058C:  IORLW  01
+058E:  MOVWF  7B
+0590:  MOVLW  2A
+0592:  MOVWF  7C
+0594:  MOVFF  7B,7D
+0598:  RCALL  0504
+.................... } 
+059A:  GOTO   0612 (RETURN)
+....................  
+.................... void readAccelData(int16* destination) 
+.................... { 
+.................... 	int i,j; 
+.................... 	int8 			rawData[6];  			// x/y/z accel register data stored here 
+.................... 	signed int16	dest; 
+.................... 	 
+.................... 	readRegisters(0x01, 6, &rawData[0]);  	// Read the six raw data registers into data array 
+*
+06E2:  MOVLW  01
+06E4:  MOVWF  x84
+06E6:  MOVLW  06
+06E8:  MOVWF  x85
+06EA:  CLRF   x87
+06EC:  MOVLW  7C
+06EE:  MOVWF  x86
+06F0:  BRA    0616
+.................... 		 
+.................... 	/* loop to calculate 12-bit ADC and g value for each axis */ 
+.................... 	for (i=0,j=0; i<6; i+=2,j++){ 
+06F2:  CLRF   7A
+06F4:  CLRF   7B
+06F6:  MOVF   7A,W
+06F8:  SUBLW  05
+06FA:  BNC   078E
+.................... 		dest = rawData[i]; 
+06FC:  CLRF   03
+06FE:  MOVF   7A,W
+0700:  ADDLW  7C
+0702:  MOVWF  FE9
+0704:  MOVLW  00
+0706:  ADDWFC 03,W
+0708:  MOVWF  FEA
+070A:  MOVF   FEF,W
+070C:  CLRF   03
+070E:  MOVWF  x82
+0710:  MOVFF  03,83
+.................... 		dest <<= 8; 
+0714:  MOVFF  82,03
+0718:  MOVLW  00
+071A:  MOVWF  x82
+071C:  MOVFF  03,83
+.................... 		dest|= rawData[i+1]; 
+0720:  MOVLW  01
+0722:  ADDWF  7A,W
+0724:  CLRF   03
+0726:  ADDLW  7C
+0728:  MOVWF  FE9
+072A:  MOVLW  00
+072C:  ADDWFC 03,W
+072E:  MOVWF  FEA
+0730:  MOVF   FEF,W
+0732:  IORWF  x82,F
+.................... 		dest>>=4; 
+0734:  RRCF   x83,W
+0736:  MOVWF  03
+0738:  RRCF   x82,W
+073A:  MOVWF  02
+073C:  RRCF   03,F
+073E:  RRCF   02,F
+0740:  RRCF   03,F
+0742:  RRCF   02,F
+0744:  RRCF   03,F
+0746:  RRCF   02,F
+0748:  MOVLW  0F
+074A:  ANDWF  03,F
+074C:  MOVFF  02,82
+0750:  MOVFF  03,83
+.................... 		// this is a Robert fix to make number properly negative 
+.................... 		if (rawData[i]>0x7F) dest+=0xF000;	 
+0754:  CLRF   03
+0756:  MOVF   7A,W
+0758:  ADDLW  7C
+075A:  MOVWF  FE9
+075C:  MOVLW  00
+075E:  ADDWFC 03,W
+0760:  MOVWF  FEA
+0762:  MOVF   FEF,W
+0764:  SUBLW  7F
+0766:  BC    076C
+0768:  MOVLW  F0
+076A:  ADDWF  x83,F
+.................... 		destination[j] = dest; 
+076C:  BCF    FD8.0
+076E:  RLCF   7B,W
+0770:  CLRF   03
+0772:  ADDWF  78,W
+0774:  MOVWF  FE9
+0776:  MOVF   79,W
+0778:  ADDWFC 03,W
+077A:  MOVWF  FEA
+077C:  MOVFF  83,FEC
+0780:  MOVF   FED,F
+0782:  MOVFF  82,FEF
+.................... 	}	 
+0786:  MOVLW  02
+0788:  ADDWF  7A,F
+078A:  INCF   7B,F
+078C:  BRA    06F6
+.................... } 
+078E:  RETLW  00
+....................  
+....................  
+.................... void initMMA8452(int8 fsr, int8 dataRate) 
+.................... { 
+.................... 	MMA8452Standby();  // Must be in standby to change registers 
+*
+059E:  BRA    0562
+.................... 	 
+.................... 	/* Set up the full scale range to 2, 4, or 8g. */ 
+.................... 	if ((fsr==2)||(fsr==4)||(fsr==8)) 
+05A0:  MOVF   78,W
+05A2:  SUBLW  02
+05A4:  BZ    05B2
+05A6:  MOVF   78,W
+05A8:  SUBLW  04
+05AA:  BZ    05B2
+05AC:  MOVF   78,W
+05AE:  SUBLW  08
+05B0:  BNZ   05C8
+.................... 		writeRegister(0x0E, fsr >> 2);   
+05B2:  RRCF   78,W
+05B4:  MOVWF  7A
+05B6:  RRCF   7A,F
+05B8:  MOVLW  3F
+05BA:  ANDWF  7A,F
+05BC:  MOVLW  0E
+05BE:  MOVWF  7C
+05C0:  MOVFF  7A,7D
+05C4:  RCALL  0504
+.................... 	else 
+05C6:  BRA    05D0
+.................... 		writeRegister(0x0E, 0); 
+05C8:  MOVLW  0E
+05CA:  MOVWF  7C
+05CC:  CLRF   7D
+05CE:  RCALL  0504
+.................... 	   
+.................... 	/* Setup the 3 data rate bits, from 0 to 7 */ 
+.................... 	writeRegister(0x2A, readRegister(0x2A) & ~(0x38)); 
+05D0:  MOVLW  2A
+05D2:  MOVWF  7B
+05D4:  RCALL  0472
+05D6:  MOVF   01,W
+05D8:  ANDLW  C7
+05DA:  MOVWF  7A
+05DC:  MOVLW  2A
+05DE:  MOVWF  7C
+05E0:  MOVFF  7A,7D
+05E4:  RCALL  0504
+.................... 	if (dataRate <= 7) 
+05E6:  MOVF   79,W
+05E8:  SUBLW  07
+05EA:  BNC   0610
+.................... 		writeRegister(0x2A, readRegister(0x2A) | (dataRate << 3));   
+05EC:  MOVLW  2A
+05EE:  MOVWF  7B
+05F0:  RCALL  0472
+05F2:  MOVFF  01,7A
+05F6:  RLCF   79,W
+05F8:  MOVWF  00
+05FA:  RLCF   00,F
+05FC:  RLCF   00,F
+05FE:  MOVLW  F8
+0600:  ANDWF  00,F
+0602:  MOVF   00,W
+0604:  IORWF  7A,F
+0606:  MOVLW  2A
+0608:  MOVWF  7C
+060A:  MOVFF  7A,7D
+060E:  RCALL  0504
+.................... 	   
+.................... #ifdef 0 
+.................... 	/* Set up portrait/landscap registers - 4 steps: 
+.................... 	   1. Enable P/L 
+.................... 	   2. Set the back/front angle trigger points (z-lock) 
+.................... 	   3. Set the threshold/hysteresis angle 
+.................... 	   4. Set the debouce rate 
+.................... 	// For more info check out this app note: http://cache.freescale.com/files/sensors/doc/app_note/AN4068.pdf */ 
+.................... 	writeRegister(0x11, 0x40);  // 1. Enable P/L 
+.................... 	writeRegister(0x13, 0x44);  // 2. 29deg z-lock (don't think this register is actually writable) 
+.................... 	writeRegister(0x14, 0x84);  // 3. 45deg thresh, 14deg hyst (don't think this register is writable either) 
+.................... 	writeRegister(0x12, 0x50);  // 4. debounce counter at 100ms (at 800 hz) 
+.................... 	 
+.................... 	/* Set up single and double tap - 5 steps: 
+.................... 	   1. Set up single and/or double tap detection on each axis individually. 
+.................... 	   2. Set the threshold - minimum required acceleration to cause a tap. 
+.................... 	   3. Set the time limit - the maximum time that a tap can be above the threshold 
+.................... 	   4. Set the pulse latency - the minimum required time between one pulse and the next 
+.................... 	   5. Set the second pulse window - maximum allowed time between end of latency and start of second pulse 
+.................... 	   for more info check out this app note: http://cache.freescale.com/files/sensors/doc/app_note/AN4072.pdf */ 
+.................... 	    
+.................... 	writeRegister(0x21, 0x7F);  // 1. enable single/double taps on all axes 
+.................... 	// writeRegister(0x21, 0x55);  // 1. single taps only on all axes 
+.................... 	// writeRegister(0x21, 0x6A);  // 1. double taps only on all axes 
+.................... 	writeRegister(0x23, 0x20);  // 2. x thresh at 2g, multiply the value by 0.0625g/LSB to get the threshold 
+.................... 	writeRegister(0x24, 0x20);  // 2. y thresh at 2g, multiply the value by 0.0625g/LSB to get the threshold 
+.................... 	writeRegister(0x25, 0x08);  // 2. z thresh at .5g, multiply the value by 0.0625g/LSB to get the threshold 
+.................... 	writeRegister(0x26, 0x30);  // 3. 30ms time limit at 800Hz odr, this is very dependent on data rate, see the app note 
+.................... 	writeRegister(0x27, 0xA0);  // 4. 200ms (at 800Hz odr) between taps min, this also depends on the data rate 
+.................... 	writeRegister(0x28, 0xFF);  // 5. 318ms (max value) between taps max 
+.................... 	 
+.................... 	/* Set up interrupt 1 and 2 */ 
+.................... 	writeRegister(0x2C, 0x02);  // Active high, push-pull interrupts 
+.................... 	writeRegister(0x2D, 0x19);  // DRDY, P/L and tap ints enabled 
+.................... 	writeRegister(0x2E, 0x01);  // DRDY on INT1, P/L and taps on INT2 
+.................... #endif 
+.................... 	 
+.................... 	MMA8452Active();  // Set to active to start reading 
+0610:  BRA    0580
+.................... } 
+0612:  GOTO   0CFA (RETURN)
+....................  
+....................  
+....................  
+....................  
+.................... #include "modbus_crc.c" 
+.................... // modbus_crc.c 
+....................  
+.................... #define CRC_16	0xA001 
+....................  
+.................... // call this function on each byte in the packet 
+.................... // be sure to clear crc to 0xFFFF before starting new packet 
+.................... void update_crc(int16& crc, char ch) 
+.................... { 
+.................... 	int			i; 
+.................... 	short		j; 
+.................... 	for (i=0; i<8; ch>>=1, i++){ 
+*
+0B30:  CLRF   x8E
+0B32:  MOVF   x8E,W
+0B34:  SUBLW  07
+0B36:  BNC   0B62
+.................... 		j = (ch^crc)&1; 
+0B38:  MOVF   x8D,W
+0B3A:  XORWF  x8A,W
+0B3C:  MOVWF  x90
+0B3E:  MOVF   x90,W
+0B40:  ANDLW  01
+0B42:  BCF    x8F.0
+0B44:  BTFSC  FE8.0
+0B46:  BSF    x8F.0
+.................... 		crc>>=1; 
+0B48:  BCF    FD8.0
+0B4A:  RRCF   x8B,F
+0B4C:  RRCF   x8A,F
+.................... 		if (j) crc^=CRC_16; 
+0B4E:  BTFSS  x8F.0
+0B50:  BRA    0B5A
+0B52:  MOVLW  01
+0B54:  XORWF  x8A,F
+0B56:  MOVLW  A0
+0B58:  XORWF  x8B,F
+.................... 	} 
+0B5A:  BCF    FD8.0
+0B5C:  RRCF   x8D,F
+0B5E:  INCF   x8E,F
+0B60:  BRA    0B32
+.................... }  
+....................  
+.................... // this function works over a whole array of chars 
+.................... int16 _CRC16_(char* array, int len) 
+.................... {	 
+*
+0B08:  MOVLW  FF
+0B0A:  MOVWF  x8B
+0B0C:  MOVWF  x8A
+.................... 	int16	test_crc = 0xFFFF; 
+.................... 	 
+.................... 	while (len--){ 
+0B0E:  MOVF   x89,W
+0B10:  DECF   x89,F
+0B12:  XORLW  00
+0B14:  BZ    0B64
+.................... 		update_crc(test_crc,*array++); 
+0B16:  MOVF   x88,W
+0B18:  MOVWF  03
+0B1A:  MOVF   x87,W
+0B1C:  INCF   x87,F
+0B1E:  BTFSC  FD8.2
+0B20:  INCF   x88,F
+0B22:  MOVWF  FE9
+0B24:  MOVFF  03,FEA
+0B28:  MOVFF  FEF,8C
+0B2C:  MOVFF  8C,8D
+.................... 	} 
+*
+0B62:  BRA    0B0E
+....................  
+.................... 	return test_crc;		 
+0B64:  MOVFF  8A,01
+0B68:  MOVFF  8B,02
+.................... } 
+0B6C:  GOTO   0BE4 (RETURN)
+....................  
+....................  
+....................  
+....................  
+.................... #include "radio.c" 
+.................... /* radio.c 
+....................  
+.................... 	09/11/2011 by Robert Trescott Jr. 
+.................... 	(C)2011 Analogic 
+....................  
+.................... 	History: 
+.................... 		09/17/11 - original work 
+....................  
+.................... */ 
+....................  
+.................... void Write1() 
+.................... { 
+.................... 	SCK		= false; 
+*
+0224:  BCF    F82.3
+.................... 	SCK		= false; 
+0226:  BCF    F82.3
+.................... 	output_high(_SDA); 
+0228:  BCF    F94.4
+022A:  BSF    F8B.4
+.................... 	delay_us(1); 
+022C:  MOVLW  02
+022E:  MOVWF  00
+0230:  DECFSZ 00,F
+0232:  BRA    0230
+0234:  NOP   
+.................... 	SCK		= true; 
+0236:  BSF    F82.3
+.................... 	SCK		= true; 
+0238:  BSF    F82.3
+.................... } 
+023A:  GOTO   0280 (RETURN)
+....................  
+.................... void Write0() 
+.................... { 
+.................... 	SCK		= false; 
+023E:  BCF    F82.3
+.................... 	SCK		= false; 
+0240:  BCF    F82.3
+.................... 	output_low(_SDA); 
+0242:  BCF    F94.4
+0244:  BCF    F8B.4
+.................... 	delay_us(1); 
+0246:  MOVLW  02
+0248:  MOVWF  00
+024A:  DECFSZ 00,F
+024C:  BRA    024A
+024E:  NOP   
+.................... 	SCK		= true; 
+0250:  BSF    F82.3
+.................... 	SCK		= true; 
+0252:  BSF    F82.3
+.................... } 
+0254:  GOTO   0280 (RETURN)
+....................  
+.................... void WriteCMD(int16 CMD) 
+.................... { 
+0258:  MOVLW  10
+025A:  MOVWF  x89
+.................... 	int8 n = 16; 
+....................  
+.................... 	output_low(_SCK); 
+025C:  BCF    F94.3
+025E:  BCF    F8B.3
+.................... 	RF_EN	= false; 
+0260:  BCF    F82.0
+....................  
+.................... 	while (n--){ 
+0262:  MOVF   x89,W
+0264:  DECF   x89,F
+0266:  XORLW  00
+0268:  BZ    0288
+.................... 		if (CMD&0x8000) 
+026A:  ANDLW  00
+026C:  MOVWF  00
+026E:  MOVF   x88,W
+0270:  ANDLW  80
+0272:  MOVWF  03
+0274:  MOVF   00,W
+0276:  IORWF  03,W
+0278:  BZ    027E
+.................... 			Write1(); 
+027A:  BRA    0224
+.................... 		else 
+027C:  BRA    0280
+.................... 			Write0(); 
+027E:  BRA    023E
+.................... 		CMD<<=1; 
+0280:  BCF    FD8.0
+0282:  RLCF   x87,F
+0284:  RLCF   x88,F
+.................... 	} 
+0286:  BRA    0262
+.................... 	SCK		= false; 
+0288:  BCF    F82.3
+.................... 	RF_EN	= true; 
+028A:  BSF    F82.0
+.................... } 
+028C:  RETLW  00
+....................  
+.................... void Init_RF12() 
+.................... { 
+.................... 	RF_EN	= true; 
+.................... 	output_high(_SDA); 
+.................... 	output_low(_SCK); 
+....................  
+.................... 	WriteCMD(0x80D8);	//enable register,433MHz,12.5pF 
+.................... 	WriteCMD(0x8208);	//Turn on crystal,!PA 
+.................... 	WriteCMD(0xA640);	// 
+.................... 	WriteCMD(0xC647);	// 
+.................... 	WriteCMD(0XCC77);	// 
+.................... 	WriteCMD(0x94A0);	//VDI,FAST,134kHz,0dBm,-103dBm 
+.................... 	WriteCMD(0xC2AC); 
+.................... 	WriteCMD(0xCA80); 
+.................... 	WriteCMD(0xCA83);	//FIFO8,SYNC, 
+.................... 	WriteCMD(0xC49B); 
+.................... 	WriteCMD(0x9850);	//!mp,9810=30kHz,MAX OUT 
+.................... 	WriteCMD(0xE000);	//NOT USE 
+.................... 	WriteCMD(0xC80E);	//NOT USE 
+.................... 	WriteCMD(0xC000);	//1.0MHz,2.2V 
+.................... } 
+....................  
+.................... void WriteFSKbyte(int8 DATA) 
+.................... { 
+.................... 	int8 	RGIT = 0; 
+.................... 	int16 	temp = 0xB800; 
+.................... 	 
+.................... 	output_float(_SDO); 
+.................... 	output_low(_SCK); 
+....................  
+.................... 	temp|= DATA; 
+....................  
+.................... Loop:	SCK = false; 
+....................  
+.................... 	RF_EN	= false; 
+.................... 	output_low(_SDA); 
+.................... 	SCK		= true; 
+.................... 	RGIT 	= (SDO==true); //Polling SDO 
+.................... 	SCK		= false; 
+.................... 	output_high(_SDA); 
+.................... 	RF_EN	= true; 
+....................  
+.................... 	if (RGIT==0){ 
+.................... 		goto Loop; 
+.................... 	} else { 
+.................... 		RGIT=false; 
+.................... 		WriteCMD(temp); 
+.................... 	} 
+.................... } 
+....................  
+.................... // preamble -> FORMATTED -> unit id -> dest id -> data -> csum -> close... 
+.................... // copied from transmitter code 
+.................... void rf_xmit_packet(int8 data) 
+.................... { 
+.................... 	int8 i; 
+.................... 	int8 outbytes[8]; 
+.................... 	int16 crc; 
+.................... 		 
+.................... 	outbytes[0] = START_ID; 
+.................... 	outbytes[1] = TX_ID; 
+.................... 	outbytes[2] = UNIT_ID; 
+.................... 	outbytes[3] = RX_ID; 
+.................... 	outbytes[4] = dest_id; 
+.................... 	outbytes[5] = data; 
+.................... 	crc = _CRC16_(outbytes, 6); 
+.................... 	outbytes[6] = make8(crc,0); 
+.................... 	outbytes[7] = make8(crc,1); 
+.................... 	 
+.................... 	WriteCMD(0x8228); 		// OPEN PA 
+.................... 	delay_us(4); 
+.................... 	WriteCMD(0x8238); 
+.................... 	delay_us(1); 
+.................... 	WriteFSKbyte(0xAA);		// PREAMBLE 
+.................... 	WriteFSKbyte(0xAA); 
+.................... 	WriteFSKbyte(0xAA); 
+.................... 	WriteFSKbyte(0x2D);		// SYNCHRO PATTERN 0x2DD4 
+.................... 	WriteFSKbyte(0xD4); 
+.................... 	 
+.................... 	for (i=0; i<8; i++) 
+.................... 		WriteFSKbyte(outbytes[i]); 
+....................  
+.................... 	WriteFSKbyte(0xAA); 
+.................... 	WriteFSKbyte(0xAA); 
+.................... 	WriteFSKbyte(0xAA); 
+.................... 	WriteCMD(0x8208); 		// CLOSE PA	 
+.................... } 
+....................  
+....................  
+....................  
+.................... int8 RF12_RDFIFO() 
+.................... { 
+.................... 	int8 	i,Result; 
+....................  
+.................... 	output_low(_SCK); 
+*
+00E6:  BCF    F94.3
+00E8:  BCF    F8B.3
+.................... 	output_low(_SDA); 
+00EA:  BCF    F94.4
+00EC:  BCF    F8B.4
+.................... 	RF_EN	= false; 
+00EE:  BCF    F82.0
+....................  
+.................... 	for (i=0; i<16; i++) { //skip status bits 
+00F0:  CLRF   xA0
+00F2:  MOVF   xA0,W
+00F4:  SUBLW  0F
+00F6:  BNC   0102
+.................... 		SCK		= true; 
+00F8:  BSF    F82.3
+.................... 		SCK		= true; 
+00FA:  BSF    F82.3
+.................... 		SCK		= false; 
+00FC:  BCF    F82.3
+.................... 	} 
+00FE:  INCF   xA0,F
+0100:  BRA    00F2
+....................  
+.................... 	Result	= 0; 
+0102:  CLRF   xA1
+....................  
+.................... 	for (i=0; i<8; i++) { //read fifo data byte 
+0104:  CLRF   xA0
+0106:  MOVF   xA0,W
+0108:  SUBLW  07
+010A:  BNC   0120
+.................... 		Result<<=1; 
+010C:  BCF    FD8.0
+010E:  RLCF   xA1,F
+....................  
+.................... 		if (SDO){ 
+0110:  BTFSS  F82.5
+0112:  BRA    0116
+.................... 			Result|=1; 
+0114:  BSF    xA1.0
+.................... 		} 
+....................  
+.................... 		SCK		= true; 
+0116:  BSF    F82.3
+.................... 		SCK		= true; 
+0118:  BSF    F82.3
+.................... 		SCK		= false; 
+011A:  BCF    F82.3
+.................... 	} 
+011C:  INCF   xA0,F
+011E:  BRA    0106
+....................  
+.................... 	RF_EN		= true; 
+0120:  BSF    F82.0
+.................... 	return(Result); 
+0122:  MOVFF  A1,01
+.................... } 
+0126:  RETLW  00
+....................  
+.................... void Init_RF12RX() 
+.................... { 
+.................... 	RF_EN	= true; 
+*
+028E:  BSF    F82.0
+.................... 	output_high(_SDA); 
+0290:  BCF    F94.4
+0292:  BSF    F8B.4
+.................... 	output_low(_SCK); 
+0294:  BCF    F94.3
+0296:  BCF    F8B.3
+....................  
+.................... 	WriteCMD(0x80D8);		//enable register,433MHz,12.5pF 
+0298:  MOVLW  80
+029A:  MOVWF  x88
+029C:  MOVLW  D8
+029E:  MOVWF  x87
+02A0:  RCALL  0258
+.................... 	WriteCMD(0x82D8);		//enable receive,!PA 
+02A2:  MOVLW  82
+02A4:  MOVWF  x88
+02A6:  MOVLW  D8
+02A8:  MOVWF  x87
+02AA:  RCALL  0258
+.................... 	WriteCMD(0xA640);		// 
+02AC:  MOVLW  A6
+02AE:  MOVWF  x88
+02B0:  MOVLW  40
+02B2:  MOVWF  x87
+02B4:  RCALL  0258
+.................... 	WriteCMD(0xC647);		// 
+02B6:  MOVLW  C6
+02B8:  MOVWF  x88
+02BA:  MOVLW  47
+02BC:  MOVWF  x87
+02BE:  RCALL  0258
+.................... 	WriteCMD(0x94A0);		//VDI,FAST,134kHz,0dBm,-103dBm 
+02C0:  MOVLW  94
+02C2:  MOVWF  x88
+02C4:  MOVLW  A0
+02C6:  MOVWF  x87
+02C8:  RCALL  0258
+.................... 	WriteCMD(0xC2AC); 
+02CA:  MOVLW  C2
+02CC:  MOVWF  x88
+02CE:  MOVLW  AC
+02D0:  MOVWF  x87
+02D2:  RCALL  0258
+.................... 	WriteCMD(0XCC77);		// 
+02D4:  MOVLW  CC
+02D6:  MOVWF  x88
+02D8:  MOVLW  77
+02DA:  MOVWF  x87
+02DC:  RCALL  0258
+.................... 	WriteCMD(0xCA80); 
+02DE:  MOVLW  CA
+02E0:  MOVWF  x88
+02E2:  MOVLW  80
+02E4:  MOVWF  x87
+02E6:  RCALL  0258
+.................... 	WriteCMD(0xCA83);		//FIFO8,SYNC, 
+02E8:  MOVLW  CA
+02EA:  MOVWF  x88
+02EC:  MOVLW  83
+02EE:  MOVWF  x87
+02F0:  RCALL  0258
+.................... 	WriteCMD(0xC49B); 
+02F2:  MOVLW  C4
+02F4:  MOVWF  x88
+02F6:  MOVLW  9B
+02F8:  MOVWF  x87
+02FA:  RCALL  0258
+.................... 	WriteCMD(0x9850);		//!mp,9810=30kHz,MAX OUT 
+02FC:  MOVLW  98
+02FE:  MOVWF  x88
+0300:  MOVLW  50
+0302:  MOVWF  x87
+0304:  RCALL  0258
+.................... 	WriteCMD(0xE000);		//NOT USE 
+0306:  MOVLW  E0
+0308:  MOVWF  x88
+030A:  CLRF   x87
+030C:  RCALL  0258
+.................... 	WriteCMD(0xC800);		//NOT USE 
+030E:  MOVLW  C8
+0310:  MOVWF  x88
+0312:  CLRF   x87
+0314:  RCALL  0258
+.................... 	WriteCMD(0xC000);		//1.0MHz,2.2V 
+0316:  MOVLW  C0
+0318:  MOVWF  x88
+031A:  CLRF   x87
+031C:  RCALL  0258
+.................... 	 
+.................... 	WriteCMD(0xCA80); 
+031E:  MOVLW  CA
+0320:  MOVWF  x88
+0322:  MOVLW  80
+0324:  MOVWF  x87
+0326:  RCALL  0258
+.................... 	WriteCMD(0xCA83); 					// reset FIFO and read to receive next Byte 
+0328:  MOVLW  CA
+032A:  MOVWF  x88
+032C:  MOVLW  83
+032E:  MOVWF  x87
+0330:  RCALL  0258
+0332:  CLRF   19
+0334:  BTFSC  FF2.7
+0336:  BSF    19.7
+0338:  BCF    FF2.7
+.................... 	RF12_RDFIFO(); 
+033A:  RCALL  00E6
+033C:  BTFSC  19.7
+033E:  BSF    FF2.7
+.................... } 
+0340:  GOTO   0CE0 (RETURN)
+....................  
+....................  
+.................... signed int32 calc_smooth_val(signed int32 in_val, signed int32* raw, int array_size) 
+.................... { 
+.................... 	int				i; 
+.................... 	signed int32 	f; 
+.................... 	 
+.................... 	for (i=array_size-1, f=0; i>0; i--){ 
+*
+0874:  MOVLW  01
+0876:  SUBWF  x84,W
+0878:  MOVWF  x85
+087A:  CLRF   x89
+087C:  CLRF   x88
+087E:  CLRF   x87
+0880:  CLRF   x86
+0882:  MOVF   x85,F
+0884:  BZ    093E
+.................... 		raw[i] = raw[i-1]; 
+0886:  MOVF   x85,W
+0888:  MULLW  04
+088A:  MOVF   FF3,W
+088C:  CLRF   03
+088E:  ADDWF  x82,W
+0890:  MOVWF  01
+0892:  MOVF   x83,W
+0894:  ADDWFC 03,F
+0896:  MOVFF  01,8A
+089A:  MOVFF  03,8B
+089E:  MOVLW  01
+08A0:  SUBWF  x85,W
+08A2:  MULLW  04
+08A4:  MOVF   FF3,W
+08A6:  CLRF   03
+08A8:  ADDWF  x82,W
+08AA:  MOVWF  FE9
+08AC:  MOVF   x83,W
+08AE:  ADDWFC 03,W
+08B0:  MOVWF  FEA
+08B2:  MOVFF  FEF,00
+08B6:  MOVFF  FEC,01
+08BA:  MOVFF  FEC,02
+08BE:  MOVFF  FEC,03
+08C2:  MOVFF  8B,FEA
+08C6:  MOVFF  8A,FE9
+08CA:  MOVFF  00,FEF
+08CE:  MOVFF  01,FEC
+08D2:  MOVFF  02,FEC
+08D6:  MOVFF  03,FEC
+.................... 		f+= ((raw[i])/array_size);		 
+08DA:  MOVF   x85,W
+08DC:  MULLW  04
+08DE:  MOVF   FF3,W
+08E0:  CLRF   03
+08E2:  ADDWF  x82,W
+08E4:  MOVWF  FE9
+08E6:  MOVF   x83,W
+08E8:  ADDWFC 03,W
+08EA:  MOVWF  FEA
+08EC:  MOVFF  FEF,8A
+08F0:  MOVFF  FEC,8B
+08F4:  MOVFF  FEC,8C
+08F8:  MOVFF  FEC,8D
+08FC:  MOVFF  FEA,8F
+0900:  MOVFF  FE9,8E
+0904:  BCF    FD8.1
+0906:  MOVFF  8D,93
+090A:  MOVFF  8C,92
+090E:  MOVFF  8B,91
+0912:  MOVFF  8A,90
+0916:  CLRF   x97
+0918:  CLRF   x96
+091A:  CLRF   x95
+091C:  MOVFF  84,94
+0920:  RCALL  0790
+0922:  MOVFF  8F,FEA
+0926:  MOVFF  8E,FE9
+092A:  MOVF   00,W
+092C:  ADDWF  x86,F
+092E:  MOVF   01,W
+0930:  ADDWFC x87,F
+0932:  MOVF   02,W
+0934:  ADDWFC x88,F
+0936:  MOVF   03,W
+0938:  ADDWFC x89,F
+.................... 	} 
+093A:  DECF   x85,F
+093C:  BRA    0882
+.................... 	 
+.................... 	raw[0] = in_val; 
+093E:  MOVFF  82,FE9
+0942:  MOVFF  83,FEA
+0946:  MOVFF  7E,FEF
+094A:  MOVFF  7F,FEC
+094E:  MOVFF  80,FEC
+0952:  MOVFF  81,FEC
+.................... 	f+= (in_val/array_size); 
+0956:  BCF    FD8.1
+0958:  MOVFF  81,93
+095C:  MOVFF  80,92
+0960:  MOVFF  7F,91
+0964:  MOVFF  7E,90
+0968:  CLRF   x97
+096A:  CLRF   x96
+096C:  CLRF   x95
+096E:  MOVFF  84,94
+0972:  RCALL  0790
+0974:  MOVF   00,W
+0976:  ADDWF  x86,F
+0978:  MOVF   01,W
+097A:  ADDWFC x87,F
+097C:  MOVF   02,W
+097E:  ADDWFC x88,F
+0980:  MOVF   03,W
+0982:  ADDWFC x89,F
+.................... 	 
+.................... 	return (f); 
+0984:  MOVFF  86,00
+0988:  MOVFF  87,01
+098C:  MOVFF  88,02
+0990:  MOVFF  89,03
+.................... } 
+0994:  RETLW  00
+....................         
+.................... // called every 50ms 
+.................... void HandleEvents() 
+.................... {			 
+.................... 	switch (cur_cmd){ 
+0996:  MOVF   66,W
+0998:  XORLW  01
+099A:  BZ    09A8
+099C:  XORLW  03
+099E:  BZ    0A26
+09A0:  XORLW  02
+09A2:  BTFSC  FD8.2
+09A4:  BRA    0AA2
+09A6:  BRA    0AA8
+.................... 		case CMD_OPEN: 
+.................... 			readAccelData(accelCount);  		// Read the x/y/z adc values 
+09A8:  CLRF   79
+09AA:  MOVLW  5E
+09AC:  MOVWF  78
+09AE:  RCALL  06E2
+.................... 			accelCount[1] = 0-accelCount[1];	// we only care about Y axis, keep it positive! 
+09B0:  COMF   60,F
+09B2:  COMF   61,F
+09B4:  INCF   60,F
+09B6:  BTFSC  FD8.2
+09B8:  INCF   61,F
+.................... 			adc_smooth = calc_smooth_val((signed int32)accelCount[1], &adc_raw, ADC_DATA_MAX); 
+09BA:  CLRF   7B
+09BC:  CLRF   7A
+09BE:  MOVFF  61,79
+09C2:  MOVFF  60,78
+09C6:  BTFSS  61.7
+09C8:  BRA    09CE
+09CA:  DECF   7A,F
+09CC:  DECF   7B,F
+09CE:  CLRF   7D
+09D0:  MOVLW  1A
+09D2:  MOVFF  7B,81
+09D6:  MOVFF  7A,80
+09DA:  MOVFF  79,7F
+09DE:  MOVFF  78,7E
+09E2:  MOVFF  7D,83
+09E6:  MOVWF  x82
+09E8:  MOVLW  10
+09EA:  MOVWF  x84
+09EC:  RCALL  0874
+09EE:  MOVFF  03,5D
+09F2:  MOVFF  02,5C
+09F6:  MOVFF  01,5B
+09FA:  MOVFF  00,5A
+.................... 			if (adc_smooth>MAX_OPENED){		// larger values are more closed! 
+09FE:  BTFSC  5D.7
+0A00:  BRA    0A22
+0A02:  MOVF   5D,F
+0A04:  BNZ   0A1A
+0A06:  MOVF   5C,F
+0A08:  BNZ   0A1A
+0A0A:  MOVF   5B,W
+0A0C:  SUBLW  01
+0A0E:  BC    0A22
+0A10:  XORLW  FF
+0A12:  BNZ   0A1A
+0A14:  MOVF   5A,W
+0A16:  SUBLW  58
+0A18:  BC    0A22
+.................... 				servo_val = SERVO_VAL_OPEN; 
+0A1A:  MOVLW  01
+0A1C:  MOVWF  65
+.................... 				SERVO_PWR = true; 
+0A1E:  BSF    F82.2
+.................... 			} else { 
+0A20:  BRA    0A24
+.................... 				cur_cmd = CMD_DONE;  
+0A22:  CLRF   66
+.................... 			} 
+.................... 			break;			 
+0A24:  BRA    0AA8
+.................... 		 
+.................... 		case CMD_CLOSE: 
+.................... 			readAccelData(accelCount);  		// Read the x/y/z adc values 
+0A26:  CLRF   79
+0A28:  MOVLW  5E
+0A2A:  MOVWF  78
+0A2C:  RCALL  06E2
+.................... 			accelCount[1] = 0-accelCount[1];	// we only care about Y axis, keep it positive! 
+0A2E:  COMF   60,F
+0A30:  COMF   61,F
+0A32:  INCF   60,F
+0A34:  BTFSC  FD8.2
+0A36:  INCF   61,F
+.................... 			adc_smooth = calc_smooth_val((signed int32)accelCount[1], &adc_raw, ADC_DATA_MAX); 
+0A38:  CLRF   7B
+0A3A:  CLRF   7A
+0A3C:  MOVFF  61,79
+0A40:  MOVFF  60,78
+0A44:  BTFSS  61.7
+0A46:  BRA    0A4C
+0A48:  DECF   7A,F
+0A4A:  DECF   7B,F
+0A4C:  CLRF   7D
+0A4E:  MOVLW  1A
+0A50:  MOVFF  7B,81
+0A54:  MOVFF  7A,80
+0A58:  MOVFF  79,7F
+0A5C:  MOVFF  78,7E
+0A60:  MOVFF  7D,83
+0A64:  MOVWF  x82
+0A66:  MOVLW  10
+0A68:  MOVWF  x84
+0A6A:  RCALL  0874
+0A6C:  MOVFF  03,5D
+0A70:  MOVFF  02,5C
+0A74:  MOVFF  01,5B
+0A78:  MOVFF  00,5A
+.................... 			if (adc_smooth<MAX_CLOSED){ 
+0A7C:  BTFSC  5D.7
+0A7E:  BRA    0A96
+0A80:  MOVF   5D,F
+0A82:  BNZ   0A9E
+0A84:  MOVF   5C,F
+0A86:  BNZ   0A9E
+0A88:  MOVF   5B,W
+0A8A:  SUBLW  03
+0A8C:  BNC   0A9E
+0A8E:  BNZ   0A96
+0A90:  MOVF   5A,W
+0A92:  SUBLW  D3
+0A94:  BNC   0A9E
+.................... 				servo_val = SERVO_VAL_CLOSE; 
+0A96:  MOVLW  02
+0A98:  MOVWF  65
+.................... 				SERVO_PWR = true; 
+0A9A:  BSF    F82.2
+.................... 			} else { 
+0A9C:  BRA    0AA0
+.................... 				cur_cmd = CMD_DONE;  
+0A9E:  CLRF   66
+.................... 			} 
+.................... 			break;			 
+0AA0:  BRA    0AA8
+.................... 		 
+.................... 		case CMD_DONE: 
+.................... 			servo_val = SERVO_VAL_STOP; 
+0AA2:  CLRF   65
+.................... 			SERVO_PWR = false; 
+0AA4:  BCF    F82.2
+.................... 			break;		 
+0AA6:  BRA    0AA8
+.................... 	}	 
+.................... } 
+0AA8:  GOTO   0D64 (RETURN)
+....................  
+.................... #define IN_START_ID		0 
+.................... #define IN_TX_ID		1 
+.................... #define IN_SRC_ID		2 
+.................... #define IN_RX_ID		3 
+.................... #define IN_UNIT_ID		4 
+.................... #define IN_DATA			5 
+.................... #define IN_CRC_LSB		6 
+.................... #define IN_CRC_MSB		7 
+....................  
+.................... void HandleRfTraffic() 
+.................... { 
+.................... 	int8 i,lsb,msb; 
+.................... 	int16 crc; 
+.................... 	int8 in_bytes[RF_MAX]; 
+.................... 	 
+.................... 	if (bRX_ready){				 
+*
+0B70:  BTFSS  64.1
+0B72:  BRA    0C76
+.................... 		for (i=0; i<RF_LEN; i++)			// copy rf to input so we can operate and still rx 
+0B74:  CLRF   78
+0B76:  MOVF   78,W
+0B78:  SUBLW  07
+0B7A:  BNC   0BAE
+.................... 			in_bytes[i] = RF_RXBUF[i]; 
+0B7C:  CLRF   03
+0B7E:  MOVF   78,W
+0B80:  ADDLW  7D
+0B82:  MOVWF  01
+0B84:  MOVLW  00
+0B86:  ADDWFC 03,F
+0B88:  MOVFF  03,88
+0B8C:  CLRF   03
+0B8E:  MOVF   78,W
+0B90:  ADDLW  68
+0B92:  MOVWF  FE9
+0B94:  MOVLW  00
+0B96:  ADDWFC 03,W
+0B98:  MOVWF  FEA
+0B9A:  MOVFF  FEF,89
+0B9E:  MOVFF  88,FEA
+0BA2:  MOVFF  01,FE9
+0BA6:  MOVFF  89,FEF
+0BAA:  INCF   78,F
+0BAC:  BRA    0B76
+.................... 			 
+.................... 		WriteCMD(0xCA80); 
+0BAE:  MOVLW  CA
+0BB0:  MOVWF  x88
+0BB2:  MOVLW  80
+0BB4:  MOVWF  x87
+0BB6:  CALL   0258
+.................... 		WriteCMD(0xCA83); 					// reset FIFO and read to receive next Byte 
+0BBA:  MOVLW  CA
+0BBC:  MOVWF  x88
+0BBE:  MOVLW  83
+0BC0:  MOVWF  x87
+0BC2:  CALL   0258
+0BC6:  CLRF   19
+0BC8:  BTFSC  FF2.7
+0BCA:  BSF    19.7
+0BCC:  BCF    FF2.7
+.................... 		RF12_RDFIFO(); 
+0BCE:  CALL   00E6
+0BD2:  BTFSC  19.7
+0BD4:  BSF    FF2.7
+.................... 		bRX_ready = FALSE;					// allow packets again 
+0BD6:  BCF    64.1
+.................... 		 
+.................... 		// now process the last packet using transferred input rx data 
+.................... 		crc = _CRC16_(in_bytes, RF_LEN-2); 
+0BD8:  CLRF   x88
+0BDA:  MOVLW  7D
+0BDC:  MOVWF  x87
+0BDE:  MOVLW  06
+0BE0:  MOVWF  x89
+0BE2:  BRA    0B08
+0BE4:  MOVFF  02,7C
+0BE8:  MOVFF  01,7B
+.................... 		lsb = make8(crc,0);					// crc lsb 
+0BEC:  MOVFF  7B,79
+.................... 		msb = make8(crc,1);					// crc msb 
+0BF0:  MOVFF  7C,7A
+....................  
+.................... 		if (in_bytes[IN_TX_ID] 	 == TX_ID && 
+.................... 			in_bytes[IN_SRC_ID]  == SRC_ID && 
+.................... 			in_bytes[IN_RX_ID]   == RX_ID && 
+.................... 			in_bytes[IN_UNIT_ID] == UNIT_ID && 
+.................... 			in_bytes[IN_CRC_LSB] == lsb && 
+.................... 			in_bytes[IN_CRC_MSB] == msb ){	// we have all good data 
+0BF4:  MOVF   7E,W
+0BF6:  SUBLW  A0
+0BF8:  BNZ   0C3E
+0BFA:  MOVF   7F,W
+0BFC:  SUBLW  30
+0BFE:  BNZ   0C3E
+0C00:  MOVF   x80,W
+0C02:  SUBLW  B0
+0C04:  BNZ   0C3E
+0C06:  MOVF   x81,W
+0C08:  SUBLW  31
+0C0A:  BNZ   0C3E
+0C0C:  MOVF   79,W
+0C0E:  SUBWF  x83,W
+0C10:  BNZ   0C3E
+0C12:  MOVF   7A,W
+0C14:  SUBWF  x84,W
+0C16:  BNZ   0C3E
+.................... 				 
+.................... 			switch (in_bytes[IN_DATA]){ 
+0C18:  MOVF   x82,W
+0C1A:  XORLW  31
+0C1C:  BZ    0C24
+0C1E:  XORLW  03
+0C20:  BZ    0C2E
+0C22:  BRA    0C38
+.................... 				case CMD_OFF: 
+.................... 					LED_M1=0; 
+0C24:  BCF    F80.0
+.................... 					LED_M2=1; 
+0C26:  BSF    F80.1
+.................... 					cur_cmd = CMD_CLOSE; 
+0C28:  MOVLW  02
+0C2A:  MOVWF  66
+.................... 					break; 
+0C2C:  BRA    0C3E
+.................... 				case CMD_ON: 
+.................... 					LED_M1=1; 
+0C2E:  BSF    F80.0
+.................... 					LED_M2=0; 
+0C30:  BCF    F80.1
+.................... 					cur_cmd = CMD_OPEN; 
+0C32:  MOVLW  01
+0C34:  MOVWF  66
+.................... 					break; 
+0C36:  BRA    0C3E
+.................... 				default: 
+.................... 					LED_M1=0; 
+0C38:  BCF    F80.0
+.................... 					LED_M2=0; 
+0C3A:  BCF    F80.1
+.................... 					break; 
+0C3C:  BRA    0C3E
+.................... 			} 
+.................... 			 
+.................... 		}	 
+.................... 		 
+.................... 		for (i=0; i<RF_LEN; i++)			// copy rf to input so we can operate and still rx 
+0C3E:  CLRF   78
+0C40:  MOVF   78,W
+0C42:  SUBLW  07
+0C44:  BNC   0C76
+.................... 			in_bytes[i] = RF_RXBUF[i] = 0;	// clear out previous data (just in case)		 
+0C46:  CLRF   03
+0C48:  MOVF   78,W
+0C4A:  ADDLW  7D
+0C4C:  MOVWF  01
+0C4E:  MOVLW  00
+0C50:  ADDWFC 03,F
+0C52:  MOVFF  03,88
+0C56:  CLRF   03
+0C58:  MOVF   78,W
+0C5A:  ADDLW  68
+0C5C:  MOVWF  FE9
+0C5E:  MOVLW  00
+0C60:  ADDWFC 03,W
+0C62:  MOVWF  FEA
+0C64:  CLRF   FEF
+0C66:  MOVLW  00
+0C68:  MOVFF  88,FEA
+0C6C:  MOVFF  01,FE9
+0C70:  MOVWF  FEF
+0C72:  INCF   78,F
+0C74:  BRA    0C40
+.................... 	} 
+.................... }	 
+0C76:  GOTO   0D6A (RETURN)
+....................  
+.................... void InitHardware() 
+.................... { 
+.................... 	int8 pb; 
+.................... 	 
+.................... 	delay_ms(20); 
+*
+0194:  MOVLW  14
+0196:  MOVWF  7A
+0198:  RCALL  016E
+.................... 		 
+.................... 	setup_adc(ADC_OFF); 
+019A:  BCF    FC2.0
+.................... 	setup_adc_ports(NO_ANALOGS); 
+019C:  MOVF   FC1,W
+019E:  ANDLW  C0
+01A0:  IORLW  0F
+01A2:  MOVWF  FC1
+....................  
+.................... 	set_tris_a(0xFC);	 
+01A4:  MOVLW  FC
+01A6:  MOVWF  F92
+.................... 	set_tris_b(0xE0);	 
+01A8:  MOVLW  E0
+01AA:  MOVWF  F93
+.................... 	set_tris_c(0xA0);	 
+01AC:  MOVLW  A0
+01AE:  MOVWF  F94
+.................... 	 
+.................... 	PORTA = 0; 
+01B0:  CLRF   F80
+.................... 	PORTB = 0xE0; 
+01B2:  MOVLW  E0
+01B4:  MOVWF  F81
+.................... 	PORTC = 0xF8; 
+01B6:  MOVLW  F8
+01B8:  MOVWF  F82
+.................... 	RBPU = 0; 
+01BA:  BCF    FF1.7
+.................... 	RF_RES	= true; 
+01BC:  BSF    F82.1
+.................... 	delay_ms(100); 
+01BE:  MOVLW  64
+01C0:  MOVWF  7A
+01C2:  RCALL  016E
+.................... 	pb = PORTB;				// end mismatch condition 
+01C4:  MOVFF  F81,78
+.................... 	RBIF = 0;				// clear port b change interrupt flag	 
+01C8:  BCF    FF2.0
+.................... 	 
+.................... 	setup_timer_1(T1_DISABLED); 
+01CA:  CLRF   FCD
+.................... //	setup_timer_2(T2_DIV_BY_4, 249, 5);			// heater pwm @5Khz & generate interrupt every 1ms 
+.................... 	setup_timer_2(T2_DIV_BY_4, 196, 10);			// heater pwm @5Khz & generate interrupt every 1ms 
+01CC:  MOVLW  48
+01CE:  IORLW  05
+01D0:  MOVWF  FCA
+01D2:  MOVLW  C4
+01D4:  MOVWF  FCB
+.................... 					 
+.................... 	enable_interrupts(INT_TIMER2); 
+01D6:  BSF    F9D.1
+.................... 	enable_interrupts(INT_RB); 
+01D8:  BSF    FF2.3
+.................... 	enable_interrupts(GLOBAL); 
+01DA:  MOVLW  C0
+01DC:  IORWF  FF2,F
+....................  
+.................... 	// startup with a light flash 
+.................... 	LED_M1 = LED_M2 = LED_B1 = LED_B2 = LED_B4 = LED_B8 = 1; 
+01DE:  BSF    F81.3
+01E0:  BSF    F81.2
+01E2:  BSF    F81.1
+01E4:  BSF    F81.0
+01E6:  BSF    F80.1
+01E8:  BSF    F80.0
+.................... 	delay_ms(350); 
+01EA:  MOVLW  02
+01EC:  MOVWF  79
+01EE:  MOVLW  AF
+01F0:  MOVWF  7A
+01F2:  RCALL  016E
+01F4:  DECFSZ 79,F
+01F6:  BRA    01EE
+.................... 	LED_M1 = LED_M2 = LED_B1 = LED_B2 = LED_B4 = LED_B8 = 0; 
+01F8:  BCF    F81.3
+01FA:  BCF    F81.2
+01FC:  BCF    F81.1
+01FE:  BCF    F81.0
+0200:  BCF    F80.1
+0202:  BCF    F80.0
+.................... 	delay_ms(750); 
+0204:  MOVLW  03
+0206:  MOVWF  79
+0208:  MOVLW  FA
+020A:  MOVWF  7A
+020C:  RCALL  016E
+020E:  DECFSZ 79,F
+0210:  BRA    0208
+.................... 	 
+.................... 	cur_cmd = CMD_DONE; 
+0212:  CLRF   66
+.................... 	servo_val = SERVO_VAL_STOP; 
+0214:  CLRF   65
+.................... 	SERVO_PWR = false; 
+0216:  BCF    F82.2
+.................... 	 
+.................... } 
+0218:  GOTO   0CD8 (RETURN)
+....................  
+....................  
+.................... void main() 
+.................... { 
+*
+0C7A:  CLRF   FF8
+0C7C:  BCF    FD0.7
+0C7E:  BSF    07.7
+0C80:  CLRF   FEA
+0C82:  CLRF   FE9
+0C84:  MOVLW  70
+0C86:  MOVWF  FD3
+0C88:  MOVLW  40
+0C8A:  MOVWF  F9B
+0C8C:  MOVF   FD3,W
+0C8E:  MOVF   FC1,W
+0C90:  ANDLW  C0
+0C92:  IORLW  0F
+0C94:  MOVWF  FC1
+0C96:  MOVLW  07
+0C98:  MOVWF  FB4
+0C9A:  CLRF   5A
+0C9C:  CLRF   5B
+0C9E:  CLRF   5C
+0CA0:  CLRF   5D
+0CA2:  BCF    64.0
+0CA4:  BCF    64.1
+0CA6:  CLRF   65
+0CA8:  CLRF   66
+0CAA:  CLRF   67
+0CAC:  CLRF   68
+0CAE:  CLRF   69
+0CB0:  CLRF   6A
+0CB2:  CLRF   6B
+0CB4:  CLRF   6C
+0CB6:  CLRF   6D
+0CB8:  CLRF   6E
+0CBA:  CLRF   6F
+0CBC:  CLRF   70
+0CBE:  CLRF   71
+0CC0:  CLRF   72
+0CC2:  CLRF   73
+0CC4:  CLRF   74
+0CC6:  CLRF   75
+0CC8:  CLRF   76
+.................... 	int8 c; 
+.................... 		 
+.................... 	setup_oscillator(OSC_32MHZ); 
+0CCA:  MOVLW  70
+0CCC:  MOVWF  FD3
+0CCE:  MOVLW  40
+0CD0:  MOVWF  F9B
+0CD2:  MOVF   FD3,W
+.................... 	InitHardware(); 
+0CD4:  GOTO   0194
+.................... 	init_i2c_device(); 
+0CD8:  GOTO   021C
+.................... 	Init_RF12RX(); 
+0CDC:  GOTO   028E
+.................... 		 
+....................   	c = readRegister(0x0D);  			// Read WHO_AM_I register 
+0CE0:  MOVLW  0D
+0CE2:  MOVWF  7B
+0CE4:  CALL   0472
+0CE8:  MOVFF  01,77
+.................... 	if (c == 0x2A){		 				// WHO_AM_I should always be 0x2A   
+0CEC:  MOVF   77,W
+0CEE:  SUBLW  2A
+0CF0:  BNZ   0CFA
+.................... 		initMMA8452(SCALE, 0);  		// init the accelerometer if communication is OK 
+0CF2:  MOVLW  02
+0CF4:  MOVWF  78
+0CF6:  CLRF   79
+0CF8:  BRA    059E
+.................... 	} 
+.................... 	 
+.................... 	// preload all the smoothing registers to filter accelerometer inputs 
+.................... 	for (c=0; c<ADC_DATA_MAX; c++){ 
+0CFA:  CLRF   77
+0CFC:  MOVF   77,W
+0CFE:  SUBLW  0F
+0D00:  BNC   0D5C
+.................... 		readAccelData(accelCount);  		// Read the x/y/z adc values 
+0D02:  CLRF   79
+0D04:  MOVLW  5E
+0D06:  MOVWF  78
+0D08:  RCALL  06E2
+.................... 		accelCount[1] = 0-accelCount[1];	// we only care about Y axis, keep it positive! 
+0D0A:  COMF   60,F
+0D0C:  COMF   61,F
+0D0E:  INCF   60,F
+0D10:  BTFSC  FD8.2
+0D12:  INCF   61,F
+.................... 		adc_smooth = calc_smooth_val((signed int32)accelCount[1], &adc_raw, ADC_DATA_MAX); 
+0D14:  CLRF   7B
+0D16:  CLRF   7A
+0D18:  MOVFF  61,79
+0D1C:  MOVFF  60,78
+0D20:  BTFSS  61.7
+0D22:  BRA    0D28
+0D24:  DECF   7A,F
+0D26:  DECF   7B,F
+0D28:  CLRF   7D
+0D2A:  MOVLW  1A
+0D2C:  MOVFF  7B,81
+0D30:  MOVFF  7A,80
+0D34:  MOVFF  79,7F
+0D38:  MOVFF  78,7E
+0D3C:  MOVFF  7D,83
+0D40:  MOVWF  x82
+0D42:  MOVLW  10
+0D44:  MOVWF  x84
+0D46:  RCALL  0874
+0D48:  MOVFF  03,5D
+0D4C:  MOVFF  02,5C
+0D50:  MOVFF  01,5B
+0D54:  MOVFF  00,5A
+.................... 	} 
+0D58:  INCF   77,F
+0D5A:  BRA    0CFC
+.................... 	 
+.................... 	for (;;){ 
+.................... 		if (b50ms){ 
+0D5C:  BTFSS  64.0
+0D5E:  BRA    0D68
+.................... 			b50ms = false; 
+0D60:  BCF    64.0
+.................... 			HandleEvents(); 
+0D62:  BRA    0996
+.................... 			HandleUILeds(); 
+0D64:  BRA    0AAC
+.................... 			HandleUIButtons(); 
+0D66:  BRA    0ACC
+.................... 		} 
+.................... 		 
+.................... 		HandleRfTraffic(); 
+0D68:  BRA    0B70
+.................... 		 
+.................... 	} 
+0D6A:  BRA    0D5C
+.................... } 
+....................  
+.................... #INT_TIMER2 
+.................... void timer2_isr() 
+0D6C:  SLEEP 
+.................... {	 
+.................... 	static int8 count; 
+.................... 	static int8 servo_frame; 
+.................... 	static int8 servo_counter; 
+.................... 	 
+.................... 	if (count++ > 49){ 
+*
+00BA:  MOVF   74,W
+00BC:  INCF   74,F
+00BE:  SUBLW  31
+00C0:  BC    00C6
+.................... 		count = 0;  
+00C2:  CLRF   74
+.................... 		b50ms = true; 
+00C4:  BSF    64.0
+.................... 	} 
+.................... 	 
+.................... 	if (servo_counter<servo_val){ 
+00C6:  MOVF   65,W
+00C8:  SUBWF  76,W
+00CA:  BC    00D2
+.................... 		servo_counter++; 
+00CC:  INCF   76,F
+.................... 		SERVO_CS = true;	 
+00CE:  BSF    F81.4
+.................... 	} else { 
+00D0:  BRA    00D4
+.................... 		SERVO_CS = false; 
+00D2:  BCF    F81.4
+.................... 	}	 
+....................  
+.................... 	if (servo_frame++ > 19){ 
+00D4:  MOVF   75,W
+00D6:  INCF   75,F
+00D8:  SUBLW  13
+00DA:  BC    00E0
+.................... 		servo_counter = 0; 
+00DC:  CLRF   76
+.................... 		servo_frame = 0; 
+00DE:  CLRF   75
+.................... 	}	 
+.................... } 
+....................  
+00E0:  BCF    F9E.1
+00E2:  GOTO   006C
+.................... #INT_RB 
+.................... void portb_isr() 
+.................... { 
+.................... 	int8	pb; 
+.................... 	int8	rx; 
+.................... 	 
+.................... 	if (!RF_IRQ && !bRX_ready){		// we have an RF interrupt and packet still not complete  
+*
+0128:  BTFSC  F81.5
+012A:  BRA    0162
+012C:  BTFSC  64.1
+012E:  BRA    0162
+.................... 		rx = RF12_RDFIFO();			// load byte with rf fifo 
+0130:  RCALL  00E6
+0132:  MOVFF  01,9F
+.................... 		if (rx == START_ID) in_ptr = 0; 
+0136:  MOVF   x9F,W
+0138:  SUBLW  52
+013A:  BNZ   0140
+013C:  CLRF   72
+.................... 		else in_ptr++; 
+013E:  BRA    0142
+0140:  INCF   72,F
+.................... 		if (in_ptr > RF_LEN){ 
+0142:  MOVF   72,W
+0144:  SUBLW  08
+0146:  BC    0150
+.................... 			bRX_ready = TRUE;		// signal that we are ready to decode packet 
+0148:  BSF    64.1
+.................... 			in_ptr = RF_MAX; 
+014A:  MOVLW  0A
+014C:  MOVWF  72
+.................... 		} else { 
+014E:  BRA    0162
+.................... 			RF_RXBUF[in_ptr] = rx; 
+0150:  CLRF   03
+0152:  MOVF   72,W
+0154:  ADDLW  68
+0156:  MOVWF  FE9
+0158:  MOVLW  00
+015A:  ADDWFC 03,W
+015C:  MOVWF  FEA
+015E:  MOVFF  9F,FEF
+.................... 		} 
+.................... 	} 
+....................  
+.................... 	pb = PORTB;				// end mismatch condition 
+0162:  MOVFF  F81,9E
+.................... 	RBIF = 0;				// clear port b change interrupt flag	 
+0166:  BCF    FF2.0
+.................... 	 
+.................... }	 
+0168:  BCF    FF2.0
+016A:  GOTO   006C
+
+Configuration Fuses:
+   Word  1: C800   INTRC_IO IESO FCMEN
+   Word  2: 1E1E   NOWDT PUT BROWNOUT BORV20 WDT32768
+   Word  3: 8700   CCP2C1 LPT1OSC PBADEN MCLR
+   Word  4: 0081   STVREN NODEBUG NOLVP NOXINST
+   Word  5: 8000   PROTECT CPB NOCPD
+   Word  6: E00F   NOWRT NOWRTC NOWRTD NOWRTB
+   Word  7: 400F   NOEBTR NOEBTRB

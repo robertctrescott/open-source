@@ -1,0 +1,655 @@
+_Set_CSW:
+  begin   (midx: 0)
+//usb_bot.c,273 :: 		void Set_CSW (u8 CSW_Status, u8 Send_Permission)
+_Set_CSW:
+  begin   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	FARG_Set_CSW_Send_Permission <1> <- R1   (midx: 0)
+   (midx: 0)
+//usb_bot.c,275 :: 		CSW.dSignature = BOT_CSW_SIGNATURE;
+	R3 <4> <- 1396855637   (midx: 0)
+	R2 <4> <- addr(_CSW+0)   (midx: 0)
+	[R2] <4> <- R3   (midx: 0)
+//usb_bot.c,276 :: 		CSW.bStatus = CSW_Status;
+	R2 <4> <- addr(_CSW+12)   (midx: 0)
+   (midx: 0)
+	[R2] <1> <- R0   (midx: 0)
+//usb_bot.c,278 :: 		UserToPMABufferCopy(((u8 *)& CSW), ENDP1_TXADDR, CSW_DATA_LENGTH);
+	R2 <1> <- 13   (midx: 0)
+	R1 <1> <- 152   (midx: 0)
+	R0 <4> <- #_CSW   (midx: 0)
+	CALL _UserToPMABufferCopy   (midx: 0)
+//usb_bot.c,280 :: 		SetEPTxCount(ENDP1, CSW_DATA_LENGTH);
+	R1 <1> <- 13   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _SetEPTxCount   (midx: 0)
+//usb_bot.c,281 :: 		Bot_State = BOT_ERROR;
+	R3 <1> <- 5   (midx: 0)
+	R2 <4> <- addr(_Bot_State)   (midx: 0)
+	[R2] <1> <- R3   (midx: 0)
+//usb_bot.c,282 :: 		if (Send_Permission)
+	R2 <1> <- FARG_Set_CSW_Send_Permission   (midx: 0)
+	if (!R2) then goto 54   (midx: 0)
+//usb_bot.c,284 :: 		Bot_State = BOT_CSW_Send;
+	R3 <1> <- 4   (midx: 0)
+	R2 <4> <- addr(_Bot_State)   (midx: 0)
+	[R2] <1> <- R3   (midx: 0)
+//usb_bot.c,285 :: 		SetEPTxStatus(ENDP1, EP_TX_VALID);
+	R1 <1> <- 48   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _SetEPTxStatus   (midx: 0)
+//usb_bot.c,286 :: 		}
+54:   (midx: 0)
+  end
+   (midx: 0)
+_Mass_Storage_In:
+  begin   (midx: 0)
+//usb_bot.c,45 :: 		void Mass_Storage_In (void)
+_Mass_Storage_In:
+  begin   (midx: 0)
+//usb_bot.c,47 :: 		switch (Bot_State)
+	goto	0   (midx: 0)
+//usb_bot.c,49 :: 		case BOT_CSW_Send:
+2:   (midx: 0)
+//usb_bot.c,50 :: 		case BOT_ERROR:
+3:   (midx: 0)
+//usb_bot.c,51 :: 		Bot_State = BOT_IDLE;
+	R1 <1> <- 0   (midx: 0)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	[R0] <1> <- R1   (midx: 0)
+//usb_bot.c,52 :: 		SetEPRxStatus(ENDP2, EP_RX_VALID);/* enable the Endpoint to recive the next cmd*/
+	R1 <1> <- 12288   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _SetEPRxStatus   (midx: 0)
+//usb_bot.c,53 :: 		break;
+	goto	1   (midx: 0)
+//usb_bot.c,54 :: 		case BOT_DATA_IN:
+4:   (midx: 0)
+//usb_bot.c,55 :: 		switch (CBW.CB[0])
+	goto	5   (midx: 0)
+//usb_bot.c,57 :: 		case SCSI_READ10:
+7:   (midx: 0)
+//usb_bot.c,58 :: 		SCSI_Read10_Cmd();
+	CALL _SCSI_Read10_Cmd   (midx: 0)
+//usb_bot.c,59 :: 		break;
+	goto	6   (midx: 0)
+//usb_bot.c,60 :: 		}
+5:   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 40) then goto 7   (midx: 0)
+6:   (midx: 0)
+//usb_bot.c,61 :: 		break;
+	goto	1   (midx: 0)
+//usb_bot.c,62 :: 		case BOT_DATA_IN_LAST:
+8:   (midx: 0)
+//usb_bot.c,63 :: 		Set_CSW (CSW_CMD_PASSED, SEND_CSW_ENABLE);
+	R1 <1> <- 1   (midx: 0)
+	R0 <1> <- 0   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//usb_bot.c,64 :: 		SetEPRxStatus(ENDP2, EP_RX_VALID);
+	R1 <1> <- 12288   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _SetEPRxStatus   (midx: 0)
+//usb_bot.c,65 :: 		break;
+	goto	1   (midx: 0)
+//usb_bot.c,67 :: 		default:
+9:   (midx: 0)
+//usb_bot.c,68 :: 		break;
+	goto	1   (midx: 0)
+//usb_bot.c,69 :: 		}
+0:   (midx: 0)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 4) then goto 2   (midx: 0)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 5) then goto 3   (midx: 0)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 2) then goto 4   (midx: 0)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 3) then goto 8   (midx: 0)
+	goto	9   (midx: 0)
+1:   (midx: 0)
+  end
+   (midx: 0)
+_Bot_Abort:
+  begin   (midx: 0)
+//usb_bot.c,297 :: 		void Bot_Abort(u8 Direction)
+_Bot_Abort:
+  begin   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	R0 <1> <- R0   (midx: 0)
+   (midx: 0)
+//usb_bot.c,299 :: 		switch (Direction)
+   (midx: 0)
+	goto	55   (midx: 0)
+//usb_bot.c,301 :: 		case DIR_IN :
+57:   (midx: 0)
+//usb_bot.c,302 :: 		SetEPTxStatus(ENDP1, EP_TX_STALL);
+	R1 <1> <- 16   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _SetEPTxStatus   (midx: 0)
+//usb_bot.c,303 :: 		break;
+	goto	56   (midx: 0)
+//usb_bot.c,304 :: 		case DIR_OUT :
+58:   (midx: 0)
+//usb_bot.c,305 :: 		SetEPRxStatus(ENDP2, EP_RX_STALL);
+	R1 <1> <- 4096   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _SetEPRxStatus   (midx: 0)
+//usb_bot.c,306 :: 		break;
+	goto	56   (midx: 0)
+//usb_bot.c,307 :: 		case BOTH_DIR :
+59:   (midx: 0)
+//usb_bot.c,308 :: 		SetEPTxStatus(ENDP1, EP_TX_STALL);
+	R1 <1> <- 16   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _SetEPTxStatus   (midx: 0)
+//usb_bot.c,309 :: 		SetEPRxStatus(ENDP2, EP_RX_STALL);
+	R1 <1> <- 4096   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _SetEPRxStatus   (midx: 0)
+//usb_bot.c,310 :: 		break;
+	goto	56   (midx: 0)
+//usb_bot.c,311 :: 		default:
+60:   (midx: 0)
+//usb_bot.c,312 :: 		break;
+	goto	56   (midx: 0)
+//usb_bot.c,313 :: 		}
+55:   (midx: 0)
+   (midx: 0)
+	if ( R0 = 0) then goto 57   (midx: 0)
+	if ( R0 = 1) then goto 58   (midx: 0)
+   (midx: 0)
+	if ( R0 = 2) then goto 59   (midx: 0)
+	goto	60   (midx: 0)
+56:   (midx: 0)
+  end
+   (midx: 0)
+_CBW_Decode:
+  begin   (midx: 0)
+//usb_bot.c,118 :: 		void CBW_Decode(void)
+_CBW_Decode:
+  begin   (midx: 0)
+//usb_bot.c,122 :: 		for (Counter = 0; Counter < Data_Len; Counter++)
+   (midx: 0)
+   (midx: 0)
+	R2 <4> <- 0   (midx: 0)
+	R2 <4> <- R2   (midx: 0)
+16:   (midx: 0)
+   (midx: 0)
+	R0 <4> <- addr(_Data_Len)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R2 >= R0) then goto 17   (midx: 2)
+//usb_bot.c,124 :: 		*((u8 *)&CBW + Counter) = Bulk_Data_Buff[Counter];
+	R0 <4> <- #_CBW   (midx: 0)
+	R1 <4> <-  R0 + R2   (midx: 2)
+	R0 <4> <- #_Bulk_Data_Buff   (midx: 0)
+	R0 <4> <-  R0 + R2   (midx: 2)
+	R0 <1> <- *R0   (midx: 0)
+	[R1] <1> <- R0   (midx: 0)
+//usb_bot.c,122 :: 		for (Counter = 0; Counter < Data_Len; Counter++)
+	R2 <4> <-  R2 + 1   (midx: 2)
+	R2 <4> <- R2   (midx: 0)
+//usb_bot.c,125 :: 		}
+   (midx: 0)
+	R2 <4> <- R2   (midx: 0)
+	goto	16   (midx: 0)
+17:   (midx: 0)
+//usb_bot.c,126 :: 		CSW.dTag = CBW.dTag;
+	R0 <4> <- addr(_CBW+4)   (midx: 0)
+	R1 <4> <- [R0]   (midx: 0)
+	R0 <4> <- addr(_CSW+4)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//usb_bot.c,127 :: 		CSW.dDataResidue = CBW.dDataLength;
+	R0 <4> <- addr(_CBW+8)   (midx: 0)
+	R1 <4> <- [R0]   (midx: 0)
+	R0 <4> <- addr(_CSW+8)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//usb_bot.c,128 :: 		if (Data_Len != BOT_CBW_PACKET_LENGTH)
+	R0 <4> <- addr(_Data_Len)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 31) then goto 19   (midx: 0)
+//usb_bot.c,130 :: 		Bot_Abort(BOTH_DIR);
+	R0 <1> <- 2   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_bot.c,132 :: 		CBW.dSignature = 0;
+	R1 <4> <- 0   (midx: 0)
+	R0 <4> <- addr(_CBW+0)   (midx: 0)
+	[R0] <4> <- R1   (midx: 0)
+//usb_bot.c,133 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, PARAMETER_LIST_LENGTH_ERROR);
+	R1 <1> <- 26   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//usb_bot.c,134 :: 		Set_CSW (CSW_CMD_FAILED, SEND_CSW_DISABLE);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//usb_bot.c,135 :: 		return;
+	return   (midx: 0)
+//usb_bot.c,136 :: 		}
+19:   (midx: 0)
+//usb_bot.c,138 :: 		if (CBW.dSignature == BOT_CBW_SIGNATURE)
+	R0 <4> <- addr(_CBW+0)   (midx: 0)
+	R1 <4> <- [R0]   (midx: 0)
+	R0 <4> <- 1128420181   (midx: 0)
+	if ( R1 != R0) then goto 20   (midx: 2)
+//usb_bot.c,141 :: 		if ((CBW.bLUN != 0) || (CBW.bCBLength < 1) || (CBW.bCBLength > 16))
+	R0 <4> <- addr(_CBW+13)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 != 0) then goto 64   (midx: 0)
+	R0 <4> <- addr(_CBW+14)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 < 1) then goto 63   (midx: 0)
+	R0 <4> <- addr(_CBW+14)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 > 16) then goto 62   (midx: 0)
+	goto	23   (midx: 0)
+64:   (midx: 0)
+63:   (midx: 0)
+62:   (midx: 0)
+//usb_bot.c,143 :: 		Bot_Abort(BOTH_DIR);
+	R0 <1> <- 2   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_bot.c,144 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, INVALID_FIELED_IN_COMMAND);
+	R1 <1> <- 36   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//usb_bot.c,145 :: 		Set_CSW (CSW_CMD_FAILED, SEND_CSW_DISABLE);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//usb_bot.c,146 :: 		}
+	goto	24   (midx: 0)
+23:   (midx: 0)
+//usb_bot.c,149 :: 		switch (CBW.CB[0])
+	goto	25   (midx: 0)
+//usb_bot.c,151 :: 		case SCSI_REQUEST_SENSE:
+27:   (midx: 0)
+//usb_bot.c,152 :: 		SCSI_RequestSense_Cmd ();
+	CALL _SCSI_RequestSense_Cmd   (midx: 0)
+//usb_bot.c,153 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,154 :: 		case SCSI_INQUIRY:
+28:   (midx: 0)
+//usb_bot.c,155 :: 		SCSI_Inquiry_Cmd();
+	CALL _SCSI_Inquiry_Cmd   (midx: 0)
+//usb_bot.c,156 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,157 :: 		case SCSI_START_STOP_UNIT:
+29:   (midx: 0)
+//usb_bot.c,158 :: 		SCSI_Start_Stop_Unit_Cmd();
+	CALL _SCSI_Start_Stop_Unit_Cmd   (midx: 0)
+//usb_bot.c,159 :: 		case SCSI_ALLOW_MEDIUM_REMOVAL:
+30:   (midx: 0)
+//usb_bot.c,160 :: 		SCSI_Start_Stop_Unit_Cmd();
+	CALL _SCSI_Start_Stop_Unit_Cmd   (midx: 0)
+//usb_bot.c,161 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,162 :: 		case SCSI_MODE_SENSE6:
+31:   (midx: 0)
+//usb_bot.c,163 :: 		SCSI_ModeSense6_Cmd ();
+	CALL _SCSI_ModeSense6_Cmd   (midx: 0)
+//usb_bot.c,164 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,165 :: 		case SCSI_MODE_SENSE10:
+32:   (midx: 0)
+//usb_bot.c,166 :: 		SCSI_ModeSense10_Cmd ();
+	CALL _SCSI_ModeSense10_Cmd   (midx: 0)
+//usb_bot.c,167 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,168 :: 		case SCSI_READ_FORMAT_CAPACITIES:
+33:   (midx: 0)
+//usb_bot.c,169 :: 		SCSI_ReadFormatCapacity_Cmd();
+	CALL _SCSI_ReadFormatCapacity_Cmd   (midx: 0)
+//usb_bot.c,170 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,171 :: 		case SCSI_READ_CAPACITY10:
+34:   (midx: 0)
+//usb_bot.c,172 :: 		SCSI_ReadCapacity10_Cmd();
+	CALL _SCSI_ReadCapacity10_Cmd   (midx: 0)
+//usb_bot.c,173 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,174 :: 		case SCSI_TEST_UNIT_READY:
+35:   (midx: 0)
+//usb_bot.c,175 :: 		SCSI_TestUnitReady_Cmd();
+	CALL _SCSI_Valid_Cmd   (midx: 0)
+//usb_bot.c,176 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,177 :: 		case SCSI_READ10:
+36:   (midx: 0)
+//usb_bot.c,178 :: 		SCSI_Read10_Cmd();
+	CALL _SCSI_Read10_Cmd   (midx: 0)
+//usb_bot.c,179 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,180 :: 		case SCSI_WRITE10:
+37:   (midx: 0)
+//usb_bot.c,181 :: 		SCSI_Write10_Cmd();
+	CALL _SCSI_Write10_Cmd   (midx: 0)
+//usb_bot.c,182 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,183 :: 		case SCSI_VERIFY10:
+38:   (midx: 0)
+//usb_bot.c,184 :: 		SCSI_Verify10_Cmd();
+	CALL _SCSI_Verify10_Cmd   (midx: 0)
+//usb_bot.c,185 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,188 :: 		case SCSI_MODE_SELECT10:
+39:   (midx: 0)
+//usb_bot.c,189 :: 		SCSI_Mode_Select10_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,190 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,191 :: 		case SCSI_MODE_SELECT6:
+40:   (midx: 0)
+//usb_bot.c,192 :: 		SCSI_Mode_Select6_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,193 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,194 :: 		case SCSI_FORMAT_UNIT:
+41:   (midx: 0)
+//usb_bot.c,195 :: 		SCSI_FormatUnit_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,196 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,197 :: 		case SCSI_SEND_DIAGNOSTIC:
+42:   (midx: 0)
+//usb_bot.c,198 :: 		SCSI_Send_Diagnostic_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,199 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,200 :: 		case SCSI_READ6:
+43:   (midx: 0)
+//usb_bot.c,201 :: 		SCSI_Read6_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,202 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,203 :: 		case SCSI_READ12:
+44:   (midx: 0)
+//usb_bot.c,204 :: 		SCSI_Read12_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,205 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,206 :: 		case SCSI_READ16:
+45:   (midx: 0)
+//usb_bot.c,207 :: 		SCSI_Read16_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,208 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,209 :: 		case SCSI_READ_CAPACITY16:
+46:   (midx: 0)
+//usb_bot.c,210 :: 		SCSI_READ_CAPACITY16_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,211 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,212 :: 		case SCSI_WRITE6:
+47:   (midx: 0)
+//usb_bot.c,213 :: 		SCSI_Write6_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,214 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,215 :: 		case SCSI_WRITE12:
+48:   (midx: 0)
+//usb_bot.c,216 :: 		SCSI_Write12_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,217 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,218 :: 		case SCSI_WRITE16:
+49:   (midx: 0)
+//usb_bot.c,219 :: 		SCSI_Write16_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,220 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,221 :: 		case SCSI_VERIFY12:
+50:   (midx: 0)
+//usb_bot.c,222 :: 		SCSI_Verify12_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,223 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,224 :: 		case SCSI_VERIFY16:
+51:   (midx: 0)
+//usb_bot.c,225 :: 		SCSI_Verify16_Cmd();
+	CALL _SCSI_Invalid_Cmd   (midx: 0)
+//usb_bot.c,226 :: 		break;
+	goto	26   (midx: 0)
+//usb_bot.c,228 :: 		default:
+52:   (midx: 0)
+//usb_bot.c,230 :: 		Bot_Abort(BOTH_DIR);
+	R0 <1> <- 2   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_bot.c,231 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, INVALID_COMMAND);
+	R1 <1> <- 32   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//usb_bot.c,232 :: 		Set_CSW (CSW_CMD_FAILED, SEND_CSW_DISABLE);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//usb_bot.c,234 :: 		}
+	goto	26   (midx: 0)
+25:   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 3) then goto 27   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 18) then goto 28   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 27) then goto 29   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 30) then goto 30   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 26) then goto 31   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 90) then goto 32   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 35) then goto 33   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 37) then goto 34   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 0) then goto 35   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 40) then goto 36   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 42) then goto 37   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 47) then goto 38   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 85) then goto 39   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 21) then goto 40   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 4) then goto 41   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 29) then goto 42   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 8) then goto 43   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 168) then goto 44   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 136) then goto 45   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 158) then goto 46   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 10) then goto 47   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 170) then goto 48   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 138) then goto 49   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 175) then goto 50   (midx: 0)
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 143) then goto 51   (midx: 0)
+	goto	52   (midx: 0)
+26:   (midx: 0)
+//usb_bot.c,235 :: 		}
+24:   (midx: 0)
+//usb_bot.c,236 :: 		}
+	goto	53   (midx: 0)
+20:   (midx: 0)
+//usb_bot.c,240 :: 		Bot_Abort(BOTH_DIR);
+	R0 <1> <- 2   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_bot.c,241 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, INVALID_COMMAND);
+	R1 <1> <- 32   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//usb_bot.c,242 :: 		Set_CSW (CSW_CMD_FAILED, SEND_CSW_DISABLE);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//usb_bot.c,243 :: 		}
+53:   (midx: 0)
+  end
+   (midx: 0)
+_Mass_Storage_Out:
+  begin   (midx: 0)
+//usb_bot.c,79 :: 		void Mass_Storage_Out (void)
+_Mass_Storage_Out:
+  begin   (midx: 0)
+//usb_bot.c,82 :: 		CMD = CBW.CB[0];
+	R0 <4> <- addr(_CBW+15)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	Mass_Storage_Out_CMD_L0 <1> <- R0   (midx: 0)
+//usb_bot.c,83 :: 		Data_Len = GetEPRxCount(ENDP2);
+	R0 <1> <- 2   (midx: 0)
+	CALL _GetEPRxCount   (midx: 0)
+	R1 <4> <- addr(_Data_Len)   (midx: 0)
+	[R1] <1> <- R0   (midx: 0)
+//usb_bot.c,85 :: 		PMAToUserBufferCopy(Bulk_Data_Buff, ENDP2_RXADDR, Data_Len);
+	R0 <1> <- R0   (midx: 0)
+	R2 <1> <- R0   (midx: 0)
+	R1 <1> <- 216   (midx: 0)
+	R0 <4> <- #_Bulk_Data_Buff   (midx: 0)
+	CALL _PMAToUserBufferCopy   (midx: 0)
+//usb_bot.c,87 :: 		switch (Bot_State)
+	goto	10   (midx: 0)
+//usb_bot.c,89 :: 		case BOT_IDLE:
+12:   (midx: 0)
+//usb_bot.c,90 :: 		CBW_Decode();
+	CALL _CBW_Decode   (midx: 0)
+//usb_bot.c,91 :: 		break;
+	goto	11   (midx: 0)
+//usb_bot.c,92 :: 		case BOT_DATA_OUT:
+13:   (midx: 0)
+//usb_bot.c,93 :: 		if (CMD == SCSI_WRITE10)
+	R0 <1> <- Mass_Storage_Out_CMD_L0   (midx: 0)
+	if ( R0 != 42) then goto 14   (midx: 0)
+//usb_bot.c,95 :: 		SCSI_Write10_Cmd();
+	CALL _SCSI_Write10_Cmd   (midx: 0)
+//usb_bot.c,96 :: 		break;
+	goto	11   (midx: 0)
+//usb_bot.c,97 :: 		}
+14:   (midx: 0)
+//usb_bot.c,98 :: 		Bot_Abort(DIR_OUT);
+	R0 <1> <- 1   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_bot.c,99 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, INVALID_FIELED_IN_COMMAND);
+	R1 <1> <- 36   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//usb_bot.c,100 :: 		Set_CSW (CSW_PHASE_ERROR, SEND_CSW_DISABLE);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//usb_bot.c,101 :: 		break;
+	goto	11   (midx: 0)
+//usb_bot.c,102 :: 		default:
+15:   (midx: 0)
+//usb_bot.c,103 :: 		Bot_Abort(BOTH_DIR);
+	R0 <1> <- 2   (midx: 0)
+	CALL _Bot_Abort   (midx: 0)
+//usb_bot.c,104 :: 		Set_Scsi_Sense_Data(ILLEGAL_REQUEST, INVALID_FIELED_IN_COMMAND);
+	R1 <1> <- 36   (midx: 0)
+	R0 <1> <- 5   (midx: 0)
+	CALL _Set_Scsi_Sense_Data   (midx: 0)
+//usb_bot.c,105 :: 		Set_CSW (CSW_PHASE_ERROR, SEND_CSW_DISABLE);
+	R1 <1> <- 0   (midx: 0)
+	R0 <1> <- 2   (midx: 0)
+	CALL _Set_CSW   (midx: 0)
+//usb_bot.c,106 :: 		break;
+	goto	11   (midx: 0)
+//usb_bot.c,107 :: 		}
+10:   (midx: 0)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 0) then goto 12   (midx: 0)
+	R0 <4> <- addr(_Bot_State)   (midx: 0)
+	R0 <1> <- [R0]   (midx: 0)
+	if ( R0 = 1) then goto 13   (midx: 0)
+	goto	15   (midx: 0)
+11:   (midx: 0)
+  end
+   (midx: 0)
+_Transfer_Data_Request:
+  begin   (midx: 0)
+//usb_bot.c,254 :: 		void Transfer_Data_Request(u8* Data_Pointer, u16 Data_Len)
+_Transfer_Data_Request:
+  begin   (midx: 0)
+   (midx: 0)
+	R0 <4> <- R0   (midx: 0)
+   (midx: 0)
+   (midx: 0)
+	FARG_Transfer_Data_Request_Data_Len <1> <- R1   (midx: 0)
+   (midx: 0)
+//usb_bot.c,256 :: 		UserToPMABufferCopy(Data_Pointer, ENDP1_TXADDR, Data_Len);
+	R2 <1> <- FARG_Transfer_Data_Request_Data_Len   (midx: 0)
+	R1 <1> <- 152   (midx: 0)
+   (midx: 0)
+	R0 <4> <- R0   (midx: 0)
+	CALL _UserToPMABufferCopy   (midx: 0)
+//usb_bot.c,258 :: 		SetEPTxCount(ENDP1, Data_Len);
+	R1 <1> <- FARG_Transfer_Data_Request_Data_Len   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _SetEPTxCount   (midx: 0)
+//usb_bot.c,259 :: 		SetEPTxStatus(ENDP1, EP_TX_VALID);
+	R1 <1> <- 48   (midx: 0)
+	R0 <1> <- 1   (midx: 0)
+	CALL _SetEPTxStatus   (midx: 0)
+//usb_bot.c,260 :: 		Bot_State = BOT_DATA_IN_LAST;
+	R3 <1> <- 3   (midx: 0)
+	R2 <4> <- addr(_Bot_State)   (midx: 0)
+	[R2] <1> <- R3   (midx: 0)
+//usb_bot.c,261 :: 		CSW.dDataResidue -= Data_Len;
+	R4 <4> <- FARG_Transfer_Data_Request_Data_Len   (midx: 0)
+	R3 <4> <- addr(_CSW+8)   (midx: 0)
+	R2 <4> <- [R3]   (midx: 0)
+	R2 <4> <-  R2 - R4   (midx: 2)
+	[R3] <4> <- R2   (midx: 0)
+//usb_bot.c,262 :: 		CSW.bStatus = CSW_CMD_PASSED;
+	R3 <1> <- 0   (midx: 0)
+	R2 <4> <- addr(_CSW+12)   (midx: 0)
+	[R2] <1> <- R3   (midx: 0)
+  end
+   (midx: 0)
