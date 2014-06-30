@@ -38,11 +38,11 @@
 #define	VERSION		    "1.02"
 #export (hex,file="SHADES1_02.hex")
 
-#define START_ID		0x52		
-#define TX_ID			0xA0
-#define	SRC_ID			0x30
-#define RX_ID			0xB0
-#define UNIT_ID			0x31
+#define START_ID		0x12		
+#define TX_ID			0x10
+#define	SRC_ID			0x10
+#define RX_ID			0x30
+#define UNIT_ID			0x11
 
 #define false			0
 #define true			1
